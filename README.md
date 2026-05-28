@@ -11,17 +11,17 @@ Built for use alongside Google Drive, Notion, and Odoo Knowledge.
 
 | Page | URL |
 |------|-----|
-| Phase Map | [/index.html](https://patrick-scm-solution.github.io/SCM-hardware-dev-system/index.html) |
-| ME Asset Checklist | [/checklists/me-assets.html](https://patrick-scm-solution.github.io/SCM-hardware-dev-system/checklists/me-assets.html) |
-| EE Asset Checklist | [/checklists/ee-assets.html](https://patrick-scm-solution.github.io/SCM-hardware-dev-system/checklists/ee-assets.html) |
-| CMF & Materials | [/checklists/cmf-materials.html](https://patrick-scm-solution.github.io/SCM-hardware-dev-system/checklists/cmf-materials.html) |
-| Tooling & Molds | [/checklists/tooling-molds.html](https://patrick-scm-solution.github.io/SCM-hardware-dev-system/checklists/tooling-molds.html) |
-| Packaging Engineering | [/checklists/packaging.html](https://patrick-scm-solution.github.io/SCM-hardware-dev-system/checklists/packaging.html) |
-| Handoff Manifest Builder | [/tools/handoff-manifest.html](https://patrick-scm-solution.github.io/SCM-hardware-dev-system/tools/handoff-manifest.html) |
-| Project Asset Registry | [/tools/project-asset-registry.html](https://patrick-scm-solution.github.io/SCM-hardware-dev-system/tools/project-asset-registry.html) |
-| Chinese SCM Reference | [/tools/chinese-srs.html](https://patrick-scm-solution.github.io/SCM-hardware-dev-system/tools/chinese-srs.html) |
-| Shared Stylesheet | [/css/scm-styles.css](https://patrick-scm-solution.github.io/SCM-hardware-dev-system/css/scm-styles.css) |
-
+| Phase Map | https://patrick-scm-solution.github.io/SCM-Bridge-OS/index.html |
+| ME Asset Checklist | https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/me-assets.html |
+| EE Asset Checklist | https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/ee-assets.html |
+| CMF & Materials | https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/cmf-materials.html |
+| Tooling & Molds | https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/tooling-molds.html |
+| Packaging Engineering | https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/packaging.html |
+| Handoff Manifest Builder | https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/handoff-manifest.html |
+| Project Asset Registry | https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/project-asset-registry.html |
+| Chinese SCM Reference | https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/chinese-srs.html |
+| SCM Dashboard | https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/scm-dashboard-v2.html |
+| Shared Stylesheet | https://patrick-scm-solution.github.io/SCM-Bridge-OS/css/scm-styles.css |
 ---
 
 ## Repository Structure
@@ -41,7 +41,7 @@ SCM-hardware-dev-system/
 └── tools/
     ├── handoff-manifest.html         ← Handoff Manifest Builder
     ├── project-asset-registry.html   ← Project Asset Registry
-    ├── scm-dashboard-v2.html         ← Operations Dashboard
+    ├── scm-dashboard-v3.html         ← Operations Dashboard
     ├── Factory-Onsite-Audit-APP      ← Web Based App for Onsite Audits
     └── chinese-srs.html              ← Chinese SCM Vocabulary Reference
 ```
