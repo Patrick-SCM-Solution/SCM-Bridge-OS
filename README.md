@@ -4,8 +4,7 @@ A structured reference and tooling system for hardware product development, cove
 
 Built for use alongside Google Drive, Notion, and Odoo Knowledge.
 
-**Live Site → [patrick-scm-solution.github.io/SCM-hardware-dev-system](https://patrick-scm-solution.github.io/SCM-hardware-dev-system/)**
-
+**Live Site → [patrick-scm-solution.github.io/SCM-hardware-dev-system](https://patrick-scm-solution.github.io/SCM-Bridge-OS/)** 
 ---
 
 ## Live Pages
