@@ -4,7 +4,7 @@ A structured reference and tooling system for hardware product development, cove
 
 Built for use alongside Google Drive, Notion, and Odoo Knowledge.
 
-**Live Site → [patrick-scm-solution.github.io/SCM-hardware-dev-system](https://patrick-scm-solution.github.io/SCM-Bridge-OS/)** 
+**Live Site → [patrick-scm-solution.github.io/SCM-Bridge-OS](https://patrick-scm-solution.github.io/SCM-Bridge-OS/)** 
 ---
 
 ## Live Pages
@@ -41,6 +41,8 @@ SCM-hardware-dev-system/
 └── tools/
     ├── handoff-manifest.html         ← Handoff Manifest Builder
     ├── project-asset-registry.html   ← Project Asset Registry
+    ├── scm-dashboard-v2.html         ← Operations Dashboard
+    ├── Factory-Onsite-Audit-APP      ← Web Based App for Onsite Audits
     └── chinese-srs.html              ← Chinese SCM Vocabulary Reference
 ```
 
