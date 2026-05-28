@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCM Solution — Operations Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/scm-styles.css">
+<style>
+/* ── Dashboard layout overrides ─────────────────────────────── */
+html, body { height: 100%; display: flex; flex-direction: column; }
+
+.db-topbar {
+  position: relative; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; height: 56px;
+  background: var(--mid); border-bottom: 1px solid var(--bdr); flex-shrink: 0;
+}
+.db-topbar-left { display: flex; align-items: center; gap: 14px; }
+.db-logomark {
+  width: 30px; height: 30px; background: var(--scm-blue); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Barlow Condensed", sans-serif; font-weight: 800; font-size: 14px; color: #fff;
+}
+.db-title { font-family: "Barlow Condensed", sans-serif; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text); }
+.db-sub { font-size: 11px; color: var(--muted); }
+.db-topbar-right { display: flex; align-items: center; gap: 14px; }
+.db-stamp { font-size: 11px; color: var(--muted); }
+.db-stamp b { color: var(--scm-green); }
+.db-refresh {
+  font-family: "Barlow Condensed", sans-serif; font-size: 12px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; padding: 7px 16px;
+  background: transparent; border: 1px solid var(--bdr); border-radius: 4px;
+  color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all .15s;
+}
+.db-refresh:hover { border-color: var(--scm-blue); color: var(--scm-blue); }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.spinning { animation: spin .6s linear; }
+
+.db-tabnav {
+  position: relative; z-index: 10;
+  display: flex; padding: 0 32px;
+  background: var(--mid); border-bottom: 1px solid var(--bdr); flex-shrink: 0;
+}
+.db-tab {
+  padding: 13px 22px;
+  font-family: "Barlow Condensed", sans-serif; font-size: 12px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent;
+  margin-bottom: -1px; transition: all .15s; user-select: none;
+}
+.db-tab:hover { color: var(--text); }
+.db-tab.active { color: var(--scm-blue); border-bottom-color: var(--scm-blue); }
+
+.db-content { flex: 1; overflow-y: auto; padding: 28px 32px 60px; position: relative; z-index: 1; }
+
+.db-view { display: none; }
+.db-view.active { display: block; animation: fadeUp .2s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.db-section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.db-h { font-family: "Barlow Condensed", sans-serif; font-size: 22px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--text); }
+.db-meta { font-family: "Barlow Condensed", sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
+.db-kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.db-kpi { background: var(--surf); border: 1px solid var(--bdr); border-radius: 6px; padding: 16px 18px; }
+.db-kpi-lbl { font-family: "Barlow Condensed", sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.db-kpi-val { font-family: "Barlow Condensed", sans-serif; font-size: 36px; font-weight: 800; line-height: 1; color: var(--text); margin-bottom: 3px; }
+.db-kpi-sub { font-size: 11px; color: var(--muted); }
+.db-kpi.blue  .db-kpi-val { color: var(--scm-blue); }
+.db-kpi.green .db-kpi-val { color: var(--scm-green); }
+.db-kpi.amber .db-kpi-val { color: var(--scm-amber); }
+.db-kpi.red   .db-kpi-val { color: var(--scm-warn); }
+
+.db-tw { background: var(--surf); border: 1px solid var(--bdr); border-radius: 6px; overflow: hidden; margin-bottom: 18px; }
+.db-tw-head { padding: 12px 18px; border-bottom: 1px solid var(--bdr); display: flex; align-items: center; justify-content: space-between; background: var(--mid); }
+.db-tw-title { font-family: "Barlow Condensed", sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text); }
+.db-tw-hint { font-size: 11px; color: var(--muted); font-style: italic; }
+
+.db-tw table { width: 100%; border-collapse: collapse; }
+.db-tw th { background: rgba(10,13,20,.8); color: var(--muted); font-family: "Barlow Condensed", sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--bdr); white-space: nowrap; }
+.db-tw td { padding: 11px 14px; border-bottom: 1px solid rgba(30,58,85,.4); vertical-align: middle; font-size: 13px; }
+.db-tw tr:last-child td { border-bottom: none; }
+.db-tw tr:hover td { background: rgba(27,155,212,.03); }
+
+.db-person { display: flex; align-items: center; gap: 10px; }
+.db-av { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: "Barlow Condensed", sans-serif; font-size: 11px; font-weight: 800; flex-shrink: 0; }
+.db-pn { font-weight: 600; color: var(--text); font-size: 13px; }
+.db-pr { font-size: 11px; color: var(--muted); }
+
+.db-bar { min-width: 150px; }
+.db-bar-t { height: 5px; background: var(--bdr); border-radius: 99px; overflow: hidden; margin-bottom: 3px; }
+.db-bar-f { height: 100%; border-radius: 99px; transition: width .8s ease; }
+.db-bar-f.g { background: var(--scm-green); }
+.db-bar-f.a { background: var(--scm-amber); }
+.db-bar-f.r { background: var(--scm-warn); }
+.db-bar-l { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); font-weight: 600; }
+
+.db-hrs { font-family: "Barlow Condensed", sans-serif; font-size: 14px; font-weight: 700; color: var(--text); }
+.db-hrs.g { color: var(--scm-green); }
+.db-hrs.a { color: var(--scm-amber); }
+.db-hrs.r { color: var(--scm-warn); }
+.db-hrs.b { color: var(--scm-blue); }
+
+.db-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: "Barlow Condensed", sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 3px; border: 1px solid; white-space: nowrap;
+}
+.db-pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.db-pill.g  { color: var(--scm-green);  border-color: rgba(125,194,66,.4);  background: rgba(125,194,66,.1);  } .db-pill.g::before  { background: var(--scm-green); }
+.db-pill.a  { color: var(--scm-amber);  border-color: rgba(246,173,85,.4);  background: rgba(246,173,85,.1);  } .db-pill.a::before  { background: var(--scm-amber); }
+.db-pill.r  { color: var(--scm-warn);   border-color: rgba(252,129,129,.4); background: rgba(252,129,129,.1); } .db-pill.r::before  { background: var(--scm-warn); }
+.db-pill.b  { color: var(--scm-blue);   border-color: rgba(27,155,212,.4);  background: rgba(27,155,212,.1);  } .db-pill.b::before  { background: var(--scm-blue); }
+.db-pill.p  { color: var(--scm-purple); border-color: rgba(183,148,244,.4); background: rgba(183,148,244,.1); } .db-pill.p::before  { background: var(--scm-purple); }
+
+.db-ptag { display: inline-block; font-family: "Barlow Condensed", sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; border: 1px solid; }
+.db-projn { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 1px; }
+.db-projc { font-size: 11px; color: var(--muted); }
+.db-var { font-family: "Barlow Condensed", sans-serif; font-size: 13px; font-weight: 700; letter-spacing: .04em; }
+.db-var.on { color: var(--scm-green); } .db-var.at { color: var(--scm-amber); } .db-var.lt { color: var(--scm-warn); }
+.db-bk-type { font-family: "Barlow Condensed", sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 2px; }
+.db-bk-type.cl { color: var(--scm-blue); } .db-bk-type.vd { color: var(--scm-purple); } .db-bk-type.in { color: var(--scm-amber); } .db-bk-type.no { color: var(--scm-green); }
+.db-bk-txt { font-size: 11px; color: var(--muted); max-width: 200px; line-height: 1.4; }
+
+.db-week-sel { display: flex; gap: 6px; }
+.db-wk {
+  font-family: "Barlow Condensed", sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; padding: 5px 11px;
+  background: transparent; border: 1px solid var(--bdr); border-radius: 3px;
+  color: var(--muted); cursor: pointer; transition: all .15s;
+}
+.db-wk:hover  { border-color: var(--scm-blue); color: var(--scm-blue); }
+.db-wk.active { border-color: var(--scm-amber); color: var(--scm-amber); background: rgba(246,173,85,.08); }
+
+.db-two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+
+.db-ml { display: flex; align-items: center; gap: 12px; padding: 10px 18px; border-bottom: 1px solid rgba(30,58,85,.5); }
+.db-ml:last-child { border-bottom: none; }
+.db-ml-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.db-ml-name { font-size: 12px; font-weight: 500; color: var(--text); flex: 1; }
+.db-ml-proj { font-family: "Barlow Condensed", sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); min-width: 110px; }
+.db-ml-date { font-size: 11px; color: var(--muted); min-width: 55px; }
+
+.db-note {
+  display: flex; align-items: center; gap: 10px; padding: 11px 16px; margin-bottom: 22px;
+  background: rgba(27,155,212,.06); border: 1px solid rgba(27,155,212,.2); border-radius: 6px;
+  font-size: 12px; color: var(--muted);
+}
+.db-note strong { color: var(--scm-blue); }
+.db-note code { font-family: monospace; font-size: 11px; color: var(--scm-amber); }
+
+.db-footer { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--bdr); display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+.db-footer-brand { font-family: "Barlow Condensed", sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--scm-blue); }
+
+@media (max-width: 768px) {
+  .db-kpi-row { grid-template-columns: 1fr 1fr; }
+  .db-two { grid-template-columns: 1fr; }
+  .db-topbar, .db-tabnav, .db-content { padding-left: 16px; padding-right: 16px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav-breadcrumb" style="padding: 10px 32px; background: var(--mid); border-bottom: 1px solid var(--bdr); margin-bottom: 0;">
+  <a href="../index.html">SCM Solution</a>
+  <span>›</span>
+  <span>Operations Dashboard</span>
+</nav>
+
+<div class="db-topbar">
+  <div class="db-topbar-left">
+    <div class="db-logomark">SC</div>
+    <div>
+      <div class="db-title">Operations Dashboard</div>
+      <div class="db-sub">COO View · Internal Use Only</div>
+    </div>
+  </div>
+  <div class="db-topbar-right">
+    <div class="db-stamp">Last updated: <b id="ts">—</b></div>
+    <button class="db-refresh" id="rbtn" onclick="doRefresh()">
+      <span id="rico">↻</span> Refresh
+    </button>
+  </div>
+</div>
+
+<div class="db-tabnav">
+  <div class="db-tab active" onclick="sw('loading',this)">Team Loading</div>
+  <div class="db-tab" onclick="sw('health',this)">Project Health</div>
+  <div class="db-tab" onclick="sw('milestones',this)">Milestones</div>
+</div>
+
+<div class="db-content">
+
+  <div class="db-note" id="dsPanel">
+    <div class="db-note-bar" onclick="toggleDS()">
+      <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)">
+        <span style="font-size:15px">⚡</span>
+        <div><strong style="color:var(--scm-blue)">Prototype mode</strong> — sample data displayed. On each refresh, the dashboard pulls live data from Odoo via XML-RPC. <span style="color:var(--muted)">Click to see data sources →</span></div>
+      </div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--scm-blue);display:flex;align-items:center;gap:5px;flex-shrink:0;margin-left:16px">
+        Data Sources <span id="dsChev" style="transition:transform .2s;display:inline-block">▼</span>
+      </div>
+    </div>
+    <div id="dsBody" style="display:none;padding:0 16px 16px">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:12px;border-top:1px solid rgba(27,155,212,.15)">
+
+        <div style="background:rgba(10,13,20,.4);border:1px solid rgba(27,155,212,.12);border-radius:4px;padding:12px 13px">
+          <div style="font-family:monospace;font-size:12px;color:var(--scm-amber);margin-bottom:4px;font-weight:600">project.project</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Project Registry</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">name</code> — project title</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">partner_id</code> — client name</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">stage_id</code> — DR phase</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">tag_ids</code> — vendor scope tags</span></div>
+          <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(30,58,85,.6);font-size:10px;color:var(--scm-blue);font-style:italic">Used for: project list, phase badges, client names</div>
+        </div>
+
+        <div style="background:rgba(10,13,20,.4);border:1px solid rgba(27,155,212,.12);border-radius:4px;padding:12px 13px">
+          <div style="font-family:monospace;font-size:12px;color:var(--scm-amber);margin-bottom:4px;font-weight:600">project.task</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Task & Allocation</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">planned_hours</code> — allocated time</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">date_deadline</code> — gate date</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">stage_id</code> — Backlog/WIP/Done</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">user_ids</code> — assignees</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">description</code> — outcomes + gate</span></div>
+          <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(30,58,85,.6);font-size:10px;color:var(--scm-blue);font-style:italic">Used for: allocation bars, deadlines, milestone list</div>
+        </div>
+
+        <div style="background:rgba(10,13,20,.4);border:1px solid rgba(27,155,212,.12);border-radius:4px;padding:12px 13px">
+          <div style="font-family:monospace;font-size:12px;color:var(--scm-amber);margin-bottom:4px;font-weight:600">account.analytic.line</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Timesheet Logs</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">unit_amount</code> — hours logged</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">employee_id</code> — who logged</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">date</code> — when logged</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">task_id</code> — linked task</span></div>
+          <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(30,58,85,.6);font-size:10px;color:var(--scm-blue);font-style:italic">Used for: logged hrs, capacity bars, % complete</div>
+        </div>
+
+        <div style="background:rgba(10,13,20,.4);border:1px solid rgba(27,155,212,.12);border-radius:4px;padding:12px 13px">
+          <div style="font-family:monospace;font-size:12px;color:var(--scm-amber);margin-bottom:4px;font-weight:600">project.task.type</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Stage Names</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">name</code> — Backlog, WIP, Done</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">sequence</code> — stage order</span></div>
+          <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(30,58,85,.6);font-size:10px;color:var(--scm-blue);font-style:italic">Used for: kanban stage mapping, gate status</div>
+        </div>
+
+        <div style="background:rgba(10,13,20,.4);border:1px solid rgba(27,155,212,.12);border-radius:4px;padding:12px 13px">
+          <div style="font-family:monospace;font-size:12px;color:var(--scm-amber);margin-bottom:4px;font-weight:600">project.milestone</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Gate Milestones</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">name</code> — milestone label</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">deadline</code> — planned gate date</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">is_reached</code> — completed flag</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">project_id</code> — linked project</span></div>
+          <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(30,58,85,.6);font-size:10px;color:var(--scm-blue);font-style:italic">Used for: milestone timeline, overdue count</div>
+        </div>
+
+        <div style="background:rgba(10,13,20,.4);border:1px solid rgba(27,155,212,.12);border-radius:4px;padding:12px 13px">
+          <div style="font-family:monospace;font-size:12px;color:var(--scm-amber);margin-bottom:4px;font-weight:600">res.users + mail.activity</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Team & Activities</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">res.users.name</code> — team member</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">activity_type_id</code> — email/call/todo</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">date_deadline</code> — activity due</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px"><span style="color:var(--scm-blue)">→</span><span><code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">summary</code> — activity note</span></div>
+          <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(30,58,85,.6);font-size:10px;color:var(--scm-blue);font-style:italic">Used for: team loading, follow-up actions</div>
+        </div>
+
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);font-style:italic">
+        Custom fields planned: <code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">x_blocker_reason</code> · <code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">x_gate_status</code> · <code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">x_vendor_ids</code> (project-scoped vendor assignment) · <code style="font-family:monospace;font-size:10px;color:var(--scm-amber)">x_dr_phase</code> (DR0–MP gate tracking)
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="db-view active" id="v-loading">
+    <div class="db-section-head">
+      <div class="db-h">Team Loading</div>
+      <div class="db-week-sel">
+        <button class="db-wk active" onclick="wk(this)">This Week</button>
+        <button class="db-wk" onclick="wk(this)">Next Week</button>
+        <button class="db-wk" onclick="wk(this)">Week +2</button>
+        <button class="db-wk" onclick="wk(this)">Week +3</button>
+      </div>
+    </div>
+    <div class="db-kpi-row">
+      <div class="db-kpi amber"><div class="db-kpi-lbl">Total Allocated</div><div class="db-kpi-val">108.5</div><div class="db-kpi-sub">hrs this week across team</div></div>
+      <div class="db-kpi blue"><div class="db-kpi-lbl">Hours Logged</div><div class="db-kpi-val">38.0</div><div class="db-kpi-sub">35% of week complete</div></div>
+      <div class="db-kpi"><div class="db-kpi-lbl">Near Capacity</div><div class="db-kpi-val" style="color:var(--scm-amber)">2</div><div class="db-kpi-sub">PM + Lead at 70–80%</div></div>
+      <div class="db-kpi green"><div class="db-kpi-lbl">On Track</div><div class="db-kpi-val">3</div><div class="db-kpi-sub">within capacity</div></div>
+    </div>
+    <div class="db-tw">
+      <div class="db-tw-head"><div class="db-tw-title">Weekly Allocation vs Logged Hours</div><div class="db-tw-hint">project.task planned_hours · account.analytic.line unit_amount</div></div>
+      <table>
+        <thead><tr><th>Team Member</th><th>Allocated</th><th>Logged</th><th>Remaining</th><th>Capacity</th><th>Status</th><th>Active Projects</th></tr></thead>
+        <tbody>
+          <tr><td><div class="db-person"><div class="db-av" style="background:var(--scm-amber);color:#633806">PM</div><div><div class="db-pn">PM</div><div class="db-pr">BD / Technical PM</div></div></div></td><td><span class="db-hrs a">32.0 hrs</span></td><td><span class="db-hrs">12.0 hrs</span></td><td><span class="db-hrs">20.0 hrs</span></td><td class="db-bar"><div class="db-bar-t"><div class="db-bar-f a" style="width:80%"></div></div><div class="db-bar-l"><span>80% cap</span><span>40hr max</span></div></td><td><span class="db-pill a">Near Capacity</span></td><td style="font-size:11px;color:var(--muted)">Project Epsilon · Project Gamma · Project Beta · Project Zeta</td></tr>
+          <tr><td><div class="db-person"><div class="db-av" style="background:var(--scm-green);color:#173404">RW</div><div><div class="db-pn">Admin</div><div class="db-pr">Admin / Coordination</div></div></div></td><td><span class="db-hrs g">18.0 hrs</span></td><td><span class="db-hrs">6.0 hrs</span></td><td><span class="db-hrs">12.0 hrs</span></td><td class="db-bar"><div class="db-bar-t"><div class="db-bar-f g" style="width:45%"></div></div><div class="db-bar-l"><span>45% cap</span><span>40hr max</span></div></td><td><span class="db-pill g">On Track</span></td><td style="font-size:11px;color:var(--muted)">Project Delta · EO · Project Epsilon</td></tr>
+          <tr><td><div class="db-person"><div class="db-av" style="background:var(--scm-blue);color:#042C53">KM</div><div><div class="db-pn">Kamil</div><div class="db-pr">Mechanical Engineer</div></div></div></td><td><span class="db-hrs a">32.0 hrs</span></td><td><span class="db-hrs">12.0 hrs</span></td><td><span class="db-hrs">20.0 hrs</span></td><td class="db-bar"><div class="db-bar-t"><div class="db-bar-f a" style="width:80%"></div></div><div class="db-bar-l"><span>80% cap</span><span>40hr max</span></div></td><td><span class="db-pill a">Near Capacity</span></td><td style="font-size:11px;color:var(--muted)">EO · Project Gamma · Project Epsilon</td></tr>
+          <tr><td><div class="db-person"><div class="db-av" style="background:var(--scm-purple);color:#26215C">COO</div><div><div class="db-pn">COO</div><div class="db-pr">Founder / COO</div></div></div></td><td><span class="db-hrs a">28.0 hrs</span></td><td><span class="db-hrs">10.0 hrs</span></td><td><span class="db-hrs">18.0 hrs</span></td><td class="db-bar"><div class="db-bar-t"><div class="db-bar-f a" style="width:70%"></div></div><div class="db-bar-l"><span>70% cap</span><span>40hr max</span></div></td><td><span class="db-pill a">Near Capacity</span></td><td style="font-size:11px;color:var(--muted)">Project Delta · Project Gamma · Project Beta</td></tr>
+          <tr><td><div class="db-person"><div class="db-av" style="background:var(--scm-teal);color:#04342C">YV</div><div><div class="db-pn">Yvette</div><div class="db-pr">Marketing Manager</div></div></div></td><td><span class="db-hrs g">16.0 hrs</span></td><td><span class="db-hrs">4.0 hrs</span></td><td><span class="db-hrs">12.0 hrs</span></td><td class="db-bar"><div class="db-bar-t"><div class="db-bar-f g" style="width:40%"></div></div><div class="db-bar-l"><span>40% cap</span><span>40hr max</span></div></td><td><span class="db-pill g">On Track</span></td><td style="font-size:11px;color:var(--muted)">Project Delta · Project Beta</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="db-tw">
+      <div class="db-tw-head"><div class="db-tw-title">Hours by Project This Week</div><div class="db-tw-hint">Allocated vs logged per project</div></div>
+      <table><thead><tr><th>Project</th><th>Phase</th><th>Allocated</th><th>Logged</th><th>Remaining</th><th>Progress</th></tr></thead><tbody id="pht"></tbody></table>
+    </div>
+  </div>
+
+  <!-- HEALTH -->
+  <div class="db-view" id="v-health">
+    <div class="db-section-head"><div class="db-h">Project Health</div><div class="db-meta">6 Active Projects</div></div>
+    <div class="db-kpi-row">
+      <div class="db-kpi green"><div class="db-kpi-lbl">On Track</div><div class="db-kpi-val">2</div><div class="db-kpi-sub">hitting gate dates</div></div>
+      <div class="db-kpi amber"><div class="db-kpi-lbl">At Risk</div><div class="db-kpi-val">3</div><div class="db-kpi-sub">slippage likely</div></div>
+      <div class="db-kpi red"><div class="db-kpi-lbl">Blocked</div><div class="db-kpi-val">1</div><div class="db-kpi-sub">hard blocker active</div></div>
+      <div class="db-kpi blue"><div class="db-kpi-lbl">Avg Slippage</div><div class="db-kpi-val">+8d</div><div class="db-kpi-sub">across at-risk projects</div></div>
+    </div>
+    <div class="db-tw">
+      <div class="db-tw-head"><div class="db-tw-title">Project Status & Gate Tracking</div><div class="db-tw-hint">Planned gate · Forecast · Variance · Root cause</div></div>
+      <table>
+        <thead><tr><th>Project</th><th>Phase</th><th>Planned</th><th>Forecast</th><th>Variance</th><th>Status</th><th>Blocker / Note</th></tr></thead>
+        <tbody>
+          <tr><td><div class="db-projn">Project Alpha</div><div class="db-projc">Client A</div></td><td><span class="db-ptag" style="background:rgba(183,148,244,.1);color:var(--scm-purple);border-color:rgba(183,148,244,.3)">DR3 · FCT</span></td><td style="font-size:11px;color:var(--muted)">Apr 10</td><td style="font-size:12px">TBD</td><td><span class="db-var lt">+14d+</span></td><td><span class="db-pill r">Blocked</span></td><td><div class="db-bk-type cl">Client</div><div class="db-bk-txt">Fuel gauge firmware sign-off from Client A pending. FCT hold active.</div></td></tr>
+          <tr><td><div class="db-projn">Project Beta</div><div class="db-projc">Client B</div></td><td><span class="db-ptag" style="background:rgba(27,155,212,.1);color:var(--scm-blue);border-color:rgba(27,155,212,.3)">DR2 · Sourcing</span></td><td style="font-size:11px;color:var(--muted)">Jun 01</td><td style="font-size:12px">Jun 15</td><td><span class="db-var at">+14d</span></td><td><span class="db-pill a">At Risk</span></td><td><div class="db-bk-type vd">Vendor</div><div class="db-bk-txt">Primary component not sold separately. Substitute quote pending.</div></td></tr>
+          <tr><td><div class="db-projn">Project Gamma</div><div class="db-projc">Client C</div></td><td><span class="db-ptag" style="background:rgba(183,148,244,.1);color:var(--scm-purple);border-color:rgba(183,148,244,.3)">DR3 · PCB Run</span></td><td style="font-size:11px;color:var(--muted)">Apr 28</td><td style="font-size:12px">May 05</td><td><span class="db-var at">+7d</span></td><td><span class="db-pill a">At Risk</span></td><td><div class="db-bk-type vd">Vendor</div><div class="db-bk-txt">Vendor fixture quote pending. Board run gated on fixture approval.</div></td></tr>
+          <tr><td><div class="db-projn">Project Delta</div><div class="db-projc">Client D</div></td><td><span class="db-ptag" style="background:rgba(125,194,66,.1);color:var(--scm-green);border-color:rgba(125,194,66,.3)">DR1 · PoC</span></td><td style="font-size:11px;color:var(--muted)">May 15</td><td style="font-size:12px">May 15</td><td><span class="db-var on">On Track</span></td><td><span class="db-pill g">On Track</span></td><td><div class="db-bk-type no">None</div><div class="db-bk-txt">Well-Linkage visit done today. VTX sample report due this week.</div></td></tr>
+          <tr><td><div class="db-projn">Project Epsilon</div><div class="db-projc">Client E</div></td><td><span class="db-ptag" style="background:rgba(246,173,85,.1);color:var(--scm-amber);border-color:rgba(246,173,85,.3)">DR0 · Onboarding</span></td><td style="font-size:11px;color:var(--muted)">Apr 18</td><td style="font-size:12px">Apr 25</td><td><span class="db-var at">+7d</span></td><td><span class="db-pill a">At Risk</span></td><td><div class="db-bk-type cl">Client</div><div class="db-bk-txt">Waiting on assets — CAD, BOM, PCB files, firmware outstanding.</div></td></tr>
+          <tr><td><div class="db-projn">Project Zeta</div><div class="db-projc">Project Zeta</div></td><td><span class="db-ptag" style="background:rgba(246,173,85,.1);color:var(--scm-amber);border-color:rgba(246,173,85,.3)">DR0 · Kickoff</span></td><td style="font-size:11px;color:var(--muted)">Apr 30</td><td style="font-size:12px">Apr 30</td><td><span class="db-var on">On Track</span></td><td><span class="db-pill g">On Track</span></td><td><div class="db-bk-type no">None</div><div class="db-bk-txt">Vendor list build in progress. Requirements and test data requested.</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="db-two">
+      <div class="db-tw" style="margin-bottom:0">
+        <div class="db-tw-head"><div class="db-tw-title">Slippage by Root Cause</div><div class="db-tw-hint">Why are we late?</div></div>
+        <table><thead><tr><th>Cause</th><th>Projects</th><th>Days Lost</th></tr></thead>
+        <tbody>
+          <tr><td><span class="db-pill b">Client</span></td><td style="font-size:11px;color:var(--muted)">Project Alpha, Project Epsilon</td><td><span class="db-hrs r">21d+</span></td></tr>
+          <tr><td><span class="db-pill p">Vendor</span></td><td style="font-size:11px;color:var(--muted)">Project Beta, Project Gamma</td><td><span class="db-hrs a">21d</span></td></tr>
+          <tr><td><span class="db-pill a">Internal</span></td><td style="font-size:11px;color:var(--muted)">—</td><td><span class="db-hrs g">0d</span></td></tr>
+        </tbody></table>
+      </div>
+      <div class="db-tw" style="margin-bottom:0">
+        <div class="db-tw-head"><div class="db-tw-title">Actions Required This Week</div><div class="db-tw-hint">To unblock at-risk projects</div></div>
+        <table><thead><tr><th>Action</th><th>Owner</th><th>Due</th></tr></thead>
+        <tbody>
+          <tr><td style="font-size:12px">Chase Client A firmware sign-off</td><td><span class="db-pill a">PM</span></td><td style="font-size:11px;color:var(--muted)">Apr 15</td></tr>
+          <tr><td style="font-size:12px">Chase asset delivery dates</td><td><span class="db-pill a">PM</span></td><td style="font-size:11px;color:var(--muted)">Apr 15</td></tr>
+          <tr><td style="font-size:12px">Vendor fixture quote follow-up</td><td><span class="db-pill a">PM</span></td><td style="font-size:11px;color:var(--muted)">Apr 16</td></tr>
+          <tr><td style="font-size:12px">Component quote confirm</td><td><span class="db-pill a">PM</span></td><td style="font-size:11px;color:var(--muted)">Apr 17</td></tr>
+          <tr><td style="font-size:12px">Project Delta Well-Linkage report to UM</td><td><span class="db-pill b">Admin</span></td><td style="font-size:11px;color:var(--muted)">Apr 16</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MILESTONES -->
+  <div class="db-view" id="v-milestones">
+    <div class="db-section-head"><div class="db-h">Upcoming Milestones</div><div class="db-meta">Next 60 Days</div></div>
+    <div class="db-kpi-row">
+      <div class="db-kpi blue"><div class="db-kpi-lbl">Next 7 Days</div><div class="db-kpi-val">3</div><div class="db-kpi-sub">milestones due</div></div>
+      <div class="db-kpi amber"><div class="db-kpi-lbl">Next 30 Days</div><div class="db-kpi-val">7</div><div class="db-kpi-sub">milestones due</div></div>
+      <div class="db-kpi red"><div class="db-kpi-lbl">Overdue</div><div class="db-kpi-val">2</div><div class="db-kpi-sub">past planned date</div></div>
+      <div class="db-kpi green"><div class="db-kpi-lbl">Completed MTD</div><div class="db-kpi-val">4</div><div class="db-kpi-sub">this month</div></div>
+    </div>
+    <div class="db-tw">
+      <div class="db-tw-head"><div class="db-tw-title">Milestone Timeline</div><div class="db-tw-hint">Sorted by planned date · project.task deadlines</div></div>
+      <div id="ml"></div>
+    </div>
+  </div>
+
+  <div class="db-footer">
+    <div class="db-footer-brand">SCM Solution Ltd.</div>
+    <div>Operations Dashboard · Rev 1.0 · April 2026 · Internal Use Only</div>
+  </div>
+
+</div>
+
+<script>
+const proj=[
+  {name:'Project Alpha',    client:'Client A',            phase:'DR3', alloc:8,   log:3, col:'var(--scm-purple)'},
+  {name:'Project Beta',      client:'Client B',   phase:'DR2', alloc:12,  log:4, col:'var(--scm-blue)'},
+  {name:'Project Gamma',         client:'Client C',    phase:'DR3', alloc:14,  log:6, col:'var(--scm-warn)'},
+  {name:'Project Delta', client:'Client D', phase:'DR1', alloc:10,  log:5, col:'var(--scm-green)'},
+  {name:'Project Epsilon',client:'Client E',    phase:'DR0', alloc:16,  log:4, col:'var(--scm-amber)'},
+  {name:'Project Zeta',            client:'Project Zeta',            phase:'DR0', alloc:8.5, log:2, col:'var(--scm-teal)'},
+];
+const ms=[
+  {name:'Chase Client A firmware sign-off',      proj:'Project Alpha', date:'Apr 15',s:'r'},
+  {name:'Asset delivery confirmed', proj:'Project Epsilon',         date:'Apr 15',s:'a'},
+  {name:'Project Delta Well-Linkage report to UM',     proj:'Project Delta',          date:'Apr 16',s:'g'},
+  {name:'Vendor fixture quote received',       proj:'Project Gamma',      date:'Apr 16',s:'a'},
+  {name:'Component quote confirmed',   proj:'Project Beta',   date:'Apr 17',s:'a'},
+  {name:'Project Zeta vendor longlist complete',     proj:'Project Zeta',         date:'Apr 22',s:'g'},
+  {name:'Project Epsilon asset review — internal',      proj:'Project Epsilon',         date:'Apr 25',s:'a'},
+  {name:'Project Gamma West Japan 500-board run',  proj:'Project Gamma',      date:'May 05',s:'a'},
+  {name:'Project Beta samples 30–40 units',    proj:'Project Beta',   date:'Jun 01',s:'g'},
+  {name:'Project Alpha FCT gate pass',        proj:'Project Alpha', date:'TBD',   s:'r'},
+];
+const dc={r:'var(--scm-warn)',a:'var(--scm-amber)',g:'var(--scm-green)'};
+const pc={r:'db-pill r',a:'db-pill a',g:'db-pill g'};
+const pl={r:'Blocked',a:'At Risk',g:'On Track'};
+
+function renderPHT(){
+  document.getElementById('pht').innerHTML=proj.map(p=>{
+    const pct=Math.min((p.log/p.alloc)*100,100);
+    const rem=(p.alloc-p.log).toFixed(1);
+    const c=pct>90?'r':pct>65?'a':'g';
+    return`<tr>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${p.col};flex-shrink:0"></div>
+        <div><div class="db-projn">${p.name}</div><div class="db-projc">${p.client}</div></div>
+      </div></td>
+      <td><span class="db-ptag" style="background:rgba(246,173,85,.1);color:var(--scm-amber);border-color:rgba(246,173,85,.3)">${p.phase}</span></td>
+      <td><span class="db-hrs a">${p.alloc} hrs</span></td>
+      <td><span class="db-hrs">${p.log} hrs</span></td>
+      <td><span class="db-hrs ${parseFloat(rem)<2?'r':''}">${rem} hrs</span></td>
+      <td class="db-bar"><div class="db-bar-t"><div class="db-bar-f ${c}" style="width:${pct}%"></div></div>
+      <div class="db-bar-l"><span>${Math.round(pct)}%</span><span>${p.log}/${p.alloc}h</span></div></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderML(){
+  document.getElementById('ml').innerHTML=ms.map(m=>`
+    <div class="db-ml">
+      <div class="db-ml-dot" style="background:${dc[m.s]}"></div>
+      <div class="db-ml-name">${m.name}</div>
+      <div class="db-ml-proj">${m.proj}</div>
+      <div class="db-ml-date">${m.date}</div>
+      <span class="${pc[m.s]}">${pl[m.s]}</span>
+    </div>`).join('');
+}
+
+function sw(v,el){
+  document.querySelectorAll('.db-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.db-view').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('v-'+v).classList.add('active');
+}
+
+function wk(el){
+  document.querySelectorAll('.db-wk').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function doRefresh(){
+  const ico=document.getElementById('rico');
+  ico.classList.add('spinning');
+  setTimeout(()=>{
+    ico.classList.remove('spinning');
+    document.getElementById('ts').textContent=new Date().toLocaleTimeString();
+  },700);
+}
+
+renderPHT(); renderML();
+document.getElementById('ts').textContent=new Date().toLocaleTimeString();
+
+function toggleDS(){
+  const panel=document.getElementById('dsPanel');
+  const body=document.getElementById('dsBody');
+  const chev=document.getElementById('dsChev');
+  const open=panel.classList.toggle('open');
+  body.style.display=open?'block':'none';
+  chev.style.transform=open?'rotate(180deg)':'rotate(0deg)';
+}
+</script>
+</body>
+</html>
