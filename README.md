@@ -1,4 +1,4 @@
-# SCM Solution — Hardware Development System
+# SCM Solution — Bridge OS
 
 A structured reference and tooling system for hardware product development, covering the full journey from Idea through to Mass Production.
 
