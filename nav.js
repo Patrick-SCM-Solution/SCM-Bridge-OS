@@ -8,7 +8,7 @@
   var pmActive = file === 'index.html' || file === '';
   var clActive = p.indexOf('/checklists/') !== -1;
   var fwActive = file === 'workflow.html';
-  var tlActive = /^(handoff-manifest|project-asset-registry|chinese-srs|project-report|scm-dashboard-v3|odoo-playbook|Factory-Onsite-Audit-APP|nda-template|scm-playbook)\.html$/.test(file);
+  var tlActive = /^(handoff-manifest|project-asset-registry|chinese-srs|project-report|scm-dashboard-v3|odoo-playbook|Factory-Onsite-Audit-APP|nda-template|scm-playbook|sow-template)\.html$/.test(file);
 
   var root = document.getElementById('site-nav-root');
   if (!root) return;
@@ -43,6 +43,7 @@
     + '          <a href="' + base + 'tools/project-report.html" class="nav-link' + a('project-report.html') + '">Project Report</a>\n'
     + '          <a href="' + base + 'tools/scm-dashboard-v3.html" class="nav-link' + a('scm-dashboard-v3.html') + '">Dashboard</a>\n'
     + '          <a href="' + base + 'tools/odoo-playbook.html" class="nav-link' + a('odoo-playbook.html') + '">Odoo Playbook</a>\n'
+    + '          <a href="' + base + 'tools/sow-template.html" class="nav-link' + a('sow-template.html') + '">SOW Template</a>\n'
     + '        </div>\n'
     + '      </div>\n'
     + '    </div>\n'
