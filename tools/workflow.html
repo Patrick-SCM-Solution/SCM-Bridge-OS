@@ -279,6 +279,25 @@
   </div>
 
   <div id="track-pm">
+
+  <!-- ── Receive Handoff ─────────────────────────────────────── -->
+  <div style="background:rgba(246,173,85,.06);border:1px solid rgba(246,173,85,.2);border-radius:8px;padding:18px 24px;margin-bottom:24px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--scm-amber)">Incoming from BD — confirm before starting</div>
+      <div style="flex:1;height:1px;background:rgba(246,173,85,.2)"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+      <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Signed SOW — reviewed and understood</div></div></div>
+      <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Phase Map phase confirmed (log which phase)</div></div></div>
+      <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Client contact log received</div></div></div>
+      <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Google Drive project folder access granted</div></div></div>
+      <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Existing assets on file — BOM, drawings, vendor list</div></div></div>
+      <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Project brief and BD background notes reviewed</div></div></div>
+      <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Key risks flagged by BD — noted</div></div></div>
+      <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">First status call in calendar</div></div></div>
+    </div>
+  </div>
+
   <!-- ── Phase Bar ───────────────────────────────────────────── -->
   <div class="phase-bar">
     <div class="phase-arrow" data-phase="idea" onclick="togglePhase('idea')">
@@ -933,6 +952,10 @@
         <div class="pa-label">Onboard</div>
         <div class="pa-gate">Kickoff · Setup</div>
       </div>
+      <div class="phase-arrow" data-bd="handoff" onclick="toggleBD('handoff')">
+        <div class="pa-label">Handoff</div>
+        <div class="pa-gate">BD → PM</div>
+      </div>
     </div>
 
     <!-- ── BD Panel: Cold Outreach ─────────────────────────── -->
@@ -945,6 +968,22 @@
             <div class="wf-top-sub">Apollo 7-Step Framework — Show Me You Know Me (#SMYKM). Research first, always. Goal is a reply, not a close.</div>
           </div>
           <div class="wf-gate-badge" style="background:var(--scm-amber);color:#0D1B2E">No calendar links in first email</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px">
+          <div class="gate-box" style="background:rgba(246,173,85,.05);border-color:rgba(246,173,85,.18)">
+            <div class="gate-box-label" style="color:var(--scm-amber)">ICP — Who to Target</div>
+            <div class="gate-item" style="color:var(--text)"><span style="color:var(--scm-amber)">→</span> <strong>Small Team (&lt;10)</strong> — hardware startup / indie brand, no in-house SCM, founder is DM</div>
+            <div class="gate-item" style="color:var(--text)"><span style="color:var(--scm-amber)">→</span> <strong>Growing Co (10–50)</strong> — scaling from MVP, outgrown current setup, needs embedded partner</div>
+            <div class="gate-item" style="color:var(--text);border:none"><span style="color:var(--scm-amber)">→</span> Typical entry: <em>firefighting</em> — something already broken in production, not greenfield NPI</div>
+          </div>
+          <div class="gate-box" style="background:rgba(246,173,85,.05);border-color:rgba(246,173,85,.18)">
+            <div class="gate-box-label" style="color:var(--scm-amber)">Buying Signals</div>
+            <div class="gate-item" style="color:var(--text)"><span style="color:var(--scm-amber)">→</span> Quality escapes, supplier problems, missed shipments</div>
+            <div class="gate-item" style="color:var(--text)"><span style="color:var(--scm-amber)">→</span> Scaling to production with no SCM support</div>
+            <div class="gate-item" style="color:var(--text)"><span style="color:var(--scm-amber)">→</span> New SCM hire signals urgency (they know they're behind)</div>
+            <div class="gate-item" style="color:var(--text);border:none"><span style="color:var(--scm-amber)">→</span> Series A–B close or investor-driven production deadline</div>
+          </div>
         </div>
 
         <div class="wf-cols">
@@ -1380,6 +1419,70 @@
               <a href="project-asset-registry.html" class="res-link"><span class="res-link-icon">🗂️</span><span class="res-link-text">Project Asset Registry</span></a>
               <a href="nda-template.html" class="res-link"><span class="res-link-icon">📄</span><span class="res-link-text">Mutual NDA Template</span></a>
             </div>
+          </div>
+        </div>
+
+        <div class="next-strip">
+          <span class="next-label">Onboard complete? Move to</span>
+          <button type="button" class="next-phase-btn" onclick="toggleBD('handoff')">Handoff →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BD Panel: Handoff ─────────────────────────────────── -->
+    <div id="bd-panel-handoff" class="bd-panel">
+      <div class="bd-band"></div>
+      <div class="bd-inner">
+        <div class="wf-top">
+          <div>
+            <div class="wf-top-title" style="color:var(--scm-amber)">BD → PM Handoff</div>
+            <div class="wf-top-sub">BD closes the file and formally passes the client to PM. Nothing starts on the PM side until every item in the handoff package is confirmed.</div>
+          </div>
+          <div class="wf-gate-badge" style="background:var(--scm-amber);color:#0D1B2E">Complete before PM starts</div>
+        </div>
+
+        <div class="bd-cols-3">
+          <div>
+            <div class="wf-col-head">BD Delivers</div>
+            <div class="bd-check-group" style="margin-bottom:0">
+              <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Signed SOW filed in project Drive</div><div class="bd-cn">PM must have read and understood scope</div></div></div>
+              <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Phase Map phase confirmed and documented</div><div class="bd-cn">Phase determines scope, timeline, and services</div></div></div>
+              <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Client contact log — names, roles, comms preference</div></div></div>
+              <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Google Drive folder live — PM granted access</div></div></div>
+              <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Existing client assets filed (BOM, drawings, vendor list)</div></div></div>
+              <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Project brief written — background, context, key risks</div></div></div>
+              <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Client NDA executed and filed</div></div></div>
+              <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">First status call scheduled — PM invited</div></div></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="wf-col-head">Odoo Update</div>
+            <div class="bd-check-group">
+              <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Deal stage → Won</div></div></div>
+              <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Project record created and linked to deal</div></div></div>
+              <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">PM assigned in Odoo</div></div></div>
+              <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">BANT notes transferred to project record</div></div></div>
+            </div>
+            <div class="wf-col-head" style="margin-top:16px">Resources</div>
+            <div class="res-list">
+              <a href="handoff-manifest.html" class="res-link"><span class="res-link-icon">📋</span><span class="res-link-text">Handoff Manifest Builder</span></a>
+              <a href="project-asset-registry.html" class="res-link"><span class="res-link-icon">🗂️</span><span class="res-link-text">Project Asset Registry</span></a>
+              <a href="odoo-playbook.html" class="res-link"><span class="res-link-icon">📖</span><span class="res-link-text">Odoo Playbook</span></a>
+            </div>
+          </div>
+
+          <div>
+            <div class="wf-col-head">Exit Gate</div>
+            <div class="gate-box" style="background:rgba(246,173,85,.06);border-color:rgba(246,173,85,.2);margin-bottom:20px">
+              <div class="gate-box-label" style="color:var(--scm-amber)">BD File Closed When</div>
+              <div class="gate-item"><span style="color:var(--scm-amber)">✓</span> All BD delivers checklist complete</div>
+              <div class="gate-item"><span style="color:var(--scm-amber)">✓</span> PM confirmed receipt of handoff package</div>
+              <div class="gate-item"><span style="color:var(--scm-amber)">✓</span> Odoo deal marked Won, PM assigned</div>
+              <div class="gate-item"><span style="color:var(--scm-amber)">✓</span> First status call in calendar</div>
+            </div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:600;letter-spacing:.02em">Handoff complete — pass to PM:</div>
+            <button type="button" class="next-phase-btn" style="width:100%;justify-content:center" onclick="showTrack('pm')">Switch to PM Workflow →</button>
           </div>
         </div>
       </div>
