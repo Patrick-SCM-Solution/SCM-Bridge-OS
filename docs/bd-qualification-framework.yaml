@@ -557,7 +557,7 @@ qualified_prospect_journey:
     client acquisition process. Junior BD hands off to senior BD here.
 
   step_1_scoping_discovery_call:
-    who: "Senior BD (Patrick or Kara) + prospect"
+    who: "Patrick (Senior BD) + prospect"
     duration: "45–60 minutes"
     goals:
       - "Understand the full scope of the problem"
@@ -568,7 +568,7 @@ qualified_prospect_journey:
     output: "Scope summary email to prospect within 24 hours of call"
 
   step_2_sow_preparation:
-    who: "Kara (founder review and sign-off)"
+    who: "Patrick prepares — Kara reviews and signs"
     timeline: "3–5 business days from scoping call"
     sow_contents:
       - "Scope of work — specific deliverables, not activity descriptions"
