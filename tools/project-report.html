@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Report — SCM Bridge OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/scm-styles.css">
+<style>
+  /* ── TOPBAR ──────────────────────────────────────────────────── */
+  .rpt-topbar {
+    display:flex; align-items:center; justify-content:space-between; gap:20px;
+    margin-bottom:28px; padding-bottom:20px; border-bottom:1px solid var(--bdr);
+  }
+  .rpt-topbar-left { display:flex; flex-direction:column; gap:4px; }
+  .rpt-topbar-label {
+    font-family:"Barlow Condensed",sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+  }
+  .rpt-save-status { font-size:12px; color:var(--muted); }
+  .rpt-topbar-actions { display:flex; gap:8px; align-items:center; flex-shrink:0; }
+
+  .rpt-btn {
+    font-family:"Barlow Condensed",sans-serif; font-size:12px; font-weight:700;
+    letter-spacing:.08em; text-transform:uppercase; padding:8px 18px; border-radius:5px;
+    cursor:pointer; border:1px solid var(--bdr); background:var(--surf); color:var(--muted);
+    transition:all .15s; display:inline-flex; align-items:center; gap:6px;
+  }
+  .rpt-btn:hover { border-color:var(--scm-blue); color:var(--scm-blue); }
+  .rpt-btn.primary { background:var(--scm-blue); border-color:var(--scm-blue); color:#fff; }
+  .rpt-btn.primary:hover { opacity:.9; }
+
+  /* ── EDIT CARDS ──────────────────────────────────────────────── */
+  .rpt-card {
+    background:var(--surf); border:1px solid var(--bdr); border-radius:8px;
+    padding:24px 28px; margin-bottom:16px;
+  }
+  .rpt-card-title {
+    font-family:"Barlow Condensed",sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+    margin-bottom:18px; display:flex; align-items:center; gap:12px;
+  }
+  .rpt-card-title::after { content:""; flex:1; height:1px; background:var(--bdr); }
+
+  /* ── FIELDS ─────────────────────────────────────────────────── */
+  .rpt-grid   { display:grid; grid-template-columns:1fr 1fr;      gap:14px; }
+  .rpt-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr;  gap:14px; }
+  .rpt-field  { display:flex; flex-direction:column; gap:5px; }
+  .rpt-label  {
+    font-family:"Barlow Condensed",sans-serif; font-size:10px; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+  }
+  .rpt-input, .rpt-select {
+    background:var(--dark); border:1px solid var(--bdr); border-radius:5px;
+    padding:9px 12px; color:var(--text); font-family:Barlow,sans-serif; font-size:14px;
+    outline:none; width:100%; box-sizing:border-box; transition:border-color .15s;
+  }
+  .rpt-input:focus, .rpt-select:focus { border-color:var(--scm-blue); }
+  .rpt-input::placeholder { color:var(--muted); }
+  .rpt-select option { background:var(--dark); }
+  .rpt-textarea {
+    background:var(--dark); border:1px solid var(--bdr); border-radius:5px;
+    padding:10px 12px; color:var(--text); font-family:Barlow,sans-serif; font-size:14px;
+    outline:none; width:100%; box-sizing:border-box; resize:vertical; min-height:56px;
+    line-height:1.6; transition:border-color .15s;
+  }
+  .rpt-textarea:focus { border-color:var(--scm-blue); }
+  .rpt-textarea::placeholder { color:var(--muted); }
+
+  /* ── LIST ITEMS ─────────────────────────────────────────────── */
+  .list-items { display:flex; flex-direction:column; gap:10px; margin-bottom:12px; }
+  .list-item-row { display:flex; gap:8px; align-items:flex-start; }
+  .list-item-meta { display:flex; flex-direction:column; gap:6px; min-width:128px; }
+  .item-del-btn {
+    flex-shrink:0; width:30px; height:30px; border-radius:4px; cursor:pointer;
+    border:1px solid var(--bdr); background:transparent; color:var(--muted);
+    font-size:16px; display:flex; align-items:center; justify-content:center;
+    transition:all .15s; margin-top:1px;
+  }
+  .item-del-btn:hover { border-color:rgba(252,129,129,.4); color:var(--scm-warn); background:rgba(252,129,129,.08); }
+  .add-item-btn {
+    font-family:"Barlow Condensed",sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase; padding:6px 14px; border-radius:4px;
+    cursor:pointer; border:1px dashed var(--bdr); background:transparent; color:var(--muted);
+    transition:all .15s; display:inline-flex; align-items:center; gap:6px;
+  }
+  .add-item-btn:hover { border-color:var(--scm-blue); color:var(--scm-blue); }
+
+  /* ── PREVIEW DOCUMENT ────────────────────────────────────────── */
+  #preview-view { max-width:760px; }
+
+  .prev-doc {
+    background:var(--surf); border:1px solid var(--bdr); border-radius:8px;
+    overflow:hidden; margin-bottom:16px;
+  }
+  .prev-hdr { background:var(--dark); border-bottom:1px solid var(--bdr); padding:28px 32px; }
+  .prev-hdr-top {
+    display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;
+  }
+  .prev-logo {
+    font-family:"Barlow Condensed",sans-serif; font-size:12px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+  }
+  .prev-conf {
+    font-family:"Barlow Condensed",sans-serif; font-size:9px; font-weight:700;
+    letter-spacing:.18em; text-transform:uppercase; color:rgba(252,129,129,.7);
+    border:1px solid rgba(252,129,129,.2); padding:3px 10px; border-radius:3px;
+  }
+  .prev-project {
+    font-family:"Barlow Condensed",sans-serif; font-size:28px; font-weight:800;
+    text-transform:uppercase; letter-spacing:.04em; color:var(--text); margin-bottom:6px;
+  }
+  .prev-meta { font-size:13px; color:var(--muted); line-height:1.7; }
+  .prev-badges { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .prev-badge {
+    font-family:"Barlow Condensed",sans-serif; font-size:10px; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase; padding:3px 10px;
+    border-radius:3px; border:1px solid;
+  }
+  .badge-phase   { color:var(--scm-blue);   background:rgba(27,155,212,.1);  border-color:rgba(27,155,212,.25); }
+  .badge-green   { color:var(--scm-green);  background:rgba(125,194,66,.1);  border-color:rgba(125,194,66,.25); }
+  .badge-amber   { color:var(--scm-amber);  background:rgba(246,173,85,.1);  border-color:rgba(246,173,85,.25); }
+  .badge-red     { color:var(--scm-warn);   background:rgba(252,129,129,.1); border-color:rgba(252,129,129,.25); }
+
+  .prev-body { padding:28px 32px; }
+
+  .prev-section { margin-bottom:28px; }
+  .prev-section:last-child { margin-bottom:0; }
+  .prev-sec-title {
+    font-family:"Barlow Condensed",sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--muted);
+    margin-bottom:14px; display:flex; align-items:center; gap:12px;
+  }
+  .prev-sec-title::after { content:""; flex:1; height:1px; background:var(--bdr); }
+
+  .prev-summary { font-size:14px; line-height:1.8; color:var(--text); }
+
+  .prev-list { display:flex; flex-direction:column; gap:10px; }
+  .prev-item { display:flex; gap:10px; align-items:flex-start; }
+  .prev-item-badge {
+    font-family:"Barlow Condensed",sans-serif; font-size:9px; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase; padding:3px 8px;
+    border-radius:3px; border:1px solid; flex-shrink:0; margin-top:3px; white-space:nowrap;
+  }
+  .prev-item-body { flex:1; }
+  .prev-item-text { font-size:14px; line-height:1.6; color:var(--text); }
+  .prev-item-sub  { font-size:12px; color:var(--muted); margin-top:2px; }
+
+  .prev-arrow { display:flex; gap:10px; align-items:flex-start; }
+  .prev-arr-icon { color:var(--scm-blue); font-weight:700; flex-shrink:0; margin-top:2px; font-size:14px; }
+  .prev-arr-text { font-size:14px; line-height:1.6; color:var(--text); }
+
+  .prev-notes { font-size:14px; line-height:1.8; color:var(--text); white-space:pre-wrap; }
+
+  .prev-footer {
+    background:var(--dark); border-top:1px solid var(--bdr); padding:14px 32px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:12px; color:var(--muted);
+  }
+
+  /* item category colours */
+  .cat-milestone   { color:var(--scm-blue);   border-color:rgba(27,155,212,.3);  background:rgba(27,155,212,.08); }
+  .cat-engineering { color:var(--scm-teal);   border-color:rgba(79,209,197,.3);  background:rgba(79,209,197,.08); }
+  .cat-tooling     { color:var(--scm-purple); border-color:rgba(183,148,244,.3); background:rgba(183,148,244,.08); }
+  .cat-procurement { color:var(--scm-amber);  border-color:rgba(246,173,85,.3);  background:rgba(246,173,85,.08); }
+  .cat-quality     { color:var(--warn);       border-color:rgba(252,129,129,.3); background:rgba(252,129,129,.08); }
+  .cat-commercial  { color:#76E4F7;           border-color:rgba(118,228,247,.3); background:rgba(118,228,247,.08); }
+  .cat-factory     { color:var(--scm-green);  border-color:rgba(125,194,66,.3);  background:rgba(125,194,66,.08); }
+  .urg-high        { color:var(--scm-warn);   border-color:rgba(252,129,129,.3); background:rgba(252,129,129,.08); }
+  .urg-medium      { color:var(--scm-amber);  border-color:rgba(246,173,85,.3);  background:rgba(246,173,85,.08); }
+
+  @media print {
+    .site-nav, .nav-breadcrumb, .rpt-topbar, footer, .rpt-preview-actions { display:none !important; }
+    .wrap { padding:0 !important; max-width:100% !important; }
+    .prev-doc { border:none !important; box-shadow:none !important; }
+  }
+  @media(max-width:640px) {
+    .rpt-grid, .rpt-grid-3 { grid-template-columns:1fr; }
+    .list-item-meta { min-width:0; width:100%; }
+    .rpt-topbar { flex-direction:column; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+<div id="site-nav-root"></div>
+<script src="../nav.js"></script>
+<div class="wrap">
+
+<nav class="nav-breadcrumb">
+  <a href="../index.html">← Phase Map</a>
+  <span>/</span><span>Tools</span>
+  <span>/</span><span>Project Report</span>
+</nav>
+
+<!-- ── EDIT TOPBAR ────────────────────────────────────────────── -->
+<div class="rpt-topbar" id="edit-topbar">
+  <div class="rpt-topbar-left">
+    <div class="rpt-topbar-label">Project Report Builder</div>
+    <div class="rpt-save-status" id="save-status">No draft saved</div>
+  </div>
+  <div class="rpt-topbar-actions">
+    <button type="button" class="rpt-btn" onclick="newReport()">New Report</button>
+    <button type="button" class="rpt-btn primary" onclick="showPreview()">Preview →</button>
+  </div>
+</div>
+
+<!-- ── PREVIEW TOPBAR ─────────────────────────────────────────── -->
+<div class="rpt-topbar" id="preview-topbar" style="display:none">
+  <div class="rpt-topbar-left">
+    <div class="rpt-topbar-label">Client Preview</div>
+    <div class="rpt-save-status">Review before sharing — use Print to export as PDF</div>
+  </div>
+  <div class="rpt-topbar-actions">
+    <button type="button" class="rpt-btn" onclick="window.print()">Print / PDF</button>
+    <button type="button" class="rpt-btn primary" onclick="showEdit()">← Edit</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- EDIT VIEW                                                    -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div id="edit-view">
+
+  <!-- Report info -->
+  <div class="rpt-card">
+    <div class="rpt-card-title">Report Info</div>
+    <div class="rpt-grid" style="margin-bottom:14px">
+      <div class="rpt-field">
+        <label class="rpt-label" for="f-project">Project Name</label>
+        <input type="text" class="rpt-input" id="f-project" placeholder="e.g. Project Falcon" oninput="scheduleSave()">
+      </div>
+      <div class="rpt-field">
+        <label class="rpt-label" for="f-client">Client</label>
+        <input type="text" class="rpt-input" id="f-client" placeholder="Client or company" oninput="scheduleSave()">
+      </div>
+    </div>
+    <div class="rpt-grid-3" style="margin-bottom:14px">
+      <div class="rpt-field">
+        <label class="rpt-label" for="f-from">Period From</label>
+        <input type="date" class="rpt-input" id="f-from" oninput="scheduleSave()">
+      </div>
+      <div class="rpt-field">
+        <label class="rpt-label" for="f-to">Period To</label>
+        <input type="date" class="rpt-input" id="f-to" oninput="scheduleSave()">
+      </div>
+      <div class="rpt-field">
+        <label class="rpt-label" for="f-rptnum">Report #</label>
+        <input type="text" class="rpt-input" id="f-rptnum" placeholder="001" oninput="scheduleSave()">
+      </div>
+    </div>
+    <div class="rpt-grid-3">
+      <div class="rpt-field">
+        <label class="rpt-label" for="f-pm">Prepared By</label>
+        <input type="text" class="rpt-input" id="f-pm" placeholder="PM name" oninput="scheduleSave()">
+      </div>
+      <div class="rpt-field">
+        <label class="rpt-label" for="f-phase">Current Phase</label>
+        <select class="rpt-select" id="f-phase" onchange="scheduleSave()">
+          <option value="poc">PoC</option>
+          <option value="design" selected>Design</option>
+          <option value="evt">EVT</option>
+          <option value="dvt">DVT</option>
+          <option value="pvt">PVT</option>
+          <option value="mp">Mass Production</option>
+        </select>
+      </div>
+      <div class="rpt-field">
+        <label class="rpt-label" for="f-rag">Overall Status</label>
+        <select class="rpt-select" id="f-rag" onchange="scheduleSave()">
+          <option value="green" selected>On Track</option>
+          <option value="amber">At Risk</option>
+          <option value="red">Delayed</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Executive summary -->
+  <div class="rpt-card">
+    <div class="rpt-card-title">Executive Summary</div>
+    <textarea class="rpt-textarea" id="f-summary" placeholder="2–3 sentence overview — key progress this period and overall project tone..." style="min-height:88px" oninput="scheduleSave()"></textarea>
+  </div>
+
+  <!-- Completed this period -->
+  <div class="rpt-card">
+    <div class="rpt-card-title">Completed This Period</div>
+    <div class="list-items" id="completed-items"></div>
+    <button type="button" class="add-item-btn" onclick="addCompleted()">+ Add Item</button>
+  </div>
+
+  <!-- Open items & blockers -->
+  <div class="rpt-card">
+    <div class="rpt-card-title">Open Items &amp; Blockers</div>
+    <div class="list-items" id="blocker-items"></div>
+    <button type="button" class="add-item-btn" onclick="addBlocker()">+ Add Item</button>
+  </div>
+
+  <!-- Next steps -->
+  <div class="rpt-card">
+    <div class="rpt-card-title">Next Steps</div>
+    <div class="list-items" id="nextstep-items"></div>
+    <button type="button" class="add-item-btn" onclick="addNextStep()">+ Add Step</button>
+  </div>
+
+  <!-- Notes / questions -->
+  <div class="rpt-card">
+    <div class="rpt-card-title">Notes / Questions for Client</div>
+    <textarea class="rpt-textarea" id="f-notes" placeholder="Anything requiring client input, decisions, or acknowledgement..." style="min-height:88px" oninput="scheduleSave()"></textarea>
+  </div>
+
+  <div style="display:flex;justify-content:flex-end;margin-bottom:48px">
+    <button type="button" class="rpt-btn primary" onclick="showPreview()">Preview Client Report →</button>
+  </div>
+
+</div><!-- /edit-view -->
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PREVIEW VIEW                                                 -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div id="preview-view" style="display:none">
+
+  <div class="prev-doc" id="prev-doc"></div>
+
+  <div class="rpt-preview-actions" style="display:flex;gap:10px;margin-bottom:48px">
+    <button type="button" class="rpt-btn" onclick="window.print()">Print / Save PDF</button>
+    <button type="button" class="rpt-btn primary" onclick="showEdit()">← Back to Edit</button>
+  </div>
+
+</div><!-- /preview-view -->
+
+<footer>
+  <span>SCM Solution LTD. — Hardware Development System</span>
+  <span>Project Report Builder · Rev 1.0</span>
+</footer>
+</div><!-- /wrap -->
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────
+var completed  = [];
+var blockers   = [];
+var nextSteps  = [];
+var saveTimer  = null;
+var STORAGE_KEY = 'rpt-draft-v1';
+
+// ── PERSIST ───────────────────────────────────────────────────────────────
+function save() {
+  var data = {
+    project:    gv('f-project'),
+    client:     gv('f-client'),
+    periodFrom: gv('f-from'),
+    periodTo:   gv('f-to'),
+    reportNum:  gv('f-rptnum'),
+    pm:         gv('f-pm'),
+    phase:      gv('f-phase'),
+    rag:        gv('f-rag'),
+    summary:    gv('f-summary'),
+    notes:      gv('f-notes'),
+    completed:  completed,
+    blockers:   blockers,
+    nextSteps:  nextSteps,
+    savedAt:    Date.now()
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  document.getElementById('save-status').textContent =
+    'Saved at ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+}
+
+function load() {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      var d = JSON.parse(raw);
+      sv('f-project', d.project   || '');
+      sv('f-client',  d.client    || '');
+      sv('f-from',    d.periodFrom|| '');
+      sv('f-to',      d.periodTo  || '');
+      sv('f-rptnum',  d.reportNum || '');
+      sv('f-pm',      d.pm        || '');
+      sv('f-phase',   d.phase     || 'design');
+      sv('f-rag',     d.rag       || 'green');
+      sv('f-summary', d.summary   || '');
+      sv('f-notes',   d.notes     || '');
+      completed = d.completed  || [];
+      blockers  = d.blockers   || [];
+      nextSteps = d.nextSteps  || [];
+      if (d.savedAt) {
+        document.getElementById('save-status').textContent =
+          'Draft from ' + new Date(d.savedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      }
+    }
+  } catch(e) {}
+
+  if (!completed.length) completed.push({text:'', cat:'milestone'});
+  if (!nextSteps.length)  nextSteps.push({text:''});
+  renderCompleted();
+  renderBlockers();
+  renderNextSteps();
+}
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(save, 700);
+}
+
+// ── DOM HELPERS ───────────────────────────────────────────────────────────
+function gv(id) { var el = document.getElementById(id); return el ? el.value : ''; }
+function sv(id, v) { var el = document.getElementById(id); if (el) el.value = v; }
+function esc(s) {
+  return String(s || '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function sel(v, o) { return v === o ? ' selected' : ''; }
+
+// ── COMPLETED ITEMS ───────────────────────────────────────────────────────
+function renderCompleted() {
+  var el = document.getElementById('completed-items');
+  if (!el) return;
+  el.innerHTML = completed.map(function(item, i) {
+    return '<div class="list-item-row">'
+      + '<textarea class="rpt-textarea" placeholder="Describe what was completed..."'
+      + ' oninput="completed[' + i + '].text=this.value;scheduleSave()">' + esc(item.text) + '</textarea>'
+      + '<div class="list-item-meta">'
+      + '<select class="rpt-select" onchange="completed[' + i + '].cat=this.value;scheduleSave()">'
+      + '<option value="milestone"'   + sel(item.cat,'milestone')   + '>Milestone</option>'
+      + '<option value="engineering"' + sel(item.cat,'engineering') + '>Engineering</option>'
+      + '<option value="tooling"'     + sel(item.cat,'tooling')     + '>Tooling</option>'
+      + '<option value="procurement"' + sel(item.cat,'procurement') + '>Procurement</option>'
+      + '<option value="quality"'     + sel(item.cat,'quality')     + '>Quality</option>'
+      + '<option value="commercial"'  + sel(item.cat,'commercial')  + '>Commercial</option>'
+      + '<option value="factory"'     + sel(item.cat,'factory')     + '>Factory</option>'
+      + '</select></div>'
+      + '<button type="button" class="item-del-btn" onclick="removeCompleted(' + i + ')" title="Remove">×</button>'
+      + '</div>';
+  }).join('');
+}
+function addCompleted() {
+  completed.push({text:'', cat:'milestone'});
+  renderCompleted();
+  var ta = document.querySelectorAll('#completed-items textarea');
+  if (ta.length) ta[ta.length-1].focus();
+  scheduleSave();
+}
+function removeCompleted(i) { completed.splice(i,1); renderCompleted(); scheduleSave(); }
+
+// ── BLOCKER ITEMS ─────────────────────────────────────────────────────────
+function renderBlockers() {
+  var el = document.getElementById('blocker-items');
+  if (!el) return;
+  el.innerHTML = blockers.map(function(item, i) {
+    return '<div class="list-item-row">'
+      + '<textarea class="rpt-textarea" placeholder="Describe the blocker or open item..."'
+      + ' oninput="blockers[' + i + '].text=this.value;scheduleSave()">' + esc(item.text) + '</textarea>'
+      + '<div class="list-item-meta">'
+      + '<input type="text" class="rpt-input" placeholder="Owner" value="' + esc(item.owner) + '"'
+      + ' oninput="blockers[' + i + '].owner=this.value;scheduleSave()">'
+      + '<select class="rpt-select" onchange="blockers[' + i + '].urgency=this.value;scheduleSave()">'
+      + '<option value="high"'   + sel(item.urgency,'high')   + '>High</option>'
+      + '<option value="medium"' + sel(item.urgency,'medium') + '>Medium</option>'
+      + '</select></div>'
+      + '<button type="button" class="item-del-btn" onclick="removeBlocker(' + i + ')" title="Remove">×</button>'
+      + '</div>';
+  }).join('');
+}
+function addBlocker() {
+  blockers.push({text:'', owner:'', urgency:'medium'});
+  renderBlockers();
+  var ta = document.querySelectorAll('#blocker-items textarea');
+  if (ta.length) ta[ta.length-1].focus();
+  scheduleSave();
+}
+function removeBlocker(i) { blockers.splice(i,1); renderBlockers(); scheduleSave(); }
+
+// ── NEXT STEP ITEMS ───────────────────────────────────────────────────────
+function renderNextSteps() {
+  var el = document.getElementById('nextstep-items');
+  if (!el) return;
+  el.innerHTML = nextSteps.map(function(item, i) {
+    return '<div class="list-item-row">'
+      + '<textarea class="rpt-textarea" placeholder="What happens before the next update?"'
+      + ' oninput="nextSteps[' + i + '].text=this.value;scheduleSave()">' + esc(item.text) + '</textarea>'
+      + '<button type="button" class="item-del-btn" onclick="removeNextStep(' + i + ')" title="Remove">×</button>'
+      + '</div>';
+  }).join('');
+}
+function addNextStep() {
+  nextSteps.push({text:''});
+  renderNextSteps();
+  var ta = document.querySelectorAll('#nextstep-items textarea');
+  if (ta.length) ta[ta.length-1].focus();
+  scheduleSave();
+}
+function removeNextStep(i) { nextSteps.splice(i,1); renderNextSteps(); scheduleSave(); }
+
+// ── LABELS ────────────────────────────────────────────────────────────────
+var PHASE_LABELS = {poc:'PoC', design:'Design', evt:'EVT', dvt:'DVT', pvt:'PVT', mp:'Mass Production'};
+var RAG_LABELS   = {green:'On Track', amber:'At Risk', red:'Delayed'};
+var CAT_LABELS   = {
+  milestone:'Milestone', engineering:'Engineering', tooling:'Tooling',
+  procurement:'Procurement', quality:'Quality', commercial:'Commercial', factory:'Factory'
+};
+
+function fmtDate(str) {
+  if (!str) return '';
+  var d = new Date(str + 'T12:00:00');
+  return d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+}
+
+// ── PREVIEW ───────────────────────────────────────────────────────────────
+function showPreview() {
+  save();
+  renderPreview();
+  document.getElementById('edit-view').style.display      = 'none';
+  document.getElementById('edit-topbar').style.display    = 'none';
+  document.getElementById('preview-view').style.display   = '';
+  document.getElementById('preview-topbar').style.display = '';
+  window.scrollTo(0, 0);
+}
+
+function showEdit() {
+  document.getElementById('preview-view').style.display   = 'none';
+  document.getElementById('preview-topbar').style.display = 'none';
+  document.getElementById('edit-view').style.display      = '';
+  document.getElementById('edit-topbar').style.display    = '';
+  window.scrollTo(0, 0);
+}
+
+function renderPreview() {
+  var project   = gv('f-project') || 'Untitled Project';
+  var client    = gv('f-client');
+  var from      = fmtDate(gv('f-from'));
+  var to        = fmtDate(gv('f-to'));
+  var rptNum    = gv('f-rptnum');
+  var pm        = gv('f-pm');
+  var phase     = gv('f-phase');
+  var rag       = gv('f-rag');
+  var summary   = gv('f-summary');
+  var notes     = gv('f-notes');
+  var today     = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+  var period    = (from && to) ? from + ' – ' + to : from || to || '';
+  var ragCls    = rag === 'red' ? 'badge-red' : rag === 'amber' ? 'badge-amber' : 'badge-green';
+
+  var meta = [client && ('Client: ' + client), rptNum && ('#' + rptNum), pm].filter(Boolean).join('  ·  ');
+
+  var h = '';
+
+  // Header
+  h += '<div class="prev-hdr">';
+  h += '<div class="prev-hdr-top"><span class="prev-logo">SCM Bridge OS &nbsp;·&nbsp; Project Update</span><span class="prev-conf">Confidential</span></div>';
+  h += '<div class="prev-project">' + esc(project) + '</div>';
+  if (meta)   h += '<div class="prev-meta">' + esc(meta) + '</div>';
+  if (period) h += '<div class="prev-meta">Period: ' + esc(period) + '</div>';
+  h += '<div class="prev-badges">';
+  h += '<span class="prev-badge badge-phase">' + (PHASE_LABELS[phase] || phase) + '</span>';
+  h += '<span class="prev-badge ' + ragCls + '">' + (RAG_LABELS[rag] || rag) + '</span>';
+  h += '</div></div>';
+
+  // Body
+  h += '<div class="prev-body">';
+
+  // Summary
+  if (summary.trim()) {
+    h += '<div class="prev-section">';
+    h += '<div class="prev-sec-title">Executive Summary</div>';
+    h += '<div class="prev-summary">' + esc(summary).replace(/\n/g,'<br>') + '</div>';
+    h += '</div>';
+  }
+
+  // Completed
+  var doneItems = completed.filter(function(it){ return it.text.trim(); });
+  if (doneItems.length) {
+    h += '<div class="prev-section"><div class="prev-sec-title">Completed This Period</div><div class="prev-list">';
+    doneItems.forEach(function(it) {
+      h += '<div class="prev-item">';
+      h += '<span class="prev-item-badge cat-' + it.cat + '">' + (CAT_LABELS[it.cat] || it.cat) + '</span>';
+      h += '<div class="prev-item-body"><div class="prev-item-text">' + esc(it.text).replace(/\n/g,'<br>') + '</div></div>';
+      h += '</div>';
+    });
+    h += '</div></div>';
+  }
+
+  // Blockers
+  var blkItems = blockers.filter(function(it){ return it.text.trim(); });
+  if (blkItems.length) {
+    h += '<div class="prev-section"><div class="prev-sec-title">Open Items &amp; Blockers</div><div class="prev-list">';
+    blkItems.forEach(function(it) {
+      h += '<div class="prev-item">';
+      h += '<span class="prev-item-badge urg-' + it.urgency + '">' + (it.urgency === 'high' ? 'High' : 'Medium') + '</span>';
+      h += '<div class="prev-item-body">';
+      h += '<div class="prev-item-text">' + esc(it.text).replace(/\n/g,'<br>') + '</div>';
+      if (it.owner) h += '<div class="prev-item-sub">Owner: ' + esc(it.owner) + '</div>';
+      h += '</div></div>';
+    });
+    h += '</div></div>';
+  }
+
+  // Next steps
+  var nsItems = nextSteps.filter(function(it){ return it.text.trim(); });
+  if (nsItems.length) {
+    h += '<div class="prev-section"><div class="prev-sec-title">Next Steps</div><div class="prev-list">';
+    nsItems.forEach(function(it) {
+      h += '<div class="prev-arrow"><span class="prev-arr-icon">→</span><div class="prev-arr-text">' + esc(it.text).replace(/\n/g,'<br>') + '</div></div>';
+    });
+    h += '</div></div>';
+  }
+
+  // Notes
+  if (notes.trim()) {
+    h += '<div class="prev-section"><div class="prev-sec-title">Notes / Questions</div>';
+    h += '<div class="prev-notes">' + esc(notes) + '</div></div>';
+  }
+
+  h += '</div>'; // /prev-body
+
+  // Footer
+  h += '<div class="prev-footer">';
+  h += '<span>Prepared by ' + esc(pm || '—') + ' &nbsp;·&nbsp; ' + today + '</span>';
+  h += '<span>SCM Bridge OS</span>';
+  h += '</div>';
+
+  document.getElementById('prev-doc').innerHTML = h;
+}
+
+// ── NEW REPORT ────────────────────────────────────────────────────────────
+function newReport() {
+  if (!confirm('Start a new report? The current draft will be cleared.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  ['f-project','f-client','f-from','f-to','f-rptnum','f-pm','f-summary','f-notes'].forEach(function(id){ sv(id,''); });
+  sv('f-phase','design'); sv('f-rag','green');
+  completed = [{text:'', cat:'milestone'}];
+  blockers  = [];
+  nextSteps = [{text:''}];
+  renderCompleted(); renderBlockers(); renderNextSteps();
+  document.getElementById('save-status').textContent = 'New report';
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+load();
+</script>
+</body>
+</html>

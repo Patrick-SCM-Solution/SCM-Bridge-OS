@@ -1,0 +1,826 @@
+# SCM Solution — BD Qualification Framework
+# Purpose: Master operational framework for cold outreach, BANT discovery, and senior BD audit
+# Version: 2.0
+# Last Updated: June 2026
+# Authors: Patrick McGuinness (v1.0), expanded with Kara
+
+---
+# ============================================================================
+# HOW TO USE THIS DOCUMENT
+# ============================================================================
+# This is the operational system for all business development at SCM Solution.
+# It is not a pitch playbook — it is a framework for:
+#
+# 1. Training junior BD / interns on listening, not pitching
+# 2. Structuring cold outreach (Apollo 7-step / #SMYKM)
+# 3. Running BANT discovery calls with senior BD audit
+# 4. Making go/no-go qualification decisions
+# 5. Handing off qualified leads into the SOW process
+# 6. Logging BANT data into Odoo for pipeline visibility
+#
+# WHO OWNS WHAT:
+#   Junior BD / interns  →  Cold outreach + discovery calls + Odoo logging
+#   Patrick / Kara       →  Senior BD audit, go/no-go decisions, SOW, close
+#   Kara (founder)       →  SOW sign-off, kickoff, delivery oversight
+#                           (Kara's goal: reduce direct sales involvement
+#                            over time — she audits, does not operate BD)
+
+---
+philosophy:
+  positioning: "Solutions Provider — not a vendor, not a staffing agency"
+  mindset: "We solve problems. We are not selling time."
+
+  core_principle: |
+    Listen openly to understand the client's actual problem before offering
+    any solution. If we can't solve it or it's a poor fit, we say so and
+    walk away. Trust comes from honesty, not desperation to close.
+    The goal of every outreach and call is diagnosis, not persuasion.
+
+  pricing_approach:
+    internal_anchor: "$100/hour (never shared with client)"
+    customer_sees: "Outcome-based price — what the solution is worth, not hours"
+    example: |
+      Motis Fire Rescue: 50 hours of vendor sourcing → quoted as $5,000
+      The outcome they bought: "a stable supplier found and qualified"
+      Not what they paid for: "50 billable hours of someone's time"
+
+    when_customer_asks_price:
+      sequence:
+        1: "Don't answer directly. Redirect: 'Tell me what you're trying to solve.'"
+        2: "Diagnose the real problem — what does fixing it mean for their business?"
+        3: "Estimate the value of the outcome (not the effort)"
+        4: "Use $100/hr internally to sense-check whether the fee is right"
+        5: "Quote the outcome: 'We think we can solve this for $X — here's what that includes'"
+      rule: "Never quote a day rate or hourly rate to the client."
+
+  geographic_positioning: |
+    SCM Solution is Taiwan-based. This is a structural advantage, not just a detail:
+    - Deep factory relationships in Taiwan (quality, IP protection, Japanese-standard QC)
+    - Strong Vietnam network (cost-efficient, post-China diversification)
+    - Less focus on China (geopolitical risk, IP exposure, tariff uncertainty)
+    When a prospect asks "can you help us move away from China?" — the answer is yes,
+    and we have the network to do it.
+
+  walk_away_triggers:
+    - "Budget conscious" but no real operational pain articulated
+    - Looking for cheapest option, not best solution
+    - Won't commit time to a scoping conversation
+    - Decision-maker not accessible or won't take a call
+    - Timeline is "someday" or "next year" with no external trigger
+    - They want to "pick your brain" for free (no commitment to explore engagement)
+
+---
+team_structure:
+  senior_bd:
+    who:
+      - "Patrick McGuinness"
+      - "Kara (Founder)"
+    responsibilities: |
+      - Silently observe or audit all discovery calls
+      - Review BANT logs submitted by junior team
+      - Make all go/no-go qualification decisions
+      - Conduct or join scoping discovery calls for qualified leads
+      - Review and sign all SOWs (Kara signs)
+      - Conduct post-call debrief with junior BD (15 min)
+    kara_note: |
+      Kara's goal is to reduce direct BD involvement over time and focus on
+      operations and delivery. In the near term she co-audits with Patrick.
+      Long term: Patrick owns BD; Kara is available for strategic close calls
+      and all SOW sign-offs.
+
+  junior_bd_and_interns:
+    who: "Interns, junior team members designated for BD"
+    responsibilities: |
+      - Execute all cold outreach (emails, LinkedIn)
+      - Run initial 30-45 min discovery calls (senior BD observes)
+      - Log BANT findings in Odoo within 2 hours of call
+      - Submit call record for senior BD review
+      - Attend post-call debrief
+      - Follow up with prospects as directed by senior BD
+    hard_rule: |
+      Junior BD does NOT make qualification decisions independently.
+      All go/maybe/no-go decisions are made by senior BD after reviewing
+      the Odoo call record.
+
+  handoff_point: |
+    Junior BD submits BANT log → Senior BD reviews (within 24 hours) →
+    Decision made → If QUALIFIED, senior BD runs or joins scoping discovery call.
+
+---
+target_icp:
+  description: "Ideal Client Profile — who we want to work with"
+
+  shared_signals_across_all_verticals:
+    - Company size: 10-200 person hardware/manufacturing companies
+    - Has a specific supply chain pain (not vague interest)
+    - "$50K+ annual problem" — margin loss, expediting, delivery failures
+    - Decision-maker is accessible (founder, ops director, supply chain lead)
+    - Budget exists or can be justified (ops or capex, not asking for free work)
+    - Open to Taiwan / Vietnam manufacturing (not locked into China-only)
+
+  verticals:
+
+    early_stage_hardware_startups:
+      description: |
+        Post-prototype, pre-scale hardware companies ready to manufacture.
+        Often first-time founders who have a product but no factory relationships
+        or supply chain knowledge. High urgency: fundraising timelines, customer
+        commitments, or competitive pressure are pushing them to move fast.
+      why_we_win: |
+        We bridge the gap between a Western product team and Asian factories.
+        We speak both languages (literally and operationally). We're in Taipei,
+        which means same timezone as their partners, real relationships, no middlemen.
+      geography_angle: |
+        Many startups in this segment want to diversify away from China due to
+        IP risk, tariff exposure, and investor pressure. Taiwan and Vietnam are
+        natural alternatives — we have strong networks in both.
+      bant_signals:
+        budget:
+          source: "Seed or Series A capex, or first production PO budget"
+          typical_range: "$50K–$500K for first production run"
+          listen_for: "Have they received funding? Is there a capex line item for manufacturing?"
+        authority:
+          decision_maker: "Founder / CEO (almost always)"
+          listen_for: "Is the founder on the call? Do they have a hardware lead or CTO?"
+        need:
+          pain_points:
+            - "No factory relationships — don't know where to start"
+            - "Failed first production run (quality, delays)"
+            - "Moving too slowly to meet launch or investor milestones"
+            - "Getting gouged by middlemen or brokers"
+            - "Need help translating product specs into factory-ready files"
+          financial_impact: "Every month of delay = missed market window or investor trust"
+        timeline:
+          triggers:
+            - "Investor milestone (Series A close, next board meeting)"
+            - "Customer commitment (LOI, pre-order campaign)"
+            - "Competitive pressure (competitor launching soon)"
+          listen_for: "'We need to be shipping by Q[X]' — real deadline"
+      red_flags:
+        - Still in idea stage (no prototype, no product definition)
+        - Wants a single vendor introduction (not ongoing engagement)
+        - Not willing to pay for CM qualification or DFM support
+
+    consumer_electronics_wearables:
+      description: |
+        Brands sourcing in Asia for CE-marked or FCC-approved consumer products.
+        Often DTC or retail-bound. May have an existing CM but hitting quality,
+        capacity, or pricing problems. Sometimes brand-new to Asian manufacturing.
+      bant_signals:
+        budget:
+          source: "Product BOM budget, NRE, or supply chain ops line"
+          listen_for: "Are they talking about BOM cost? Production run size? NRE budget?"
+        authority:
+          decision_maker: "Head of Hardware, VP Supply Chain, or Founder"
+          listen_for: "Who owns the factory relationship today?"
+        need:
+          pain_points:
+            - "CM quality issues (defect rate, field failures)"
+            - "Single-source risk (one CM, no backup)"
+            - "Can't get DFM feedback fast enough"
+            - "Pricing from current CM is not competitive"
+            - "No on-the-ground presence in Asia to manage the relationship"
+          financial_impact: "Quality escapes = returns + brand damage. Delays = lost retail slots."
+        timeline:
+          triggers:
+            - "Product refresh / new SKU launch"
+            - "Current CM relationship failing (bad batch, capacity issue)"
+            - "Entering a new market (new certifications needed)"
+      red_flags:
+        - Just wants a CM list (not ongoing qualification support)
+        - BOM cost is the only concern (margin is too thin for us to add value)
+        - No quality or delivery problems currently (no urgency)
+
+    medical_devices_regulated_hardware:
+      description: |
+        Class I or Class II medical device companies needing suppliers who understand
+        ISO 13485, FDA 21 CFR Part 820, or CE MDR documentation requirements.
+        High-value, long-cycle, but exceptional fit for SCM Solution's quality emphasis.
+      why_we_win: |
+        Most supply chain consultants can't navigate regulatory requirements.
+        We understand what "qualified supplier" means in a regulated context and
+        can manage audit trails, supplier documentation, and incoming QC.
+      bant_signals:
+        budget:
+          source: "R&D capex or supply chain ops; sometimes regulatory/quality budget"
+          listen_for: "Is this funded through a product program or an ongoing ops line?"
+        authority:
+          decision_maker: "VP Supply Chain, Director of Operations, or Regulatory Affairs"
+          listen_for: "Who signs supplier qualification documents? That's the real authority."
+        need:
+          pain_points:
+            - "Supplier doesn't maintain ISO 13485 documentation"
+            - "FDA audit flagged supply chain gaps"
+            - "Can't find suppliers who understand regulatory traceability"
+            - "Building a new supply chain for Class II device expansion"
+          financial_impact: "Regulatory failure = product hold, recall risk, FDA warning letter"
+        timeline:
+          triggers:
+            - "FDA submission target date"
+            - "CE MDR renewal"
+            - "New product launch requiring new BOM qualification"
+          note: |
+            Medical timelines are long but FIXED. A submission date is a hard wall —
+            they cannot slip it without catastrophic consequences. This creates urgency
+            even when the date feels far away.
+      red_flags:
+        - Class III device (too complex, too high-risk for our scope)
+        - Looking for a regulatory consultant (not a supply chain partner)
+        - Supplier base is already qualified and stable (no immediate need)
+
+    ev_auto_components:
+      description: |
+        Tier 2/3 auto suppliers or EV startups sourcing critical components.
+        Long qualification cycles, strict quality standards (IATF 16949 awareness),
+        high-volume production requirements. More complex than typical hardware.
+      bant_signals:
+        budget:
+          source: "Program budget (large, multi-year)"
+          listen_for: "Is this tied to a vehicle program? Who funds the supply chain work?"
+        authority:
+          decision_maker: "Procurement Director + Engineering Lead (often a joint decision)"
+          listen_for: "Who signs supplier approvals? Who owns the PPAP process?"
+        need:
+          pain_points:
+            - "Existing supplier can't scale with volume ramp"
+            - "Single-source risk on a critical component"
+            - "Need qualified second source before SOP (Start of Production)"
+            - "Cost reduction program requiring new supplier identification"
+          financial_impact: "Line stoppage at an auto plant = $10K–$100K+ per hour"
+        timeline:
+          triggers:
+            - "Vehicle SOP date (non-negotiable)"
+            - "PPAP submission deadline"
+            - "Annual sourcing review cycle"
+      red_flags:
+        - They want us to manage IATF certification (not our scope)
+        - Volume too large for our network (>500K units/year, China-only sourcing)
+        - Tier 1 supplier with full procurement team (don't need us)
+
+    industrial_b2b_equipment:
+      description: |
+        Safety-critical industrial equipment manufacturers. Similar profile to Motis
+        Fire Rescue — mid-market, ops-heavy, supply chain pain driven by component
+        reliability and lead times rather than cost.
+      bant_signals:
+        budget:
+          source: "Operations or procurement budget"
+          listen_for: "Are they buying on value (reliability, safety) or price (margin)?"
+        authority:
+          decision_maker: "Operations Director or VP Procurement"
+        need:
+          pain_points:
+            - "Vendor reliability failing (missed deliveries, quality issues)"
+            - "Single-source components with no qualified backup"
+            - "Long lead times disrupting production schedule"
+            - "Need better visibility into supplier capacity and risk"
+          financial_impact: "Missed delivery to industrial buyer = contract penalty or lost renewal"
+        timeline:
+          triggers:
+            - "Production schedule gap (current vendor failing)"
+            - "Contract renewal with major buyer requiring supply chain audit"
+            - "New product line requiring new supplier qualification"
+      red_flags:
+        - Looking for the cheapest vendor (not a fit for our value-based model)
+        - Single transaction (want one vendor introduction, no ongoing relationship)
+
+---
+cold_outreach:
+  framework: "Apollo 7-Step (#SMYKM — Show Me You Know Me)"
+  research_depth: "Human + Company + Vertical — minimum 20 min research before outreach"
+  channel: "Email primary; LinkedIn second (never cold call without email first)"
+
+  pre_outreach_research_checklist:
+    - Company size, funding stage, recent news or product launches
+    - Likely decision-maker (LinkedIn — title, background, posts)
+    - Their current CM/supply chain approach (job postings, LinkedIn mentions, press)
+    - Vertical-specific pain points (what does every company in this space struggle with?)
+    - One specific personal or company detail to use in the subject line
+
+  steps:
+    1_subject_line:
+      rule: "Prove you did research. Specific > clever."
+      formula: "[Personal/company detail] + [implied problem]"
+      examples:
+        - "Paul's aluminum sourcing + Stoney Creek fire rescue"
+        - "KoreLock's IoT expansion — Taiwan CM question"
+        - "Saw the Kickstarter hit $800K — supply chain next?"
+      anti_patterns:
+        - "Quick question" (lazy)
+        - "Following up on hardware manufacturing" (generic)
+        - "Introduction — SCM Solution" (about us, not them)
+
+    2_first_sentence:
+      rule: "Non-salesy opener. Not 'I hope this finds you well.'"
+      what_to_do: "Reference the research. Make them think: this person actually looked me up."
+      examples:
+        - "We haven't met, but I saw you onboarded with Motis last quarter."
+        - "I noticed [company] just closed your Series A — congrats."
+        - "Your post on LinkedIn about Vietnam manufacturing caught my eye."
+
+    3_transition:
+      phrase: "The real reason for my outreach, however, is —"
+      purpose: "Bridge from the personal hook to the business problem. Avoids feeling like a bait-and-switch."
+
+    4_challenge:
+      rule: "Suspect a pain point. Don't claim certainty — hypothesis, not assumption."
+      formula: "Given [what I know about their situation], I suspect [specific pain]."
+      examples:
+        - "Given your fire rescue vertical, I suspect sourcing stable aluminum vendors is harder than it should be — especially when SKU continuity is critical."
+        - "For a Series A hardware company at your stage, I'd guess you're hitting DFM pushback from your CM and don't have leverage to fix it."
+        - "Post-China sourcing is easy to say and hard to execute. I'm guessing Vietnam hasn't been as straightforward as it looked."
+
+    5_value_proposition:
+      description: "Use ONE of three angles — hook, pain point insight, or loss aversion"
+      angles:
+        hook:
+          description: "Specific thing we do that maps to their pain"
+          example: "We've qualified vendors for 12 fire rescue companies in the past 18 months. All sourced in Taiwan or Vietnam."
+        pain_point:
+          description: "Show you understand their situation better than they expected"
+          example: "The real problem with CE-mark sourcing in Vietnam isn't finding a supplier — it's keeping documentation in shape for the audit. That's where most companies lose 3–6 months."
+        loss_aversion:
+          description: "What they're losing right now by not solving this. 2x more motivating than gain."
+          example: "Every month without a second-source qualified means one supplier failure can halt your production. At your run rate, that's not a risk — it's a deadline."
+
+    6_objection_handling:
+      rule: "Pre-handle the obvious objection before they think it."
+      common_objections:
+        we_have_vendors_already:
+          response: "I know you likely have supplier relationships. What we do differently is continuous qualification — we monitor supply chain risk so you don't need a dedicated team in Asia to do it."
+        we_do_this_internally:
+          response: "Makes sense at scale. What we often find is that internal sourcing works well until you need to move fast or move away from China — that's usually when the gap shows."
+        we_cant_afford_consultants:
+          response: "We don't quote time — we quote outcomes. So the question is what finding a stable supplier is worth to your business, not what our hourly rate is."
+
+    7_close:
+      rules:
+        - Always end with a question (not a statement)
+        - Never include a calendar link in the first email
+        - Tone: "Thanks!" or "Cheers!" (not "Best regards" or "Sincerely")
+      examples:
+        - "Worth a 20-minute call to compare notes on your sourcing situation?"
+        - "Interested in how we approach vendor qualification for [their vertical]?"
+        - "Happy to share how we handled [similar pain] for [comparable company] — interested?"
+
+  follow_up_cadence:
+    description: |
+      If no reply to initial outreach, follow up 3 times over 14 days.
+      After that, send a break-up email and tag for 90-day re-check.
+      Do not chase past 4 touches without a signal of interest.
+    sequence:
+      day_0:
+        action: "Send initial SMYKM email"
+      day_3:
+        action: "First follow-up"
+        format: "Reply to the same thread — one sentence"
+        example: "Wanted to bump this in case it got buried — thoughts?"
+      day_7:
+        action: "Second follow-up"
+        format: "Add a new value hook or piece of context"
+        example: "Worth adding: we recently helped a [similar company type] qualify a new CM in Vietnam in under 8 weeks. Relevant to your situation?"
+      day_14:
+        action: "Break-up email"
+        format: "Graceful close — short, honest, no pressure"
+        example: |
+          "I'll stop here so I'm not adding noise to your inbox. If [supply chain pain]
+          ever becomes urgent, happy to reconnect. Good luck with [specific thing]."
+      post_break_up:
+        action: "Tag in Odoo CRM for 90-day re-check"
+        note: "A graceful walk-away often gets a reply within 30 days. Situations change."
+
+---
+bant_discovery_call:
+  purpose: |
+    Uncover whether the prospect is qualified on all four BANT dimensions.
+    Junior BD leads. Senior BD (Patrick or Kara) observes silently.
+    Goal is diagnosis, not pitch.
+
+  format:
+    duration: "30–45 minutes"
+    structure: "Junior BD runs the call. Senior BD on mute, camera off."
+    post_call: "Senior BD reviews Odoo BANT log within 24 hours and makes decision."
+
+  pre_call_prep:
+    junior_checklist:
+      - "Re-read company research (size, vertical, recent news)"
+      - "Identify likely decision-maker and any stakeholders on the call"
+      - "Map probable supply chain pain points for their vertical"
+      - "Prepare 3–5 discovery questions — don't memorize, use as a guide"
+      - "Open Odoo call record template before the call starts"
+      - "Brief senior BD on prospect (5 min pre-call sync)"
+
+  conversation_flow:
+    opening: |
+      "Thanks for making the time. Before I say anything about what we do, I want
+      to understand your situation. What's the main supply chain challenge you're
+      dealing with right now?"
+    listening_stance: |
+      Ask one question. Let them talk. Don't interrupt. When they finish, ask:
+      "What else is happening there?" or "How does that affect your operations?"
+      Resist the urge to pitch. The more they talk, the more you learn.
+    bant_weaving: |
+      Don't ask BANT as four formal questions in sequence. Weave them naturally:
+        NEED    → emerges from "what's the challenge"
+        TIMELINE → "When do you need this sorted?"
+        BUDGET  → "Have you thought about what solving this is worth to you?"
+        AUTHORITY → "Who else needs to weigh in on something like this?"
+    closing: |
+      "Based on what you've shared — [reflect back the problem in their words].
+      I think we may be able to help, but I want to talk with my team about your
+      situation and whether we're a real fit. Can I follow up with you by [specific date]?"
+
+  bant_framework:
+    budget:
+      primary_question: "What budget have you allocated for solving this?"
+      follow_up_probes:
+        - "Is that budget already approved, or does it need sign-off?"
+        - "Is this sitting in an ops budget, a capex line, or a project budget?"
+        - "What's the approval process — one sign-off or multiple layers?"
+        - "What would you expect to pay to have this fully resolved?"
+      listen_for:
+        green: "Specific number, clear owner, approved or path to approval clear"
+        yellow: "'It depends on scope' — requires more probing"
+        red: "'We don't have budget right now' or 'We were hoping this would be cheap'"
+      decision:
+        green: "Proceed"
+        yellow: "One more follow-up question before deciding"
+        red: "Walk away"
+
+    authority:
+      primary_question: "Who else needs to be involved in a decision like this?"
+      follow_up_probes:
+        - "Is the final call yours to make, or does it go up the chain?"
+        - "Does procurement or finance need to sign off?"
+        - "Are there other stakeholders we should loop in for the scoping call?"
+        - "Who would veto this if they disagreed?"
+      listen_for:
+        green: "They decide, or they're the key influencer with a clear path to the DM"
+        yellow: "Real influencer but DM is someone else — get the DM on the next call"
+        red: "'My boss decides' with no path to that person"
+      decision:
+        green: "Proceed"
+        yellow: "Request DM join the scoping call before qualifying"
+        red: "Walk away or park"
+
+    need:
+      primary_question: "What happens if you don't solve this problem?"
+      follow_up_probes:
+        - "What does this cost you right now in dollars, time, or risk?"
+        - "Has this caused any operational failures — missed deliveries, quality escapes?"
+        - "Is this a 'nice to fix' or a 'must fix before [event]'?"
+        - "How long has this been a problem? What's changed that makes now the moment?"
+      listen_for:
+        green: "Financial impact articulated, operational urgency, specific event driving action"
+        yellow: "Real pain but they haven't quantified it yet — keep probing"
+        red: "'It would be nice to improve this' with no operational urgency"
+      decision:
+        green: "Proceed"
+        yellow: "Probe: 'If you don't fix this by [date], what breaks?'"
+        red: "Walk away — no urgency means no engagement"
+
+    timeline:
+      primary_question: "When do you need this solved by?"
+      follow_up_probes:
+        - "Is there an external deadline driving that — a contract, launch, audit?"
+        - "What happens if you miss that date?"
+        - "How long have you been looking at this? Why now?"
+        - "If we could start next month, would you be ready to move?"
+      listen_for:
+        green: "Specific date or external trigger (contract, product launch, production start)"
+        yellow: "'This quarter' — fuzzy but real"
+        red: "'Eventually', 'next year', 'when the time is right'"
+      decision:
+        green: "Proceed"
+        yellow: "Clarify: 'What would have to happen for the timeline to firm up?'"
+        red: "Walk away — no timeline means no urgency"
+
+  post_call_odoo_logging:
+    who: "Junior BD — within 2 hours of call"
+    what_to_log:
+      - "B: Budget — amount, owner, approval status, path to sign-off"
+      - "A: Authority — is DM on call? Who has veto? Who else is involved?"
+      - "N: Need — problem statement in their exact words, financial impact, urgency"
+      - "T: Timeline — specific date or trigger, flexibility"
+      - "Conversation summary (3–5 sentences)"
+      - "Red flags (list)"
+      - "Green lights (list)"
+      - "Preliminary recommendation: qualified / maybe / unqualified"
+    rule: "Log immediately after the call while it's fresh. Don't wait."
+
+---
+audit_and_decision_framework:
+  who_decides: "Patrick or Kara (senior BD) — always. Junior BD does not decide."
+  when_they_audit: "Observe call silently. Review BANT log within 24 hours of submission."
+
+  decision_criteria:
+    qualified:
+      all_must_be_true:
+        - "Budget is real and approved (or path to approval is clear and near-term)"
+        - "Authority is clear — decision-maker or strong influencer on call"
+        - "Need is urgent and has operational/financial impact — not theoretical"
+        - "Timeline is specific — this quarter or next quarter, with an external trigger"
+      action: "Senior BD initiates scoping discovery call within 1 week"
+
+    maybe:
+      one_dimension_is_fuzzy:
+        - "Need is real but timeline is soft"
+        - "Authority is unclear (too many stakeholders)"
+        - "Budget exists but approval path is murky"
+        - "Timeline exists but no external trigger found"
+      action: "Junior BD sends one targeted follow-up email to clarify the fuzzy dimension"
+      rule: "One follow-up. If still fuzzy after that — move to no-go."
+
+    no_go:
+      any_one_is_true:
+        - "No real budget, or 'too expensive' without exploring value"
+        - "Not the decision-maker and no path to the decision-maker"
+        - "Pain point is theoretical — no operational or financial urgency"
+        - "'Maybe next year' or 'someday' timeline"
+        - "They want a free consultation or a vendor list without an engagement"
+      action: "Senior BD sends graceful decline. Tag for 6-month re-check if the vertical is strong."
+
+  decline_language:
+    from: "Junior BD (on behalf of team)"
+    tone: "Professional, respectful, honest — never dismissive"
+    template: |
+      "After our conversation, I don't think we're the right fit for your
+      timeline and scope right now — our process is thorough, and rushing it
+      doesn't serve you well. I'd be happy to reconnect in [timeframe] when
+      things may be clearer. Good luck with [specific thing they mentioned]."
+    note: "Walking away gracefully builds more credibility than forcing a close."
+
+---
+qualified_prospect_journey:
+  description: |
+    After senior BD marks a prospect QUALIFIED, the lead moves into the
+    client acquisition process. Junior BD hands off to senior BD here.
+
+  step_1_scoping_discovery_call:
+    who: "Senior BD (Patrick or Kara) + prospect"
+    duration: "45–60 minutes"
+    goals:
+      - "Understand the full scope of the problem"
+      - "Map specific deliverables and success criteria"
+      - "Understand the prospect's team structure and key contacts"
+      - "Identify timeline milestones and dependencies"
+      - "Sense-check fit — is this the right engagement for SCM Solution?"
+    output: "Scope summary email to prospect within 24 hours of call"
+
+  step_2_sow_preparation:
+    who: "Kara (founder review and sign-off)"
+    timeline: "3–5 business days from scoping call"
+    sow_contents:
+      - "Scope of work — specific deliverables, not activity descriptions"
+      - "Timeline and milestones"
+      - "Pricing — outcome-based, not hourly"
+      - "Success criteria (how we both know the job is done)"
+      - "Terms and conditions"
+      - "Payment schedule"
+    pricing_rule: |
+      Quote the outcome, not the hours. Use $100/hr internally to check
+      whether the fee makes sense for the effort. Client sees a project price.
+
+  step_3_sow_review:
+    who: "Senior BD manages. Kara available for strategic negotiation."
+    duration: "Typically 1 week"
+    rules:
+      - "Minor scope adjustments OK within the same price"
+      - "Major scope changes require a revised SOW"
+      - "Do not discount without Kara's approval"
+
+  step_4_signed_sow_and_nda:
+    actions:
+      - "NDA executed (use SCM Solution standard Mutual NDA template)"
+      - "Signed SOW filed in project Google Drive folder"
+      - "Odoo deal moved to 'Won' status"
+
+  step_5_project_kickoff:
+    who: "Kara (ops lead) + client"
+    actions:
+      - "Set up project Google Drive folder structure"
+      - "Open project contact log"
+      - "Brief delivery team on scope and client context"
+      - "Schedule first weekly or bi-weekly status call"
+      - "Send kickoff summary: timeline, key milestones, first deliverable date"
+    output: "Kickoff summary email + shared project timeline"
+
+---
+coaching_and_iteration:
+  post_call_debrief:
+    who: "Senior BD + junior BD who ran the call"
+    duration: "15 minutes — immediately after the decision"
+    questions:
+      - "Where did you listen well? Where did you start pitching too early?"
+      - "Which BANT dimension did you miss or underprobe?"
+      - "What would you ask differently next time?"
+      - "What was the moment you knew this was a qualified / unqualified lead?"
+
+  pattern_tracking:
+    senior_bd_builds_library_over_time:
+      - "Which verticals have realistic budgets for our engagement model?"
+      - "Which questions reliably surface the 'need' signal fastest?"
+      - "Which red flags are real vs. false alarms?"
+      - "What's the typical sales cycle by vertical?"
+
+  monthly_review:
+    what: "Review qualified leads that became clients"
+    goal: "What BANT patterns predicted success? Refine ICP accordingly."
+    output: "Update this framework — it should get sharper every quarter."
+
+---
+red_flags_and_walk_aways:
+  by_stage:
+    cold_outreach:
+      - "No response after 4 touches (break-up + 90-day re-check)"
+      - "'Not the right person' reply with no referral to the right person"
+      - "'We're happy with our current setup' (no pain signal)"
+    discovery_call:
+      - "No budget allocated despite direct question"
+      - "Decision-maker won't take a call"
+      - "'We're comparing 5 vendors on price' (shopping on cost alone)"
+      - "'We'd love a free assessment first' (no commitment to explore)"
+      - "Timeline is soft with no external trigger"
+      - "'It would be good to solve this eventually'"
+    post_call:
+      - "BANT log is incomplete after 2 follow-up questions"
+      - "Prospect ghosts after call (no response to follow-up email)"
+      - "'We'll revisit if things change' (no urgency, no commitment)"
+
+  walk_away_language:
+    tone: "Honest, professional, brief — no groveling, no over-explaining"
+    templates:
+      general: |
+        "After our conversation, I don't think we're aligned on timeline and scope.
+        Our process is thorough, and rushing it doesn't serve you well. Let's reconnect
+        in [timeframe]. Good luck with [specific detail they shared]."
+      no_budget: |
+        "Based on what you've shared, the budget isn't there yet for the kind of
+        engagement that would actually solve this. Happy to reconnect when that changes —
+        in the meantime, good luck with [project/milestone]."
+      no_timeline: |
+        "Without a clear timeline driving this, we wouldn't be adding value right now.
+        When [event or urgency] shows up, reach back out — we'd love to help."
+      ghosted: |
+        "I'll stop reaching out so I'm not adding noise. If [supply chain pain] ever
+        becomes urgent, you know where to find us. Good luck!"
+
+---
+odoo_integration:
+  call_record_schema:
+    fields:
+      prospect_name: string
+      company: string
+      vertical: string
+      call_date: date
+      call_duration: integer  # minutes
+      junior_bd_name: string
+      senior_bd_observer: string
+
+      bant:
+        budget:
+          amount: float
+          currency: string
+          owner: string
+          approval_status:
+            type: enum
+            values: [approved, pending_approval, unclear, no_budget]
+          timeline_to_approval: string
+
+        authority:
+          decision_maker_on_call: boolean
+          decision_maker_name: string
+          influencers: list
+          veto_holders: list
+          path_to_dm: string  # if DM not on call
+
+        need:
+          problem_statement: text  # in prospect's exact words
+          financial_impact: string  # e.g. "$50K/month risk"
+          urgency_level:
+            type: enum
+            values: [high, medium, low, none]
+
+        timeline:
+          target_date: date
+          external_trigger: string  # e.g. "contract renewal", "Series A close"
+          flexibility:
+            type: enum
+            values: [fixed, flexible, undefined]
+
+      conversation_summary: text  # 3-5 sentences
+      red_flags: list
+      green_lights: list
+      junior_recommendation:
+        type: enum
+        values: [qualified, maybe, unqualified]
+      senior_bd_decision:
+        type: enum
+        values: [qualified, maybe, unqualified, pending_review]
+      senior_bd_notes: text
+      next_action: string
+      next_action_date: date
+      re_check_date: date  # if parked — 90 days or 6 months
+
+  workflow_automation:
+    trigger: "Call record submitted by junior BD"
+    if_qualified:
+      - "Create 'Scoping Call' task, assign to Patrick or Kara"
+      - "Set due date: within 5 business days of qualification"
+      - "Move Odoo pipeline stage to 'Qualified — Scoping'"
+      - "Link to deal record"
+    if_maybe:
+      - "Create 'Follow-Up Question' task for junior BD"
+      - "Set due date: within 2 business days"
+      - "Note which BANT dimension needs clarification"
+    if_unqualified:
+      - "Log decline reason"
+      - "Set CRM status to 'Not a Fit'"
+      - "Set re_check_date if vertical is strong (6 months)"
+      - "Create task for junior BD: send decline email within 24 hours"
+
+  reporting_dashboard:
+    visible_to: "Patrick + Kara"
+    metrics:
+      - "Outreach sent this week / month"
+      - "Calls booked"
+      - "Calls completed"
+      - "BANT pass rate (by junior BD, by vertical)"
+      - "Average call-to-decision time"
+      - "Qualified leads pending scoping call"
+      - "Deals in SOW stage"
+
+---
+metrics_and_tracking:
+  per_person_per_month:
+    - Outreach sent
+    - Reply rate (positive + negative)
+    - Calls booked
+    - Calls completed
+    - BANT qualified (pass rate %)
+    - Proposals / SOWs generated
+    - Deals closed
+
+  by_vertical:
+    - Pass rate (calls to qualified)
+    - Average BANT quality score
+    - Average sales cycle length (first touch to signed SOW)
+    - Win rate (qualified to closed)
+
+  coaching_focus:
+    - Which junior BD is getting highest call quality?
+    - Which BANT dimensions are being consistently missed?
+    - Which verticals are converting best?
+    - Which red flags are being caught early vs. late?
+
+---
+summary_checklist_for_junior_bd:
+  before_outreach:
+    - [ ] Research company (size, vertical, leadership, recent news, funding stage)
+    - [ ] Identify likely decision-maker (LinkedIn)
+    - [ ] Map their probable supply chain pain (vertical-specific)
+    - [ ] Find one SMYKM angle — personal or business detail for subject line
+    - [ ] Draft email — share with senior BD for first few until style is approved
+
+  before_call:
+    - [ ] Re-read company research
+    - [ ] Prepare 3–5 BANT discovery questions (guide, not script)
+    - [ ] Open Odoo call record template before the call
+    - [ ] 5-min pre-call sync with senior BD observer
+    - [ ] Test audio/video if remote
+
+  during_call:
+    - [ ] Senior BD is listening — talk naturally, don't perform
+    - [ ] Ask one question, then let them talk
+    - [ ] Take brief notes on BANT signals as they emerge
+    - [ ] Don't pitch. Listen for pain.
+    - [ ] End with: "Let me follow up with you by [specific date]"
+
+  after_call:
+    - [ ] Log BANT findings in Odoo within 2 hours
+    - [ ] Write problem statement in their exact words (not your interpretation)
+    - [ ] List red flags and green lights
+    - [ ] Submit call record for senior BD review
+    - [ ] Attend post-call debrief (15 min with senior BD)
+    - [ ] Send prospect follow-up email as directed by senior BD
+
+---
+version_history:
+  v1_0:
+    date: "2026-06-24"
+    author: "Patrick McGuinness"
+    summary: "Initial framework — philosophy, outreach, BANT, audit, Odoo schema"
+  v2_0:
+    date: "2026-06-24"
+    author: "Patrick McGuinness + Kara"
+    summary: |
+      Major expansion:
+      - Added 5 vertical ICPs with detailed BANT signals (early-stage hardware
+        startups, consumer electronics, medical devices, EV/auto, industrial)
+      - Added geographic positioning (Taiwan/Vietnam advantage, less China)
+      - Added full post-qualification journey (scoping → SOW → kickoff)
+      - Added cold outreach follow-up cadence (Day 0/3/7/14 + break-up email)
+      - Added deeper BANT probing questions per dimension
+      - Clarified team structure (junior BD runs calls; Patrick/Kara audit)
+      - Expanded decline language templates
+      - Expanded Odoo schema with junior/senior BD fields and re-check dates

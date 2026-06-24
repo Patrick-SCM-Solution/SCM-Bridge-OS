@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mutual NDA Template — SCM Bridge OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/scm-styles.css">
+<style>
+.nda-actions {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+.nda-note {
+  font-size: 12px; color: var(--muted); margin-left: auto;
+}
+
+/* ── Document shell ─────────────────────────────────── */
+.doc-shell {
+  background: #fff;
+  color: #111;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,.4);
+  margin-bottom: 48px;
+}
+.doc-body {
+  padding: 72px 80px;
+  max-width: 780px;
+  margin: 0 auto;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 12pt;
+  line-height: 1.7;
+  color: #111;
+}
+
+/* ── Document typography ────────────────────────────── */
+.doc-title {
+  text-align: center;
+  font-size: 14pt;
+  font-weight: bold;
+  margin-bottom: 32px;
+  letter-spacing: .02em;
+}
+.doc-parties {
+  margin-bottom: 24px;
+  line-height: 1.9;
+}
+.doc-party-line {
+  border-bottom: 1px solid #111;
+  display: block;
+  margin-top: 20px;
+  margin-bottom: 4px;
+  width: 60%;
+}
+.doc-body p {
+  margin-bottom: 14px;
+  text-align: justify;
+}
+.doc-section {
+  display: flex; gap: 16px; margin-bottom: 14px;
+}
+.doc-section-num {
+  flex-shrink: 0; font-weight: normal; min-width: 20px;
+}
+.doc-section-body { flex: 1; text-align: justify; }
+.doc-subsection {
+  display: flex; gap: 16px; margin-top: 10px; padding-left: 20px;
+}
+.doc-subsection-id { flex-shrink: 0; min-width: 28px; }
+.doc-subsection-body { flex: 1; text-align: justify; }
+.doc-italic { font-style: italic; text-align: center; margin: 20px 0; }
+
+/* ── Signature block ────────────────────────────────── */
+.sig-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+  margin-top: 32px;
+}
+.sig-col { }
+.sig-party-name { font-weight: bold; margin-bottom: 24px; }
+.sig-field {
+  display: flex; flex-direction: column; gap: 4px; margin-bottom: 18px;
+}
+.sig-label { font-size: 10pt; }
+.sig-line {
+  border-bottom: 1px solid #111;
+  height: 24px;
+  display: block;
+}
+
+/* ── Editable counterparty ──────────────────────────── */
+.counterparty-input {
+  background: #fef9e7;
+  border: 1px dashed #c8a200;
+  border-radius: 3px;
+  padding: 3px 8px;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 12pt;
+  color: #111;
+  width: 100%;
+  outline: none;
+  line-height: 1.5;
+}
+.counterparty-input:focus { background: #fffde7; border-color: #f0b800; }
+.counterparty-hint {
+  font-size: 11px; color: var(--muted); margin-bottom: 6px;
+  font-style: italic;
+}
+
+/* ── Print styles ───────────────────────────────────── */
+@media print {
+  #site-nav-root, .nda-actions, .counterparty-hint, header { display: none !important; }
+  body { background: #fff !important; }
+  body::before { display: none !important; }
+  .wrap { padding: 0 !important; max-width: none !important; }
+  .doc-shell { box-shadow: none; border-radius: 0; margin: 0; }
+  .doc-body { padding: 40px 60px; }
+  .counterparty-input { background: transparent !important; border: none !important; border-bottom: 1px solid #111 !important; border-radius: 0; padding: 0; }
+  footer { display: none !important; }
+}
+</style>
+</head>
+<body>
+<div id="site-nav-root"></div>
+<script src="../nav.js"></script>
+
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="phase-tag phase-tag--blue">Idea Phase · DR0</div>
+      <h1>Mutual <span class="text-blue">NDA Template</span></h1>
+      <p class="subtitle" style="margin-bottom:0">Standard mutual non-disclosure agreement for SCM Solution Ltd. Fill in the counterparty details, then print or save as PDF.</p>
+    </div>
+    <div class="header-badge">SCM Solution Ltd.</div>
+  </header>
+
+  <div class="nda-actions">
+    <button class="btn btn-primary" onclick="window.print()">Print / Save as PDF</button>
+    <a href="../tools/workflow.html" class="btn btn-ghost">← Workflow</a>
+    <span class="nda-note">Tip: use your browser's Print → Save as PDF to export a signed-ready copy</span>
+  </div>
+
+  <div class="counterparty-hint">Fill in counterparty name and address below before printing:</div>
+
+  <!-- ── NDA Document ───────────────────────────────── -->
+  <div class="doc-shell">
+    <div class="doc-body">
+
+      <div class="doc-title">MUTUAL NON-DISCLOSURE AGREEMENT</div>
+
+      <div class="doc-parties">
+        <p style="margin-bottom:6px">between</p>
+        SCM Solution Ltd.<br>
+        7F-1, 380, Linsen N. Rd.<br>
+        Taipei 10451<br>
+        Taiwan, R.O.C.
+        <p style="margin-top:16px;margin-bottom:6px">and</p>
+        <input class="counterparty-input" type="text" placeholder="Counterparty name and address…" aria-label="Counterparty name and address">
+        <p style="margin-top:16px">each hereinafter referred to individually as a "Party" and together as the "Parties."</p>
+      </div>
+
+      <p>The above named Parties desire to begin discussions regarding a business opportunity of mutual interest (the "Business Purpose"). In connection with such discussions, the Parties recognize that there is a need to disclose to each other certain confidential information to be used only for the Business Purpose and to protect such confidential information from unauthorized use and disclosure.</p>
+
+      <p>In consideration of the other Party's disclosure of such confidential information, each Party agrees as follows:</p>
+
+      <div class="doc-section">
+        <div class="doc-section-num">1.</div>
+        <div class="doc-section-body">For purposes of this Agreement, "Confidential Information" means any technical or business information disclosed by one Party to the other Party that: (i) if disclosed in writing, is marked "confidential" or "proprietary" at the time of such disclosure; (ii) if disclosed orally, is identified as "confidential" or "proprietary" at the time of such disclosure, and is summarized in a writing sent by the disclosing Party to the receiving Party within thirty (30) days after any such disclosure; or (iii) under the circumstances, a person exercising reasonable business judgment would understand to be confidential or proprietary.</div>
+      </div>
+
+      <div class="doc-section">
+        <div class="doc-section-num">2.</div>
+        <div class="doc-section-body">Each Party agrees: (i) to maintain the other Party's Confidential Information in strict confidence; (ii) not to disclose such Confidential Information to any third parties; and (iii) not to use any such Confidential Information for any purpose except for the Business Purpose. Each Party may disclose the Confidential Information of the other Party to its employees and consultants who have a bona fide need to know such Confidential Information for the Business Purpose, but solely to the extent necessary to pursue the Business Purpose and for no other purpose; provided that each such employee and consultant first executes a written agreement (or is otherwise already bound by a written agreement) that contains use and nondisclosure restrictions at least as protective of the other Party's Confidential Information as those set forth in this Agreement. The provisions of this Section 2 will not restrict a Party from disclosing the other Party's Confidential Information to the extent required by any law or regulation; provided that the Party required to make such a disclosure uses reasonable efforts to give the other Party reasonable advance notice of such required disclosure in order to enable the other Party to prevent or limit such disclosure.</div>
+      </div>
+
+      <div class="doc-section">
+        <div class="doc-section-num">3.</div>
+        <div class="doc-section-body">
+          The receiving Party's obligations in Section 2 will not apply to the extent any Confidential Information:
+          <div class="doc-subsection">
+            <div class="doc-subsection-id">(i)</div>
+            <div class="doc-subsection-body">is now or hereafter becomes generally known or available to the public, through no act or omission on the part of the receiving Party;</div>
+          </div>
+          <div class="doc-subsection">
+            <div class="doc-subsection-id">(ii)</div>
+            <div class="doc-subsection-body">was known, without restriction as to use or disclosure, by the receiving Party prior to receiving such information from the disclosing Party;</div>
+          </div>
+          <div class="doc-subsection">
+            <div class="doc-subsection-id">(iii)</div>
+            <div class="doc-subsection-body">is rightfully acquired by the receiving Party from a third party who has the right to disclose it and who provides it without restriction as to use or disclosure; or</div>
+          </div>
+          <div class="doc-subsection">
+            <div class="doc-subsection-id">(iv)</div>
+            <div class="doc-subsection-body">is independently developed by the receiving Party without access to any Confidential Information of the disclosing Party.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-section">
+        <div class="doc-section-num">4.</div>
+        <div class="doc-section-body">Upon the disclosing Party's request, the receiving Party will promptly return to the disclosing Party all tangible items and embodiments containing or consisting of the disclosing Party's Confidential Information and all copies thereof (including electronic copies) and provide the disclosing Party with a written officer's certificate certifying the receiving Party's compliance with the foregoing obligation.</div>
+      </div>
+
+      <div class="doc-section">
+        <div class="doc-section-num">5.</div>
+        <div class="doc-section-body">All Confidential Information remains the sole and exclusive property of the disclosing Party. Each Party acknowledges and agrees that nothing in this Agreement will be construed as granting any rights to the receiving Party, by license or otherwise, in or to any Confidential Information of the disclosing Party, or any patent, copyright or other intellectual property or proprietary rights of the disclosing Party, except as specified in this Agreement.</div>
+      </div>
+
+      <div class="doc-section">
+        <div class="doc-section-num">6.</div>
+        <div class="doc-section-body">ALL CONFIDENTIAL INFORMATION IS PROVIDED BY THE DISCLOSING PARTY "AS IS."</div>
+      </div>
+
+      <div class="doc-section">
+        <div class="doc-section-num">7.</div>
+        <div class="doc-section-body">Each Party acknowledges that the unauthorized use or disclosure of the disclosing Party's Confidential Information would cause the disclosing Party to incur irreparable harm and significant damages, the degree of which may be difficult to ascertain. Accordingly, each Party agrees that the disclosing Party will have the right to obtain immediate equitable relief to enjoin any unauthorized use or disclosure of its Confidential Information, in addition to any other rights and remedies that it may have at law or otherwise.</div>
+      </div>
+
+      <div class="doc-section">
+        <div class="doc-section-num">8.</div>
+        <div class="doc-section-body">This Agreement will be construed, interpreted, and applied in accordance with the laws of Taiwan (excluding its body of law controlling conflicts of law). This Agreement is the complete and exclusive statement regarding the subject matter of this Agreement and supersedes all prior agreements, understandings and communications, oral or written, between the Parties regarding the subject matter of this Agreement. Neither Party may assign this Agreement, in whole or in part, without the other Party's prior written consent, and any attempted assignment without such consent will be void.</div>
+      </div>
+
+      <div class="doc-section">
+        <div class="doc-section-num">9.</div>
+        <div class="doc-section-body">This Agreement will commence on the date first set forth above and will remain in effect for three (3) years from the date of the last disclosure of Confidential Information by either Party, at which time it will terminate; provided, however, that with respect to any Confidential Information that constitutes a trade secret under applicable law, the obligations of confidentiality and non-use set forth in this Agreement will continue for so long as such Confidential Information remains a trade secret.</div>
+      </div>
+
+      <p class="doc-italic">[Signature Page Follows]</p>
+
+      <p>IN WITNESS WHEREOF, the Parties hereto have executed this Mutual Non-Disclosure Agreement by their duly authorized officers or representatives as of the date first set forth above.</p>
+
+      <div class="sig-grid">
+        <div class="sig-col">
+          <div class="sig-field">
+            <span class="sig-line"></span>
+            <span class="sig-label">&nbsp;</span>
+          </div>
+          <div class="sig-field">
+            <span class="sig-label">Signature:</span>
+            <span class="sig-line"></span>
+          </div>
+          <div class="sig-field">
+            <span class="sig-label">Name:</span>
+            <span class="sig-line"></span>
+          </div>
+          <div class="sig-field">
+            <span class="sig-label">Title:</span>
+            <span class="sig-line"></span>
+          </div>
+          <div class="sig-field">
+            <span class="sig-label">Date:</span>
+            <span class="sig-line"></span>
+          </div>
+        </div>
+        <div class="sig-col">
+          <div class="sig-party-name">SCM Solution Ltd.</div>
+          <div class="sig-field">
+            <span class="sig-label">Signature:</span>
+            <span class="sig-line"></span>
+          </div>
+          <div class="sig-field">
+            <span class="sig-label">Name:</span>
+            <span class="sig-line"></span>
+          </div>
+          <div class="sig-field">
+            <span class="sig-label">Title:</span>
+            <span class="sig-line"></span>
+          </div>
+          <div class="sig-field">
+            <span class="sig-label">Date:</span>
+            <span class="sig-line"></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <span>SCM Solution LTD. — NDA Template</span>
+    <span>© 2025 · For internal use</span>
+  </footer>
+
+</div>
+</body>
+</html>
