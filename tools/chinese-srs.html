@@ -3,144 +3,214 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chinese SCM Reference — SCM Hardware System</title>
+<title>Chinese SCM Reference — SCM Bridge OS</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/scm-styles.css">
 <style>
-  /* ── PAGE-SPECIFIC ── */
+  /* ── MODE TOGGLE ──────────────────────────────────────────────── */
+  .mode-toggle { display:flex; gap:8px; margin-bottom:28px; }
+  .mode-btn {
+    font-family:"Barlow Condensed",sans-serif; font-size:13px; font-weight:700;
+    letter-spacing:.08em; text-transform:uppercase; padding:9px 20px; border-radius:6px;
+    cursor:pointer; border:1px solid var(--bdr); background:var(--surf); color:var(--muted);
+    transition:all .15s; display:inline-flex; align-items:center; gap:8px;
+  }
+  .mode-btn:hover { border-color:var(--scm-blue); color:var(--scm-blue); }
+  .mode-btn.active { background:var(--scm-blue); border-color:var(--scm-blue); color:#fff; }
+  .due-badge {
+    font-size:10px; font-weight:800; padding:1px 7px; border-radius:10px;
+    background:var(--scm-blue); color:#fff;
+  }
+  .mode-btn.active .due-badge { background:rgba(255,255,255,.25); color:#fff; }
+
+  /* ── REFERENCE — search / tabs / grid ────────────────────────── */
   .search-bar {
-    display: flex; gap: 12px; align-items: center;
-    background: var(--surf); border: 1px solid var(--bdr);
-    border-radius: 8px; padding: 14px 20px; margin-bottom: 24px;
+    display:flex; gap:12px; align-items:center;
+    background:var(--surf); border:1px solid var(--bdr);
+    border-radius:8px; padding:14px 20px; margin-bottom:24px;
   }
   .search-input {
-    flex: 1; background: transparent; border: none; outline: none;
-    color: var(--text); font-family: Barlow, sans-serif; font-size: 15px;
+    flex:1; background:transparent; border:none; outline:none;
+    color:var(--text); font-family:Barlow,sans-serif; font-size:15px;
   }
-  .search-input::placeholder { color: var(--muted); }
-  .search-icon { color: var(--muted); font-size: 16px; flex-shrink: 0; }
-  .search-count { font-size: 11px; color: var(--muted); white-space: nowrap; font-weight: 600; }
+  .search-input::placeholder { color:var(--muted); }
+  .search-icon { color:var(--muted); font-size:16px; flex-shrink:0; }
+  .search-count { font-size:11px; color:var(--muted); white-space:nowrap; font-weight:600; }
 
-  /* Category tabs */
-  .cat-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .cat-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
   .cat-tab {
-    font-family: "Barlow Condensed", sans-serif; font-size: 11px; font-weight: 700;
-    letter-spacing: .1em; text-transform: uppercase; padding: 7px 14px;
-    border-radius: 4px; cursor: pointer; border: 1px solid var(--bdr);
-    background: var(--surf); color: var(--muted); transition: all .15s;
-    display: flex; align-items: center; gap: 6px;
+    font-family:"Barlow Condensed",sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase; padding:7px 14px;
+    border-radius:4px; cursor:pointer; border:1px solid var(--bdr);
+    background:var(--surf); color:var(--muted); transition:all .15s;
+    display:flex; align-items:center; gap:6px;
   }
-  .cat-tab:hover { border-color: var(--scm-blue); color: var(--scm-blue); }
-  .cat-tab.active { background: var(--scm-blue); border-color: var(--scm-blue); color: #fff; }
-  .cat-tab .count { font-size: 10px; opacity: .7; }
+  .cat-tab:hover { border-color:var(--scm-blue); color:var(--scm-blue); }
+  .cat-tab.active { background:var(--scm-blue); border-color:var(--scm-blue); color:#fff; }
+  .cat-tab .count { font-size:10px; opacity:.7; }
 
-  /* Term grid */
   .term-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 12px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+    gap:12px;
   }
-
-  /* Term card */
   .term-card {
-    background: var(--surf); border: 1px solid var(--bdr);
-    border-radius: 8px; padding: 18px 20px;
-    transition: border-color .15s, transform .1s;
-    position: relative; overflow: hidden;
+    background:var(--surf); border:1px solid var(--bdr);
+    border-radius:8px; padding:18px 20px;
+    transition:border-color .15s, transform .1s;
+    position:relative; overflow:hidden;
   }
-  .term-card:hover { border-color: rgba(27,155,212,.4); transform: translateY(-1px); }
+  .term-card:hover { border-color:rgba(27,155,212,.4); transform:translateY(-1px); }
   .term-card::before {
-    content: ""; position: absolute; left: 0; top: 0; bottom: 0;
-    width: 3px; border-radius: 2px 0 0 2px;
+    content:""; position:absolute; left:0; top:0; bottom:0;
+    width:3px; border-radius:2px 0 0 2px;
   }
-
-  /* Category colour accents */
-  .term-card[data-cat="general"]::before    { background: var(--scm-blue); }
-  .term-card[data-cat="me"]::before         { background: var(--scm-teal); }
-  .term-card[data-cat="ee"]::before         { background: var(--scm-sky); }
-  .term-card[data-cat="tooling"]::before    { background: var(--scm-purple); }
-  .term-card[data-cat="cmf"]::before        { background: var(--scm-amber); }
-  .term-card[data-cat="packaging"]::before  { background: var(--scm-green); }
-  .term-card[data-cat="quality"]::before    { background: var(--warn); }
-  .term-card[data-cat="commercial"]::before { background: #76E4F7; }
-  .term-card[data-cat="process"]::before    { background: #F687B3; }
+  .term-card[data-cat="general"]::before    { background:var(--scm-blue); }
+  .term-card[data-cat="me"]::before         { background:var(--scm-teal); }
+  .term-card[data-cat="ee"]::before         { background:var(--scm-sky); }
+  .term-card[data-cat="tooling"]::before    { background:var(--scm-purple); }
+  .term-card[data-cat="cmf"]::before        { background:var(--scm-amber); }
+  .term-card[data-cat="packaging"]::before  { background:var(--scm-green); }
+  .term-card[data-cat="quality"]::before    { background:var(--warn); }
+  .term-card[data-cat="commercial"]::before { background:#76E4F7; }
+  .term-card[data-cat="process"]::before    { background:#F687B3; }
 
   .term-en {
-    font-family: "Barlow Condensed", sans-serif; font-size: 16px;
-    font-weight: 800; text-transform: uppercase; letter-spacing: .04em;
-    color: var(--text); margin-bottom: 6px; padding-left: 10px;
+    font-family:"Barlow Condensed",sans-serif; font-size:16px;
+    font-weight:800; text-transform:uppercase; letter-spacing:.04em;
+    color:var(--text); margin-bottom:6px; padding-left:10px;
   }
   .term-zh-row {
-    display: flex; gap: 16px; align-items: baseline;
-    padding-left: 10px; margin-bottom: 10px;
+    display:flex; gap:16px; align-items:baseline;
+    padding-left:10px; margin-bottom:4px;
   }
-  .term-trad {
-    font-size: 20px; font-weight: 700; color: var(--scm-blue); line-height: 1.2;
-    letter-spacing: .05em;
+  .term-trad { font-size:20px; font-weight:700; color:var(--scm-blue); line-height:1.2; letter-spacing:.05em; }
+  .term-simp { font-size:20px; font-weight:700; color:var(--scm-green); line-height:1.2; letter-spacing:.05em; }
+  .term-zh-divider { color:var(--bdr); font-size:14px; }
+  .term-same { font-size:11px; color:var(--muted); font-style:italic; align-self:center; }
+  .term-py {
+    font-size:12px; color:var(--muted); font-style:italic;
+    padding-left:10px; margin-bottom:10px; letter-spacing:.02em;
   }
-  .term-simp {
-    font-size: 20px; font-weight: 700; color: var(--scm-green); line-height: 1.2;
-    letter-spacing: .05em;
-  }
-  .term-zh-divider { color: var(--bdr); font-size: 14px; }
-  .term-same { font-size: 11px; color: var(--muted); font-style: italic; align-self: center; }
   .term-context {
-    font-size: 12px; color: var(--muted); line-height: 1.6;
-    padding-left: 10px; border-top: 1px solid var(--bdr); padding-top: 10px;
+    font-size:12px; color:var(--muted); line-height:1.6;
+    padding-left:10px; border-top:1px solid var(--bdr); padding-top:10px;
   }
-  .term-context strong { color: var(--text); font-weight: 600; }
+  .term-context strong { color:var(--text); font-weight:600; }
   .term-cat-badge {
-    position: absolute; top: 14px; right: 14px;
-    font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-    padding: 2px 8px; border-radius: 3px; border: 1px solid;
+    position:absolute; top:14px; right:14px;
+    font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+    padding:2px 8px; border-radius:3px; border:1px solid;
   }
 
-  /* Cat badge colours */
-  [data-cat="general"]    .term-cat-badge { color: var(--scm-blue);   border-color: rgba(27,155,212,.3);  background: rgba(27,155,212,.08); }
-  [data-cat="me"]         .term-cat-badge { color: var(--scm-teal);   border-color: rgba(79,209,197,.3);  background: rgba(79,209,197,.08); }
-  [data-cat="ee"]         .term-cat-badge { color: var(--scm-sky);    border-color: rgba(99,179,237,.3);  background: rgba(99,179,237,.08); }
-  [data-cat="tooling"]    .term-cat-badge { color: var(--scm-purple); border-color: rgba(183,148,244,.3); background: rgba(183,148,244,.08); }
-  [data-cat="cmf"]        .term-cat-badge { color: var(--scm-amber);  border-color: rgba(246,173,85,.3);  background: rgba(246,173,85,.08); }
-  [data-cat="packaging"]  .term-cat-badge { color: var(--scm-green);  border-color: rgba(125,194,66,.3);  background: rgba(125,194,66,.08); }
-  [data-cat="quality"]    .term-cat-badge { color: var(--warn);       border-color: rgba(252,129,129,.3); background: rgba(252,129,129,.08); }
-  [data-cat="commercial"] .term-cat-badge { color: #76E4F7;           border-color: rgba(118,228,247,.3); background: rgba(118,228,247,.08); }
-  [data-cat="process"]    .term-cat-badge { color: #F687B3;           border-color: rgba(246,135,179,.3); background: rgba(246,135,179,.08); }
+  [data-cat="general"]    .term-cat-badge { color:var(--scm-blue);   border-color:rgba(27,155,212,.3);  background:rgba(27,155,212,.08); }
+  [data-cat="me"]         .term-cat-badge { color:var(--scm-teal);   border-color:rgba(79,209,197,.3);  background:rgba(79,209,197,.08); }
+  [data-cat="ee"]         .term-cat-badge { color:var(--scm-sky);    border-color:rgba(99,179,237,.3);  background:rgba(99,179,237,.08); }
+  [data-cat="tooling"]    .term-cat-badge { color:var(--scm-purple); border-color:rgba(183,148,244,.3); background:rgba(183,148,244,.08); }
+  [data-cat="cmf"]        .term-cat-badge { color:var(--scm-amber);  border-color:rgba(246,173,85,.3);  background:rgba(246,173,85,.08); }
+  [data-cat="packaging"]  .term-cat-badge { color:var(--scm-green);  border-color:rgba(125,194,66,.3);  background:rgba(125,194,66,.08); }
+  [data-cat="quality"]    .term-cat-badge { color:var(--warn);       border-color:rgba(252,129,129,.3); background:rgba(252,129,129,.08); }
+  [data-cat="commercial"] .term-cat-badge { color:#76E4F7;           border-color:rgba(118,228,247,.3); background:rgba(118,228,247,.08); }
+  [data-cat="process"]    .term-cat-badge { color:#F687B3;           border-color:rgba(246,135,179,.3); background:rgba(246,135,179,.08); }
 
-  .no-results { text-align: center; padding: 60px 20px; color: var(--muted); grid-column: 1/-1; }
-  .no-results .big { font-size: 40px; margin-bottom: 12px; }
+  .no-results { text-align:center; padding:60px 20px; color:var(--muted); grid-column:1/-1; }
+  .no-results .big { font-size:40px; margin-bottom:12px; }
 
-  /* Script legend */
-  .script-legend {
-    display: flex; gap: 20px; align-items: center;
-    margin-bottom: 20px; font-size: 12px;
+  .script-legend { display:flex; gap:20px; align-items:center; margin-bottom:20px; font-size:12px; }
+  .legend-dot { display:flex; align-items:center; gap:6px; }
+  .ld-swatch { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+  /* ── FLASHCARD ────────────────────────────────────────────────── */
+  .fc-wrap { max-width:580px; margin:0 auto; }
+
+  .fc-progress { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+  .fc-prog-text { font-size:12px; color:var(--muted); font-weight:600; white-space:nowrap; min-width:60px; }
+  .fc-prog-bar { flex:1; height:4px; background:var(--bdr); border-radius:2px; overflow:hidden; }
+  .fc-prog-fill { height:100%; background:var(--scm-blue); border-radius:2px; transition:width .3s; }
+
+  .fc-card {
+    background:var(--surf); border:1px solid var(--bdr); border-radius:12px;
+    padding:36px 32px; cursor:pointer; transition:border-color .15s, transform .1s;
+    min-height:220px; display:flex; flex-direction:column; justify-content:center;
+    margin-bottom:14px; position:relative; overflow:hidden;
   }
-  .legend-dot { display: flex; align-items: center; gap: 6px; }
-  .ld-swatch { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .fc-card:hover { border-color:rgba(27,155,212,.4); transform:translateY(-1px); }
+
+  .fc-cat-badge {
+    position:absolute; top:16px; right:16px;
+    font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+    padding:3px 10px; border-radius:3px; border:1px solid;
+  }
+  .cat-general    { color:var(--scm-blue);   border-color:rgba(27,155,212,.3);  background:rgba(27,155,212,.08); }
+  .cat-me         { color:var(--scm-teal);   border-color:rgba(79,209,197,.3);  background:rgba(79,209,197,.08); }
+  .cat-ee         { color:var(--scm-sky);    border-color:rgba(99,179,237,.3);  background:rgba(99,179,237,.08); }
+  .cat-tooling    { color:var(--scm-purple); border-color:rgba(183,148,244,.3); background:rgba(183,148,244,.08); }
+  .cat-cmf        { color:var(--scm-amber);  border-color:rgba(246,173,85,.3);  background:rgba(246,173,85,.08); }
+  .cat-packaging  { color:var(--scm-green);  border-color:rgba(125,194,66,.3);  background:rgba(125,194,66,.08); }
+  .cat-quality    { color:var(--warn);       border-color:rgba(252,129,129,.3); background:rgba(252,129,129,.08); }
+  .cat-commercial { color:#76E4F7;           border-color:rgba(118,228,247,.3); background:rgba(118,228,247,.08); }
+  .cat-process    { color:#F687B3;           border-color:rgba(246,135,179,.3); background:rgba(246,135,179,.08); }
+
+  .fc-front { text-align:center; }
+  .fc-en {
+    font-family:"Barlow Condensed",sans-serif; font-size:26px; font-weight:800;
+    text-transform:uppercase; letter-spacing:.04em; color:var(--text); margin-bottom:16px;
+  }
+  .fc-hint { font-size:12px; color:var(--muted); font-style:italic; }
+
+  .fc-zh-block { display:flex; align-items:baseline; gap:14px; margin-bottom:8px; flex-wrap:wrap; }
+  .fc-trad { font-size:26px; font-weight:700; color:var(--scm-blue); letter-spacing:.04em; }
+  .fc-zh-div { color:var(--bdr); font-size:18px; }
+  .fc-simp { font-size:26px; font-weight:700; color:var(--scm-green); letter-spacing:.04em; }
+  .fc-py { font-size:13px; color:var(--muted); font-style:italic; margin-bottom:14px; letter-spacing:.02em; }
+  .fc-ctx {
+    font-size:12px; color:var(--muted); line-height:1.6;
+    border-top:1px solid var(--bdr); padding-top:12px;
+  }
+  .fc-ctx strong { color:var(--text); }
+
+  .fc-ratings { display:flex; gap:8px; margin-bottom:28px; }
+  .fc-btn {
+    flex:1; padding:10px 4px; border-radius:6px; cursor:pointer;
+    font-family:"Barlow Condensed",sans-serif; font-weight:700;
+    letter-spacing:.06em; text-transform:uppercase; border:1px solid;
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    transition:all .15s;
+  }
+  .fc-btn-label { font-size:12px; }
+  .fc-btn-interval { font-size:10px; opacity:.7; font-weight:600; }
+
+  .fc-again   { color:var(--scm-warn);   background:rgba(252,129,129,.08); border-color:rgba(252,129,129,.25); }
+  .fc-again:hover   { background:rgba(252,129,129,.2); }
+  .fc-hard    { color:var(--scm-amber);  background:rgba(246,173,85,.08);  border-color:rgba(246,173,85,.25); }
+  .fc-hard:hover    { background:rgba(246,173,85,.2); }
+  .fc-good    { color:var(--scm-blue);   background:rgba(27,155,212,.08);  border-color:rgba(27,155,212,.25); }
+  .fc-good:hover    { background:rgba(27,155,212,.2); }
+  .fc-easy    { color:var(--scm-green);  background:rgba(125,194,66,.08);  border-color:rgba(125,194,66,.25); }
+  .fc-easy:hover    { background:rgba(125,194,66,.2); }
+
+  .fc-done { text-align:center; padding:60px 20px; }
+  .fc-done-icon { font-size:48px; color:var(--scm-green); margin-bottom:16px; line-height:1; }
+  .fc-done-title {
+    font-family:"Barlow Condensed",sans-serif; font-size:24px; font-weight:700;
+    text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px;
+  }
+  .fc-done-sub { font-size:13px; color:var(--muted); margin-bottom:24px; line-height:1.6; }
+  .fc-done-btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .fc-btn-reset {
+    font-family:"Barlow Condensed",sans-serif; font-size:13px; font-weight:700;
+    letter-spacing:.08em; text-transform:uppercase; padding:9px 20px; border-radius:6px;
+    cursor:pointer; border:1px solid rgba(252,129,129,.3); background:transparent;
+    color:var(--scm-warn); transition:all .15s;
+  }
+  .fc-btn-reset:hover { background:rgba(252,129,129,.1); }
+
+  .fc-kb-hint { font-size:11px; color:var(--muted); text-align:center; margin-bottom:8px; opacity:.6; }
 </style>
 </head>
 <body>
-<nav class="site-nav">
-  <div class="site-nav-inner">
-    <a href="../index.html" class="nav-brand">
-      <span class="s">S</span><span class="c">C</span><span class="m">M</span>
-      <span class="sol"> Bridge OS</span>
-    </a>
-    <div class="nav-links">
-      <a href="../index.html" class="nav-link">Phase Map</a>
-      <div class="nav-sep"></div>
-      <a href="../checklists/me-assets.html" class="nav-link">ME Assets</a>
-      <a href="../checklists/ee-assets.html" class="nav-link">EE Assets</a>
-      <a href="../checklists/cmf-materials.html" class="nav-link">CMF</a>
-      <a href="../checklists/tooling-molds.html" class="nav-link">Tooling</a>
-      <a href="../checklists/packaging.html" class="nav-link">Packaging</a>
-      <div class="nav-sep"></div>
-      <a href="handoff-manifest.html" class="nav-link">Handoff</a>
-      <a href="project-asset-registry.html" class="nav-link">Registry</a>
-      <a href="chinese-srs.html" class="nav-link active">CN Ref</a>
-      <a href="odoo-playbook.html" class="nav-link">Odoo</a>
-    </div>
-  </div>
-</nav>
+<div id="site-nav-root"></div>
+<script src="../nav.js"></script>
 <div class="wrap">
 
 <nav class="nav-breadcrumb">
@@ -150,179 +220,466 @@
 </nav>
 
 <div class="page-header">
-<div class="phase-tag phase-tag--blue">Reference Tool — All Phases</div>
-<h1>Chinese SCM<br>Reference</h1>
-<p class="subtitle">Supply chain vocabulary for working with Chinese-speaking suppliers and factories. Each entry shows the English term, Traditional Chinese (繁體 — Taiwan), Simplified Chinese (简体 — mainland), and usage context.</p>
+  <div class="phase-tag phase-tag--blue">Reference Tool — All Phases</div>
+  <h1>Chinese SCM<br>Reference</h1>
+  <p class="subtitle">Supply chain vocabulary for working with Chinese-speaking suppliers and factories. Browse the reference or use Study mode to learn with spaced-repetition flashcards (SM-2).</p>
 </div>
 
-<div class="script-legend">
-  <div class="legend-dot"><div class="ld-swatch" style="background:var(--scm-blue)"></div> <strong style="color:var(--scm-blue)">繁體</strong> Traditional — Taiwan / HK</div>
-  <div class="legend-dot"><div class="ld-swatch" style="background:var(--scm-green)"></div> <strong style="color:var(--scm-green)">简体</strong> Simplified — Mainland China</div>
+<!-- Mode toggle -->
+<div class="mode-toggle">
+  <button type="button" class="mode-btn active" id="btn-ref" onclick="setMode('ref')">Reference</button>
+  <button type="button" class="mode-btn" id="btn-study" onclick="setMode('study')">
+    Study <span class="due-badge" id="due-count" style="display:none"></span>
+  </button>
 </div>
 
-<!-- Search -->
-<div class="search-bar">
-  <span class="search-icon">🔍</span>
-  <input class="search-input" id="search" type="text" placeholder="Search terms in English or Chinese...">
-  <span class="search-count" id="search-count"></span>
-</div>
+<!-- ── REFERENCE VIEW ──────────────────────────────────────────── -->
+<div id="ref-view">
 
-<!-- Category tabs -->
-<div class="cat-tabs" id="cat-tabs">
-  <div class="cat-tab active" data-cat="all" onclick="setCategory('all')">All <span class="count" id="cnt-all"></span></div>
-  <div class="cat-tab" data-cat="general"    onclick="setCategory('general')">General <span class="count" id="cnt-general"></span></div>
-  <div class="cat-tab" data-cat="process"    onclick="setCategory('process')">Process &amp; Phases <span class="count" id="cnt-process"></span></div>
-  <div class="cat-tab" data-cat="me"         onclick="setCategory('me')">ME / CAD <span class="count" id="cnt-me"></span></div>
-  <div class="cat-tab" data-cat="ee"         onclick="setCategory('ee')">EE / PCB <span class="count" id="cnt-ee"></span></div>
-  <div class="cat-tab" data-cat="tooling"    onclick="setCategory('tooling')">Tooling &amp; Molds <span class="count" id="cnt-tooling"></span></div>
-  <div class="cat-tab" data-cat="cmf"        onclick="setCategory('cmf')">CMF &amp; Materials <span class="count" id="cnt-cmf"></span></div>
-  <div class="cat-tab" data-cat="packaging"  onclick="setCategory('packaging')">Packaging <span class="count" id="cnt-packaging"></span></div>
-  <div class="cat-tab" data-cat="quality"    onclick="setCategory('quality')">Quality &amp; Testing <span class="count" id="cnt-quality"></span></div>
-  <div class="cat-tab" data-cat="commercial" onclick="setCategory('commercial')">Commercial <span class="count" id="cnt-commercial"></span></div>
-</div>
+  <div class="script-legend">
+    <div class="legend-dot"><div class="ld-swatch" style="background:var(--scm-blue)"></div> <strong style="color:var(--scm-blue)">繁體</strong> Traditional — Taiwan / HK</div>
+    <div class="legend-dot"><div class="ld-swatch" style="background:var(--scm-green)"></div> <strong style="color:var(--scm-green)">简体</strong> Simplified — Mainland China</div>
+  </div>
 
-<!-- Term grid -->
-<div class="term-grid" id="term-grid"></div>
+  <div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="search" type="text" placeholder="Search terms, Chinese characters, or pinyin...">
+    <span class="search-count" id="search-count"></span>
+  </div>
+
+  <div class="cat-tabs" id="cat-tabs">
+    <div class="cat-tab active" data-cat="all"        onclick="setCategory('all')">All <span class="count" id="cnt-all"></span></div>
+    <div class="cat-tab" data-cat="general"           onclick="setCategory('general')">General <span class="count" id="cnt-general"></span></div>
+    <div class="cat-tab" data-cat="process"           onclick="setCategory('process')">Process &amp; Phases <span class="count" id="cnt-process"></span></div>
+    <div class="cat-tab" data-cat="me"                onclick="setCategory('me')">ME / CAD <span class="count" id="cnt-me"></span></div>
+    <div class="cat-tab" data-cat="ee"                onclick="setCategory('ee')">EE / PCB <span class="count" id="cnt-ee"></span></div>
+    <div class="cat-tab" data-cat="tooling"           onclick="setCategory('tooling')">Tooling &amp; Molds <span class="count" id="cnt-tooling"></span></div>
+    <div class="cat-tab" data-cat="cmf"               onclick="setCategory('cmf')">CMF &amp; Materials <span class="count" id="cnt-cmf"></span></div>
+    <div class="cat-tab" data-cat="packaging"         onclick="setCategory('packaging')">Packaging <span class="count" id="cnt-packaging"></span></div>
+    <div class="cat-tab" data-cat="quality"           onclick="setCategory('quality')">Quality &amp; Testing <span class="count" id="cnt-quality"></span></div>
+    <div class="cat-tab" data-cat="commercial"        onclick="setCategory('commercial')">Commercial <span class="count" id="cnt-commercial"></span></div>
+  </div>
+
+  <div class="term-grid" id="term-grid"></div>
+
+</div><!-- /ref-view -->
+
+<!-- ── STUDY VIEW ─────────────────────────────────────────────── -->
+<div id="study-view" style="display:none">
+  <div class="fc-wrap">
+
+    <div class="fc-progress">
+      <span id="fc-prog-text">0 / 0</span>
+      <div class="fc-prog-bar"><div class="fc-prog-fill" id="fc-prog-fill" style="width:0%"></div></div>
+    </div>
+
+    <div class="fc-card" id="fc-card" onclick="flipCard()">
+      <span class="fc-cat-badge" id="fc-cat-badge"></span>
+      <div class="fc-front" id="fc-front">
+        <div class="fc-en" id="fc-en"></div>
+        <div class="fc-hint">tap to reveal &nbsp;·&nbsp; or press Space</div>
+      </div>
+      <div class="fc-back" id="fc-back" style="display:none">
+        <div class="fc-zh-block">
+          <span class="fc-trad" id="fc-trad"></span>
+          <span class="fc-zh-div" id="fc-zh-div">·</span>
+          <span class="fc-simp" id="fc-simp"></span>
+        </div>
+        <div class="fc-py" id="fc-py"></div>
+        <div class="fc-ctx" id="fc-ctx"></div>
+      </div>
+    </div>
+
+    <div class="fc-kb-hint" id="fc-kb-hint" style="display:none">1 Again &nbsp;·&nbsp; 2 Hard &nbsp;·&nbsp; 3 Good &nbsp;·&nbsp; 4 Easy</div>
+
+    <div class="fc-ratings" id="fc-ratings" style="display:none">
+      <button type="button" class="fc-btn fc-again" onclick="rate(1)">
+        <span class="fc-btn-label">Again</span>
+        <span class="fc-btn-interval">&lt;1m</span>
+      </button>
+      <button type="button" class="fc-btn fc-hard" onclick="rate(2)">
+        <span class="fc-btn-label">Hard</span>
+        <span class="fc-btn-interval" id="int-hard"></span>
+      </button>
+      <button type="button" class="fc-btn fc-good" onclick="rate(3)">
+        <span class="fc-btn-label">Good</span>
+        <span class="fc-btn-interval" id="int-good"></span>
+      </button>
+      <button type="button" class="fc-btn fc-easy" onclick="rate(4)">
+        <span class="fc-btn-label">Easy</span>
+        <span class="fc-btn-interval" id="int-easy"></span>
+      </button>
+    </div>
+
+    <div class="fc-done" id="fc-done" style="display:none">
+      <div class="fc-done-icon">✓</div>
+      <div class="fc-done-title">Session Complete</div>
+      <div class="fc-done-sub" id="fc-done-sub"></div>
+      <div class="fc-done-btns">
+        <button type="button" class="mode-btn active" onclick="startStudy()">Study Again</button>
+        <button type="button" class="mode-btn" onclick="setMode('ref')">Reference</button>
+        <button type="button" class="fc-btn-reset" onclick="resetSRS()">Reset Progress</button>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /study-view -->
 
 <footer>
   <span>SCM Solution LTD. — Hardware Development System</span>
-  <span>Chinese SCM Reference · Rev 1.0</span>
+  <span>Chinese SCM Reference · Rev 2.0</span>
 </footer>
 
-</div>
+</div><!-- /wrap -->
 <script>
 // ── TERM DATABASE ─────────────────────────────────────────────────────────────
-// Fields: en, trad, simp, context, cat
-// If trad === simp, only one is shown with a "same in both" note
+// py = pinyin for traditional (or shared when same)
+// py_simp = pinyin for simplified, only when pronunciation genuinely differs
 const TERMS = [
 
   // ── GENERAL ─────────────────────────────────────────────────────────────
-  { cat:'general', en:'Supply Chain',         trad:'供應鏈',    simp:'供应链',    context:'The network of suppliers, manufacturers, and logistics involved in producing a product. <strong>Used in:</strong> all project phases.' },
-  { cat:'general', en:'Contract Manufacturer',trad:'代工廠',    simp:'代工厂',    context:'A factory that manufactures products designed by another company (CM). <strong>Also known as:</strong> 製造商 (zhìzào shāng).' },
-  { cat:'general', en:'ODM Partner',          trad:'原廠設計製造商', simp:'原厂设计制造商', context:'Original Design Manufacturer — a partner that designs and makes a product to your spec. <strong>Used in:</strong> PoC and Design phases.' },
-  { cat:'general', en:'NDA / Non-Disclosure', trad:'保密協議',   simp:'保密协议',   context:'Non-Disclosure Agreement. Always required before sharing native CAD or pricing. <strong>Abbreviation:</strong> NDA (same in both).' },
-  { cat:'general', en:'BOM — Bill of Materials', trad:'物料清單', simp:'物料清单', context:'Complete list of components, quantities, and part numbers. <strong>Used in:</strong> Design, Test, and Factory phases. <strong>Send to:</strong> CM and suppliers.' },
-  { cat:'general', en:'Lead Time',            trad:'交貨期',    simp:'交货期',    context:'Time from order placement to delivery. <strong>Ask:</strong> 交貨期是幾天？ (How many days is the lead time?)' },
-  { cat:'general', en:'MOQ — Minimum Order',  trad:'最低訂購量', simp:'最低订购量', context:'Minimum quantity a supplier will accept per order. <strong>Abbreviation:</strong> MOQ (same in both).' },
-  { cat:'general', en:'Vendor',               trad:'供應商',    simp:'供应商',    context:'A supplier of components, materials, or services. Interchangeable with 廠商 (chǎng shāng) in practice.' },
-  { cat:'general', en:'Sample',               trad:'樣品',      simp:'样品',      context:'A pre-production part or unit for evaluation. <strong>Used in:</strong> PoC and Design phases.' },
-  { cat:'general', en:'Prototype',            trad:'原型機',    simp:'原型机',    context:'An early working model of the product. <strong>Also:</strong> 手板 (shǒubǎn) for CNC/3D-printed appearance models.' },
-  { cat:'general', en:'Drawing / Technical Drawing', trad:'工程圖', simp:'工程图', context:'2D engineering drawing showing dimensions and tolerances. <strong>Always include:</strong> revision number and date.' },
-  { cat:'general', en:'Specification',        trad:'規格書',    simp:'规格书',    context:'Document defining requirements for a part or product. <strong>Also:</strong> 技術規格 (jìshù guīgé) for detailed technical specs.' },
-  { cat:'general', en:'Revision',             trad:'版本',      simp:'版本',      context:'Document or file version. <strong>Common format:</strong> Rev A, Rev B or v1.0, v1.1. Always confirm which revision you are discussing.' },
-  { cat:'general', en:'Approval',             trad:'確認',      simp:'确认',      context:'Confirmation or sign-off. <strong>Used in:</strong> 請確認 (please confirm / please approve).' },
-  { cat:'general', en:'Factory',              trad:'工廠',      simp:'工厂',      context:'The manufacturing facility. <strong>Also:</strong> 廠 (chǎng) informally. <strong>Used in:</strong> factory audits, visits, and all production-phase docs.' },
+  { cat:'general', en:'Supply Chain',              trad:'供應鏈',         simp:'供应链',         py:'gōng yìng liàn',                  context:'The network of suppliers, manufacturers, and logistics involved in producing a product. <strong>Used in:</strong> all project phases.' },
+  { cat:'general', en:'Contract Manufacturer',     trad:'代工廠',         simp:'代工厂',         py:'dài gōng chǎng',                  context:'A factory that manufactures products designed by another company (CM). <strong>Also known as:</strong> 製造商 (zhìzào shāng).' },
+  { cat:'general', en:'ODM Partner',               trad:'原廠設計製造商', simp:'原厂设计制造商', py:'yuán chǎng shè jì zhì zào shāng', context:'Original Design Manufacturer — a partner that designs and makes a product to your spec. <strong>Used in:</strong> PoC and Design phases.' },
+  { cat:'general', en:'NDA / Non-Disclosure',      trad:'保密協議',       simp:'保密协议',       py:'bǎo mì xié yì',                   context:'Non-Disclosure Agreement. Always required before sharing native CAD or pricing. <strong>Abbreviation:</strong> NDA (same in both).' },
+  { cat:'general', en:'BOM — Bill of Materials',   trad:'物料清單',       simp:'物料清单',       py:'wù liào qīng dān',                context:'Complete list of components, quantities, and part numbers. <strong>Used in:</strong> Design, Test, and Factory phases. <strong>Send to:</strong> CM and suppliers.' },
+  { cat:'general', en:'Lead Time',                 trad:'交貨期',         simp:'交货期',         py:'jiāo huò qī',                     context:'Time from order placement to delivery. <strong>Ask:</strong> 交貨期是幾天？ (How many days is the lead time?)' },
+  { cat:'general', en:'MOQ — Minimum Order',       trad:'最低訂購量',     simp:'最低订购量',     py:'zuì dī dìng gòu liàng',           context:'Minimum quantity a supplier will accept per order. <strong>Abbreviation:</strong> MOQ (same in both).' },
+  { cat:'general', en:'Vendor',                    trad:'供應商',         simp:'供应商',         py:'gōng yìng shāng',                 context:'A supplier of components, materials, or services. Interchangeable with 廠商 (chǎng shāng) in practice.' },
+  { cat:'general', en:'Sample',                    trad:'樣品',           simp:'样品',           py:'yàng pǐn',                        context:'A pre-production part or unit for evaluation. <strong>Used in:</strong> PoC and Design phases.' },
+  { cat:'general', en:'Prototype',                 trad:'原型機',         simp:'原型机',         py:'yuán xíng jī',                    context:'An early working model of the product. <strong>Also:</strong> 手板 (shǒubǎn) for CNC/3D-printed appearance models.' },
+  { cat:'general', en:'Drawing / Technical Drawing', trad:'工程圖',       simp:'工程图',         py:'gōng chéng tú',                   context:'2D engineering drawing showing dimensions and tolerances. <strong>Always include:</strong> revision number and date.' },
+  { cat:'general', en:'Specification',             trad:'規格書',         simp:'规格书',         py:'guī gé shū',                      context:'Document defining requirements for a part or product. <strong>Also:</strong> 技術規格 (jìshù guīgé) for detailed technical specs.' },
+  { cat:'general', en:'Revision',                  trad:'版本',           simp:'版本',           py:'bǎn běn',                         context:'Document or file version. <strong>Common format:</strong> Rev A, Rev B or v1.0, v1.1. Always confirm which revision you are discussing.' },
+  { cat:'general', en:'Approval',                  trad:'確認',           simp:'确认',           py:'què rèn',                         context:'Confirmation or sign-off. <strong>Used in:</strong> 請確認 (please confirm / please approve).' },
+  { cat:'general', en:'Factory',                   trad:'工廠',           simp:'工厂',           py:'gōng chǎng',                      context:'The manufacturing facility. <strong>Also:</strong> 廠 (chǎng) informally. <strong>Used in:</strong> factory audits, visits, and all production-phase docs.' },
 
   // ── PROCESS & PHASES ────────────────────────────────────────────────────
-  { cat:'process', en:'Design Review (DR)',   trad:'設計審查',  simp:'设计审查',  context:'Formal gate review before moving to the next phase. DR0–DR4. <strong>Used in:</strong> gate checklists.' },
-  { cat:'process', en:'EVT — Engineering Validation Test', trad:'工程驗證測試', simp:'工程验证测试', context:'First round of functional builds for engineering validation. <strong>Phase:</strong> Test.' },
-  { cat:'process', en:'DVT — Design Validation Test',      trad:'設計驗證測試', simp:'设计验证测试', context:'Builds that confirm the design meets all requirements. <strong>Phase:</strong> Test.' },
-  { cat:'process', en:'PVT — Production Validation Test',  trad:'生產驗證測試', simp:'生产验证测试', context:'Final validation run on the actual production line. <strong>Phase:</strong> Factory.' },
-  { cat:'process', en:'Mass Production (MP)', trad:'量產',     simp:'量产',      context:'Full-scale manufacturing after all validations pass. <strong>Abbreviation:</strong> MP. <strong>Phase:</strong> MP.' },
-  { cat:'process', en:'FAI — First Article Inspection', trad:'首件檢查', simp:'首件检查', context:'Inspection of the very first production part to verify process capability. <strong>Phase:</strong> Test / Factory.' },
-  { cat:'process', en:'Handoff Package',      trad:'移交資料包', simp:'移交资料包', context:'Complete set of files transferred to a CM or ODM to begin manufacturing. Use the Handoff Manifest to document this.' },
-  { cat:'process', en:'DFM — Design for Manufacturing', trad:'可製造性設計', simp:'可制造性设计', context:'Design review process to identify manufacturability issues early. <strong>Request from CM:</strong> 請提供DFM意見 (please provide DFM feedback).' },
-  { cat:'process', en:'Change Order / ECO',   trad:'工程變更單', simp:'工程变更单', context:'Engineering Change Order — formal document for design changes. <strong>Always:</strong> increment revision number and date.' },
-  { cat:'process', en:'Timeline / Schedule',  trad:'時程表',    simp:'时程表',    context:'Project schedule. <strong>Also:</strong> 進度表 (jìndù biǎo) for progress tracking. <strong>Ask:</strong> 請提供最新時程表。' },
+  { cat:'process', en:'Design Review (DR)',        trad:'設計審查',       simp:'设计审查',       py:'shè jì shěn chá',                 context:'Formal gate review before moving to the next phase. DR0–DR4. <strong>Used in:</strong> gate checklists.' },
+  { cat:'process', en:'EVT — Engineering Validation Test', trad:'工程驗證測試', simp:'工程验证测试', py:'gōng chéng yàn zhèng cè shì', context:'First round of functional builds for engineering validation. <strong>Phase:</strong> Test.' },
+  { cat:'process', en:'DVT — Design Validation Test',      trad:'設計驗證測試', simp:'设计验证测试', py:'shè jì yàn zhèng cè shì',     context:'Builds that confirm the design meets all requirements. <strong>Phase:</strong> Test.' },
+  { cat:'process', en:'PVT — Production Validation Test',  trad:'生產驗證測試', simp:'生产验证测试', py:'shēng chǎn yàn zhèng cè shì', context:'Final validation run on the actual production line. <strong>Phase:</strong> Factory.' },
+  { cat:'process', en:'Mass Production (MP)',      trad:'量產',           simp:'量产',           py:'liàng chǎn',                      context:'Full-scale manufacturing after all validations pass. <strong>Abbreviation:</strong> MP. <strong>Phase:</strong> MP.' },
+  { cat:'process', en:'FAI — First Article Inspection', trad:'首件檢查',  simp:'首件检查',       py:'shǒu jiàn jiǎn chá',              context:'Inspection of the very first production part to verify process capability. <strong>Phase:</strong> Test / Factory.' },
+  { cat:'process', en:'Handoff Package',           trad:'移交資料包',     simp:'移交资料包',     py:'yí jiāo zī liào bāo',             context:'Complete set of files transferred to a CM or ODM to begin manufacturing. Use the Handoff Manifest to document this.' },
+  { cat:'process', en:'DFM — Design for Manufacturing', trad:'可製造性設計', simp:'可制造性设计', py:'kě zhì zào xìng shè jì',         context:'Design review process to identify manufacturability issues early. <strong>Request from CM:</strong> 請提供DFM意見 (please provide DFM feedback).' },
+  { cat:'process', en:'Change Order / ECO',        trad:'工程變更單',     simp:'工程变更单',     py:'gōng chéng biàn gēng dān',        context:'Engineering Change Order — formal document for design changes. <strong>Always:</strong> increment revision number and date.' },
+  { cat:'process', en:'Timeline / Schedule',       trad:'時程表',         simp:'时程表',         py:'shí chéng biǎo',                  context:'Project schedule. <strong>Also:</strong> 進度表 (jìndù biǎo) for progress tracking. <strong>Ask:</strong> 請提供最新時程表。' },
 
   // ── ME / CAD ────────────────────────────────────────────────────────────
-  { cat:'me', en:'STEP File',                 trad:'STEP檔案',  simp:'STEP文件',  context:'Standard 3D CAD exchange format (.stp / .step). Safe to share with CM — does not expose native parametric data.' },
-  { cat:'me', en:'Native CAD',                trad:'原始設計檔', simp:'原始设计文件', context:'Source CAD file (SolidWorks .sldprt, Fusion .f3d etc.). Treat as IP — restrict to internal use only. Never send without NDA.' },
-  { cat:'me', en:'Assembly Drawing',          trad:'裝配圖',    simp:'装配图',    context:'Drawing showing how parts fit together with reference dimensions. <strong>Include:</strong> with every handoff package.' },
-  { cat:'me', en:'Part Drawing',              trad:'零件圖',    simp:'零件图',    context:'2D drawing of an individual machined or molded part with tolerances.' },
-  { cat:'me', en:'Tolerance',                 trad:'公差',      simp:'公差',      context:'Acceptable dimensional variation on a part. <strong>Specify clearly:</strong> ±0.1mm, ±0.05mm etc. Tighter tolerances increase cost.' },
-  { cat:'me', en:'DXF File',                  trad:'DXF檔案',  simp:'DXF文件',   context:'2D drawing exchange format. Used for laser cutting, sheet metal, and PCB outlines.' },
-  { cat:'me', en:'Wall Thickness',            trad:'壁厚',      simp:'壁厚',      context:'Thickness of a molded or machined wall. Critical for injection molding — typically 1.5–3mm for plastic.' },
-  { cat:'me', en:'Draft Angle',               trad:'拔模角',    simp:'拔模角',    context:'Taper on vertical walls of a molded part to allow ejection from the mold. Typically 1–3°.' },
-  { cat:'me', en:'Undercut',                  trad:'倒扣',      simp:'倒扣',      context:'A feature that prevents a part from being ejected from the mold without side actions. Increases tooling cost.' },
-  { cat:'me', en:'CNC Machining',             trad:'CNC加工',   simp:'CNC加工',   context:'Computer-controlled subtractive manufacturing. Used for metal parts, jigs, and prototypes. Same abbreviation in both scripts.' },
-  { cat:'me', en:'3D Printing / SLA / FDM',   trad:'3D列印',    simp:'3D打印',    context:'Additive manufacturing for prototypes. Taiwan uses 列印 (print); mainland uses 打印 (print/type).' },
-  { cat:'me', en:'Sheet Metal',               trad:'鈑金',      simp:'钣金',      context:'Metal forming process for brackets, enclosures, and chassis components.' },
+  { cat:'me', en:'STEP File',                      trad:'STEP檔案',       simp:'STEP文件',       py:'STEP dǎng àn',   py_simp:'STEP wén jiàn',  context:'Standard 3D CAD exchange format (.stp / .step). Safe to share with CM — does not expose native parametric data.' },
+  { cat:'me', en:'Native CAD',                     trad:'原始設計檔',     simp:'原始设计文件',   py:'yuán shǐ shè jì dǎng', py_simp:'yuán shǐ shè jì wén jiàn', context:'Source CAD file (SolidWorks .sldprt, Fusion .f3d etc.). Treat as IP — restrict to internal use only. Never send without NDA.' },
+  { cat:'me', en:'Assembly Drawing',               trad:'裝配圖',         simp:'装配图',         py:'zhuāng pèi tú',                   context:'Drawing showing how parts fit together with reference dimensions. <strong>Include:</strong> with every handoff package.' },
+  { cat:'me', en:'Part Drawing',                   trad:'零件圖',         simp:'零件图',         py:'líng jiàn tú',                    context:'2D drawing of an individual machined or molded part with tolerances.' },
+  { cat:'me', en:'Tolerance',                      trad:'公差',           simp:'公差',           py:'gōng chā',                        context:'Acceptable dimensional variation on a part. <strong>Specify clearly:</strong> ±0.1mm, ±0.05mm etc. Tighter tolerances increase cost.' },
+  { cat:'me', en:'DXF File',                       trad:'DXF檔案',        simp:'DXF文件',        py:'DXF dǎng àn',    py_simp:'DXF wén jiàn',   context:'2D drawing exchange format. Used for laser cutting, sheet metal, and PCB outlines.' },
+  { cat:'me', en:'Wall Thickness',                 trad:'壁厚',           simp:'壁厚',           py:'bì hòu',                          context:'Thickness of a molded or machined wall. Critical for injection molding — typically 1.5–3mm for plastic.' },
+  { cat:'me', en:'Draft Angle',                    trad:'拔模角',         simp:'拔模角',         py:'bá mó jiǎo',                      context:'Taper on vertical walls of a molded part to allow ejection from the mold. Typically 1–3°.' },
+  { cat:'me', en:'Undercut',                       trad:'倒扣',           simp:'倒扣',           py:'dào kòu',                         context:'A feature that prevents a part from being ejected from the mold without side actions. Increases tooling cost.' },
+  { cat:'me', en:'CNC Machining',                  trad:'CNC加工',        simp:'CNC加工',        py:'CNC jiā gōng',                    context:'Computer-controlled subtractive manufacturing. Used for metal parts, jigs, and prototypes. Same abbreviation in both scripts.' },
+  { cat:'me', en:'3D Printing / SLA / FDM',        trad:'3D列印',         simp:'3D打印',         py:'3D liè yìn',     py_simp:'3D dǎ yìn',       context:'Additive manufacturing for prototypes. Taiwan uses 列印 (liè yìn — print); mainland uses 打印 (dǎ yìn — print/type).' },
+  { cat:'me', en:'Sheet Metal',                    trad:'鈑金',           simp:'钣金',           py:'bǎn jīn',                         context:'Metal forming process for brackets, enclosures, and chassis components.' },
 
   // ── EE / PCB ────────────────────────────────────────────────────────────
-  { cat:'ee', en:'PCB — Printed Circuit Board', trad:'印刷電路板', simp:'印刷电路板', context:'The physical board that holds electronic components. <strong>Abbreviation:</strong> PCB (same in both). Also informally called 電路板.' },
-  { cat:'ee', en:'PCBA — PCB Assembly',        trad:'電路板組裝', simp:'电路板组装', context:'PCB with all components soldered on. <strong>Abbreviation:</strong> PCBA (same in both). What you send to a CM after Gerbers are approved.' },
-  { cat:'ee', en:'Gerber Files',               trad:'Gerber檔案', simp:'Gerber文件', context:'Manufacturing files for PCB fabrication. Include copper layers, silkscreen, solder mask, and drill files. <strong>Send to:</strong> PCB fabricator.' },
-  { cat:'ee', en:'Schematic',                  trad:'電路圖',    simp:'电路图',    context:'Diagram showing electrical connections between components. <strong>File format:</strong> .sch / .kicad_sch (KiCad), .SchDoc (Altium).' },
-  { cat:'ee', en:'CPL — Component Placement List', trad:'元件位置表', simp:'元件位置表', context:'File listing X/Y coordinates, rotation, and layer for each component. Required for SMT pick-and-place machines.' },
-  { cat:'ee', en:'BOM with AVL',               trad:'物料清單含合格廠商', simp:'物料清单含合格供应商', context:'BOM with Approved Vendor List — specifies exact component sources. <strong>Critical for:</strong> cost control and supply chain risk.' },
-  { cat:'ee', en:'SMT — Surface Mount Technology', trad:'表面貼裝技術', simp:'表面贴装技术', context:'Method of placing components directly on PCB surface. The standard for most modern electronics.' },
-  { cat:'ee', en:'THT — Through-Hole',         trad:'插件',      simp:'插件',      context:'Components with leads that go through the board. Used for connectors, large capacitors, and high-stress parts.' },
-  { cat:'ee', en:'Firmware',                   trad:'韌體',      simp:'固件',      context:'Software embedded in a device\'s hardware. <strong>Important difference:</strong> 韌體 (trad) vs 固件 (simp) — very different words.' },
-  { cat:'ee', en:'Test Script / Test Fixture',  trad:'測試治具',  simp:'测试治具',  context:'Hardware fixture used to test PCBAs in production. <strong>Also:</strong> 測試程序 for the software test routine.' },
-  { cat:'ee', en:'ESD — Electrostatic Discharge', trad:'靜電放電', simp:'静电放电', context:'Precautions required when handling bare PCBs and sensitive components. <strong>Require:</strong> ESD wristbands and mats at factory.' },
-  { cat:'ee', en:'Signal Integrity',           trad:'訊號完整性', simp:'信号完整性', context:'Quality of an electrical signal — affects high-speed designs. Relevant in DVT and Design Review.' },
+  { cat:'ee', en:'PCB — Printed Circuit Board',    trad:'印刷電路板',     simp:'印刷电路板',     py:'yìn shuā diàn lù bǎn',            context:'The physical board that holds electronic components. <strong>Abbreviation:</strong> PCB (same in both). Also informally called 電路板.' },
+  { cat:'ee', en:'PCBA — PCB Assembly',            trad:'電路板組裝',     simp:'电路板组装',     py:'diàn lù bǎn zǔ zhuāng',           context:'PCB with all components soldered on. <strong>Abbreviation:</strong> PCBA (same in both). What you send to a CM after Gerbers are approved.' },
+  { cat:'ee', en:'Gerber Files',                   trad:'Gerber檔案',     simp:'Gerber文件',     py:'Gerber dǎng àn', py_simp:'Gerber wén jiàn', context:'Manufacturing files for PCB fabrication. Include copper layers, silkscreen, solder mask, and drill files. <strong>Send to:</strong> PCB fabricator.' },
+  { cat:'ee', en:'Schematic',                      trad:'電路圖',         simp:'电路图',         py:'diàn lù tú',                      context:'Diagram showing electrical connections between components. <strong>File format:</strong> .sch / .kicad_sch (KiCad), .SchDoc (Altium).' },
+  { cat:'ee', en:'CPL — Component Placement List', trad:'元件位置表',     simp:'元件位置表',     py:'yuán jiàn wèi zhì biǎo',          context:'File listing X/Y coordinates, rotation, and layer for each component. Required for SMT pick-and-place machines.' },
+  { cat:'ee', en:'BOM with AVL',                   trad:'物料清單含合格廠商', simp:'物料清单含合格供应商', py:'wù liào qīng dān hán hé gé chǎng shāng', context:'BOM with Approved Vendor List — specifies exact component sources. <strong>Critical for:</strong> cost control and supply chain risk.' },
+  { cat:'ee', en:'SMT — Surface Mount Technology', trad:'表面貼裝技術',   simp:'表面贴装技术',   py:'biǎo miàn tiē zhuāng jì shù',     context:'Method of placing components directly on PCB surface. The standard for most modern electronics.' },
+  { cat:'ee', en:'THT — Through-Hole',             trad:'插件',           simp:'插件',           py:'chā jiàn',                        context:'Components with leads that go through the board. Used for connectors, large capacitors, and high-stress parts.' },
+  { cat:'ee', en:'Firmware',                       trad:'韌體',           simp:'固件',           py:'rèn tǐ',         py_simp:'gù jiàn',         context:'Software embedded in a device\'s hardware. <strong>Important:</strong> 韌體 (rèn tǐ, Taiwan) vs 固件 (gù jiàn, mainland) — completely different words.' },
+  { cat:'ee', en:'Test Script / Test Fixture',     trad:'測試治具',       simp:'测试治具',       py:'cè shì zhì jù',                   context:'Hardware fixture used to test PCBAs in production. <strong>Also:</strong> 測試程序 for the software test routine.' },
+  { cat:'ee', en:'ESD — Electrostatic Discharge',  trad:'靜電放電',       simp:'静电放电',       py:'jìng diàn fàng diàn',             context:'Precautions required when handling bare PCBs and sensitive components. <strong>Require:</strong> ESD wristbands and mats at factory.' },
+  { cat:'ee', en:'Signal Integrity',               trad:'訊號完整性',     simp:'信号完整性',     py:'xùn hào wán zhěng xìng', py_simp:'xìn hào wán zhěng xìng', context:'Quality of an electrical signal — affects high-speed designs. Relevant in DVT and Design Review.' },
 
   // ── TOOLING & MOLDS ─────────────────────────────────────────────────────
-  { cat:'tooling', en:'Injection Mold',        trad:'射出模具',  simp:'注塑模具',  context:'Steel or aluminum tool for mass-producing plastic parts. Major cost item — confirm ownership in writing before committing.' },
-  { cat:'tooling', en:'T1 Sample',             trad:'T1樣品',    simp:'T1样品',    context:'First shots from a new mold for dimensional and appearance review. <strong>Expect:</strong> T1 issues — do not approve without full review.' },
-  { cat:'tooling', en:'T2 / T3 Sample',        trad:'T2/T3樣品', simp:'T2/T3样品', context:'Subsequent mold trial shots after T1 corrections. Each trial costs time and money — be specific with feedback.' },
-  { cat:'tooling', en:'Mold Ownership',        trad:'模具所有權', simp:'模具所有权', context:'Who legally owns the mold — client or factory. <strong>Critical:</strong> always clarify and document this in the contract before tooling starts.' },
-  { cat:'tooling', en:'Tooling Cost',          trad:'模具費',    simp:'模具费',    context:'One-time cost to manufacture the mold. Typically amortized into unit cost at MP volumes. <strong>Negotiate:</strong> ownership and reimbursement terms.' },
-  { cat:'tooling', en:'Steel Grade',           trad:'鋼材等級',  simp:'钢材等级',  context:'Grade of steel used for the mold (e.g. P20, H13, S136). Higher grade = longer mold life but higher tooling cost.' },
-  { cat:'tooling', en:'Mold Trial',            trad:'試模',      simp:'试模',      context:'Running the mold to produce test shots. <strong>Standard sequence:</strong> T1 → review → T2 → review → approve.' },
-  { cat:'tooling', en:'Parting Line',          trad:'分模線',    simp:'分模线',    context:'The visible line on a molded part where the two halves of the mold meet. Affects cosmetic quality.' },
-  { cat:'tooling', en:'Gate / Injection Gate', trad:'澆口',      simp:'浇口',      context:'Point where plastic enters the mold cavity. Gate position affects flow, appearance, and strength.' },
-  { cat:'tooling', en:'Warpage',               trad:'翹曲',      simp:'翘曲',      context:'Distortion of a molded part due to uneven cooling or shrinkage. Specify flatness tolerance in drawing.' },
-  { cat:'tooling', en:'Sink Mark',             trad:'縮水痕',    simp:'缩水痕',    context:'Surface depression caused by thick wall sections cooling unevenly. Avoid with wall thickness < 3mm.' },
-  { cat:'tooling', en:'Side Action / Slider',  trad:'滑塊',      simp:'滑块',      context:'Mold mechanism to form undercuts. Increases tooling cost and complexity — avoid in design if possible.' },
+  { cat:'tooling', en:'Injection Mold',            trad:'射出模具',       simp:'注塑模具',       py:'shè chū mó jù',  py_simp:'zhù sù mó jù',    context:'Steel or aluminum tool for mass-producing plastic parts. Major cost item — confirm ownership in writing before committing.' },
+  { cat:'tooling', en:'T1 Sample',                 trad:'T1樣品',         simp:'T1样品',         py:'T1 yàng pǐn',                     context:'First shots from a new mold for dimensional and appearance review. <strong>Expect:</strong> T1 issues — do not approve without full review.' },
+  { cat:'tooling', en:'T2 / T3 Sample',            trad:'T2/T3樣品',      simp:'T2/T3样品',      py:'T2/T3 yàng pǐn',                  context:'Subsequent mold trial shots after T1 corrections. Each trial costs time and money — be specific with feedback.' },
+  { cat:'tooling', en:'Mold Ownership',            trad:'模具所有權',     simp:'模具所有权',     py:'mó jù suǒ yǒu quán',              context:'Who legally owns the mold — client or factory. <strong>Critical:</strong> always clarify and document this in the contract before tooling starts.' },
+  { cat:'tooling', en:'Tooling Cost',              trad:'模具費',         simp:'模具费',         py:'mó jù fèi',                       context:'One-time cost to manufacture the mold. Typically amortized into unit cost at MP volumes. <strong>Negotiate:</strong> ownership and reimbursement terms.' },
+  { cat:'tooling', en:'Steel Grade',               trad:'鋼材等級',       simp:'钢材等级',       py:'gāng cái děng jí',                context:'Grade of steel used for the mold (e.g. P20, H13, S136). Higher grade = longer mold life but higher tooling cost.' },
+  { cat:'tooling', en:'Mold Trial',                trad:'試模',           simp:'试模',           py:'shì mó',                          context:'Running the mold to produce test shots. <strong>Standard sequence:</strong> T1 → review → T2 → review → approve.' },
+  { cat:'tooling', en:'Parting Line',              trad:'分模線',         simp:'分模线',         py:'fēn mó xiàn',                     context:'The visible line on a molded part where the two halves of the mold meet. Affects cosmetic quality.' },
+  { cat:'tooling', en:'Gate / Injection Gate',     trad:'澆口',           simp:'浇口',           py:'jiāo kǒu',                        context:'Point where plastic enters the mold cavity. Gate position affects flow, appearance, and strength.' },
+  { cat:'tooling', en:'Warpage',                   trad:'翹曲',           simp:'翘曲',           py:'qiào qū',                         context:'Distortion of a molded part due to uneven cooling or shrinkage. Specify flatness tolerance in drawing.' },
+  { cat:'tooling', en:'Sink Mark',                 trad:'縮水痕',         simp:'缩水痕',         py:'suō shuǐ hén',                    context:'Surface depression caused by thick wall sections cooling unevenly. Avoid with wall thickness < 3mm.' },
+  { cat:'tooling', en:'Side Action / Slider',      trad:'滑塊',           simp:'滑块',           py:'huá kuài',                        context:'Mold mechanism to form undercuts. Increases tooling cost and complexity — avoid in design if possible.' },
 
   // ── CMF & MATERIALS ─────────────────────────────────────────────────────
-  { cat:'cmf', en:'CMF — Color Material Finish', trad:'顏色材質表面處理', simp:'颜色材质表面处理', context:'Defines the visual and tactile properties of a product. A complete CMF spec is required before tooling approval.' },
-  { cat:'cmf', en:'Pantone Color',             trad:'彩通色號',  simp:'彩通色号',  context:'Standardized color reference system. <strong>Always specify:</strong> Pantone number + TCX or TPX suffix for plastic/textile.' },
-  { cat:'cmf', en:'RAL Color',                 trad:'RAL色號',   simp:'RAL色号',   context:'European color standard. Common for powder coating and paint. Specify RAL Classic or RAL Design number.' },
-  { cat:'cmf', en:'ABS Plastic',               trad:'ABS塑料',   simp:'ABS塑料',   context:'Acrylonitrile Butadiene Styrene — the most common plastic for consumer electronics enclosures.' },
-  { cat:'cmf', en:'PC — Polycarbonate',        trad:'聚碳酸酯',  simp:'聚碳酸酯',  context:'High-impact engineering plastic. Used where toughness and optical clarity are needed. More expensive than ABS.' },
-  { cat:'cmf', en:'Texture / Grain',           trad:'咬花',      simp:'咬花',      context:'Surface texture applied to a mold cavity by chemical etching. Specify VDI or Mold-Tech texture code.' },
-  { cat:'cmf', en:'Gloss Level',               trad:'光澤度',    simp:'光泽度',    context:'Surface sheen — measured in gloss units (GU). Matte < 10 GU, Semi-gloss 10–70 GU, High-gloss > 70 GU.' },
-  { cat:'cmf', en:'Anodizing',                 trad:'陽極氧化',  simp:'阳极氧化',  context:'Electrochemical surface treatment for aluminum — creates hard, colored oxide layer. Common in consumer electronics.' },
-  { cat:'cmf', en:'Powder Coating',            trad:'粉末塗裝',  simp:'粉末涂装',  context:'Dry powder applied electrostatically and cured under heat. Used for metal parts — durable and cost-effective.' },
-  { cat:'cmf', en:'Silk Screen Printing',      trad:'絲印',      simp:'丝印',      context:'Printing logos and markings onto parts. <strong>Also:</strong> 移印 (pad printing) for curved surfaces.' },
-  { cat:'cmf', en:'RoHS Compliance',           trad:'RoHS合規',  simp:'RoHS合规',  context:'Restriction of Hazardous Substances — EU directive restricting lead, mercury, cadmium etc. Required for EU market.' },
-  { cat:'cmf', en:'Material Certificate',      trad:'材料證書',  simp:'材料证书',  context:'Supplier documentation certifying material composition. Required for compliance and audit purposes.' },
+  { cat:'cmf', en:'CMF — Color Material Finish',   trad:'顏色材質表面處理', simp:'颜色材质表面处理', py:'yán sè cái zhì biǎo miàn chǔ lǐ', context:'Defines the visual and tactile properties of a product. A complete CMF spec is required before tooling approval.' },
+  { cat:'cmf', en:'Pantone Color',                 trad:'彩通色號',       simp:'彩通色号',       py:'cǎi tōng sè hào',                 context:'Standardized color reference system. <strong>Always specify:</strong> Pantone number + TCX or TPX suffix for plastic/textile.' },
+  { cat:'cmf', en:'RAL Color',                     trad:'RAL色號',        simp:'RAL色号',        py:'RAL sè hào',                      context:'European color standard. Common for powder coating and paint. Specify RAL Classic or RAL Design number.' },
+  { cat:'cmf', en:'ABS Plastic',                   trad:'ABS塑料',        simp:'ABS塑料',        py:'ABS sù liào',                     context:'Acrylonitrile Butadiene Styrene — the most common plastic for consumer electronics enclosures.' },
+  { cat:'cmf', en:'PC — Polycarbonate',            trad:'聚碳酸酯',       simp:'聚碳酸酯',       py:'jù tàn suān zhǐ',                 context:'High-impact engineering plastic. Used where toughness and optical clarity are needed. More expensive than ABS.' },
+  { cat:'cmf', en:'Texture / Grain',               trad:'咬花',           simp:'咬花',           py:'yǎo huā',                         context:'Surface texture applied to a mold cavity by chemical etching. Specify VDI or Mold-Tech texture code.' },
+  { cat:'cmf', en:'Gloss Level',                   trad:'光澤度',         simp:'光泽度',         py:'guāng zé dù',                     context:'Surface sheen — measured in gloss units (GU). Matte < 10 GU, Semi-gloss 10–70 GU, High-gloss > 70 GU.' },
+  { cat:'cmf', en:'Anodizing',                     trad:'陽極氧化',       simp:'阳极氧化',       py:'yáng jí yǎng huà',                context:'Electrochemical surface treatment for aluminum — creates hard, colored oxide layer. Common in consumer electronics.' },
+  { cat:'cmf', en:'Powder Coating',                trad:'粉末塗裝',       simp:'粉末涂装',       py:'fěn mò tú zhuāng',                context:'Dry powder applied electrostatically and cured under heat. Used for metal parts — durable and cost-effective.' },
+  { cat:'cmf', en:'Silk Screen Printing',          trad:'絲印',           simp:'丝印',           py:'sī yìn',                          context:'Printing logos and markings onto parts. <strong>Also:</strong> 移印 (pad printing) for curved surfaces.' },
+  { cat:'cmf', en:'RoHS Compliance',               trad:'RoHS合規',       simp:'RoHS合规',       py:'RoHS hé guī',                     context:'Restriction of Hazardous Substances — EU directive restricting lead, mercury, cadmium etc. Required for EU market.' },
+  { cat:'cmf', en:'Material Certificate',          trad:'材料證書',       simp:'材料证书',       py:'cái liào zhèng shū',              context:'Supplier documentation certifying material composition. Required for compliance and audit purposes.' },
 
   // ── PACKAGING ───────────────────────────────────────────────────────────
-  { cat:'packaging', en:'Retail Box',          trad:'零售包裝盒', simp:'零售包装盒', context:'The outer packaging the end customer sees. <strong>Requires:</strong> CMF spec, structural design, and regulatory labelling.' },
-  { cat:'packaging', en:'Insert / Tray',       trad:'內托',      simp:'内托',      context:'Formed insert inside the box that holds the product. <strong>Materials:</strong> EPE foam, EVA foam, thermoformed plastic, pulp.' },
-  { cat:'packaging', en:'Shipping Carton',     trad:'外箱',      simp:'外箱',      context:'Corrugated cardboard outer carton for shipping. Specify carton count (pcs/carton), weight, and dimensions.' },
-  { cat:'packaging', en:'Drop Test',           trad:'跌落測試',  simp:'跌落测试',  context:'Package drop test to verify protection during shipping. Standard heights: 60cm, 90cm, 100cm depending on product weight.' },
-  { cat:'packaging', en:'Barcode / QR Code',   trad:'條碼',      simp:'条码',      context:'Required on retail packaging for retail and logistics. <strong>Types:</strong> EAN-13 (Europe), UPC-A (US), QR (any).' },
-  { cat:'packaging', en:'Accessories',         trad:'配件',      simp:'配件',      context:'Items included in the box — cables, adapters, manuals, quick-start guides. List in full in the BOM.' },
-  { cat:'packaging', en:'Packing List',        trad:'裝箱單',    simp:'装箱单',    context:'Document listing contents of a shipment carton. Required for customs and logistics.' },
-  { cat:'packaging', en:'Quick Start Guide',   trad:'快速入門指南', simp:'快速入门指南', context:'User-facing document included in the box. <strong>Note:</strong> regulatory requirements may mandate local language versions.' },
+  { cat:'packaging', en:'Retail Box',              trad:'零售包裝盒',     simp:'零售包装盒',     py:'líng shòu bāo zhuāng hé',         context:'The outer packaging the end customer sees. <strong>Requires:</strong> CMF spec, structural design, and regulatory labelling.' },
+  { cat:'packaging', en:'Insert / Tray',           trad:'內托',           simp:'内托',           py:'nèi tuō',                         context:'Formed insert inside the box that holds the product. <strong>Materials:</strong> EPE foam, EVA foam, thermoformed plastic, pulp.' },
+  { cat:'packaging', en:'Shipping Carton',         trad:'外箱',           simp:'外箱',           py:'wài xiāng',                       context:'Corrugated cardboard outer carton for shipping. Specify carton count (pcs/carton), weight, and dimensions.' },
+  { cat:'packaging', en:'Drop Test',               trad:'跌落測試',       simp:'跌落测试',       py:'diē luò cè shì',                  context:'Package drop test to verify protection during shipping. Standard heights: 60cm, 90cm, 100cm depending on product weight.' },
+  { cat:'packaging', en:'Barcode / QR Code',       trad:'條碼',           simp:'条码',           py:'tiáo mǎ',                         context:'Required on retail packaging for retail and logistics. <strong>Types:</strong> EAN-13 (Europe), UPC-A (US), QR (any).' },
+  { cat:'packaging', en:'Accessories',             trad:'配件',           simp:'配件',           py:'pèi jiàn',                        context:'Items included in the box — cables, adapters, manuals, quick-start guides. List in full in the BOM.' },
+  { cat:'packaging', en:'Packing List',            trad:'裝箱單',         simp:'装箱单',         py:'zhuāng xiāng dān',                context:'Document listing contents of a shipment carton. Required for customs and logistics.' },
+  { cat:'packaging', en:'Quick Start Guide',       trad:'快速入門指南',   simp:'快速入门指南',   py:'kuài sù rù mén zhǐ nán',          context:'User-facing document included in the box. <strong>Note:</strong> regulatory requirements may mandate local language versions.' },
 
   // ── QUALITY & TESTING ────────────────────────────────────────────────────
-  { cat:'quality', en:'AQL — Acceptable Quality Level', trad:'允收水準', simp:'允收水准', context:'Statistical sampling standard for incoming inspection. AQL 1.0 (strict) to AQL 2.5 (standard). Define in your PO.' },
-  { cat:'quality', en:'IQC — Incoming Quality Control', trad:'來料品管', simp:'来料品管', context:'Inspection of materials and components when they arrive at the factory. First line of defect prevention.' },
-  { cat:'quality', en:'OQC — Outgoing Quality Control', trad:'出貨品管', simp:'出货品管', context:'Inspection of finished goods before shipment. <strong>Request:</strong> OQC report with every order.' },
-  { cat:'quality', en:'Defect Rate',           trad:'不良率',    simp:'不良率',    context:'Percentage of units failing inspection. <strong>Target:</strong> < 0.5% for consumer electronics. Negotiate with CM.' },
-  { cat:'quality', en:'Rework',                trad:'返工',      simp:'返工',      context:'Fixing defective units — costs time and money. Track rework rate as an indicator of process problems.' },
-  { cat:'quality', en:'Scrap',                 trad:'報廢',      simp:'报废',      context:'Units that cannot be reworked and must be discarded. Agree on scrap rate accountability with the CM.' },
-  { cat:'quality', en:'FMEA',                  trad:'失效模式分析', simp:'失效模式分析', context:'Failure Mode and Effects Analysis — systematic review of potential failures. <strong>Phase:</strong> Design and Test.' },
-  { cat:'quality', en:'Reliability Testing',   trad:'可靠性測試', simp:'可靠性测试', context:'Long-duration tests verifying the product meets its rated lifespan — thermal cycling, vibration, humidity.' },
-  { cat:'quality', en:'Golden Sample',         trad:'金樣',      simp:'金样',      context:'Approved reference unit used as the quality standard at the factory. Always keep one internally and send one to CM.' },
-  { cat:'quality', en:'8D Report',             trad:'8D報告',    simp:'8D报告',    context:'8 Disciplines problem-solving report for quality failures. Request from CM when defect rate exceeds threshold.' },
+  { cat:'quality', en:'AQL — Acceptable Quality Level', trad:'允收水準',  simp:'允收水准',       py:'yǔn shōu shuǐ zhǔn',              context:'Statistical sampling standard for incoming inspection. AQL 1.0 (strict) to AQL 2.5 (standard). Define in your PO.' },
+  { cat:'quality', en:'IQC — Incoming Quality Control', trad:'來料品管',  simp:'来料品管',       py:'lái liào pǐn guǎn',               context:'Inspection of materials and components when they arrive at the factory. First line of defect prevention.' },
+  { cat:'quality', en:'OQC — Outgoing Quality Control', trad:'出貨品管',  simp:'出货品管',       py:'chū huò pǐn guǎn',                context:'Inspection of finished goods before shipment. <strong>Request:</strong> OQC report with every order.' },
+  { cat:'quality', en:'Defect Rate',               trad:'不良率',         simp:'不良率',         py:'bù liáng lǜ',                     context:'Percentage of units failing inspection. <strong>Target:</strong> < 0.5% for consumer electronics. Negotiate with CM.' },
+  { cat:'quality', en:'Rework',                    trad:'返工',           simp:'返工',           py:'fǎn gōng',                        context:'Fixing defective units — costs time and money. Track rework rate as an indicator of process problems.' },
+  { cat:'quality', en:'Scrap',                     trad:'報廢',           simp:'报废',           py:'bào fèi',                         context:'Units that cannot be reworked and must be discarded. Agree on scrap rate accountability with the CM.' },
+  { cat:'quality', en:'FMEA',                      trad:'失效模式分析',   simp:'失效模式分析',   py:'shī xiào mó shì fēn xī',          context:'Failure Mode and Effects Analysis — systematic review of potential failures. <strong>Phase:</strong> Design and Test.' },
+  { cat:'quality', en:'Reliability Testing',       trad:'可靠性測試',     simp:'可靠性测试',     py:'kě kào xìng cè shì',              context:'Long-duration tests verifying the product meets its rated lifespan — thermal cycling, vibration, humidity.' },
+  { cat:'quality', en:'Golden Sample',             trad:'金樣',           simp:'金样',           py:'jīn yàng',                        context:'Approved reference unit used as the quality standard at the factory. Always keep one internally and send one to CM.' },
+  { cat:'quality', en:'8D Report',                 trad:'8D報告',         simp:'8D报告',         py:'8D bào gào',                      context:'8 Disciplines problem-solving report for quality failures. Request from CM when defect rate exceeds threshold.' },
 
   // ── COMMERCIAL ───────────────────────────────────────────────────────────
-  { cat:'commercial', en:'RFQ — Request for Quotation', trad:'詢價單', simp:'询价单', context:'Formal document requesting a price quote from a supplier. Include: quantity tiers, target cost, and lead time.' },
-  { cat:'commercial', en:'Quotation / Quote',  trad:'報價單',    simp:'报价单',    context:'Supplier\'s formal price response to an RFQ. <strong>Review:</strong> unit cost, tooling cost, lead time, and payment terms.' },
-  { cat:'commercial', en:'Purchase Order (PO)',trad:'採購訂單',  simp:'采购订单',  context:'Formal order issued to a supplier. Legally binding. Include: part number, revision, quantity, price, and delivery date.' },
-  { cat:'commercial', en:'Proforma Invoice',   trad:'形式發票',  simp:'形式发票',  context:'Preliminary invoice issued before goods are shipped. Used for customs, payment, and LC applications.' },
-  { cat:'commercial', en:'Commercial Invoice', trad:'商業發票',  simp:'商业发票',  context:'Final invoice issued with shipment. Required for customs clearance.' },
-  { cat:'commercial', en:'Payment Terms',      trad:'付款條件',  simp:'付款条件',  context:'Agreement on when and how payment is made. Common: 30% deposit / 70% before shipment; Net 30; Net 60.' },
-  { cat:'commercial', en:'Incoterms — FOB',    trad:'離岸價',    simp:'离岸价',    context:'Free On Board — seller delivers goods to the named port. Buyer assumes risk and cost from that point.' },
-  { cat:'commercial', en:'Incoterms — EXW',    trad:'工廠交貨價', simp:'工厂交货价', context:'Ex Works — buyer collects from supplier\'s premises and assumes all transport cost and risk.' },
-  { cat:'commercial', en:'DDP — Delivered Duty Paid', trad:'完稅後交貨', simp:'完税后交货', context:'Seller covers all costs including import duties to the destination. Best for buyers with less logistics experience.' },
-  { cat:'commercial', en:'HS Code',            trad:'海關編碼',  simp:'海关编码',  context:'Harmonized System code for classifying goods in international trade. Required on all customs documents.' },
-  { cat:'commercial', en:'Unit Cost',          trad:'單價',      simp:'单价',      context:'Cost per single unit. <strong>Important:</strong> always confirm whether unit cost includes or excludes tooling amortization.' },
-  { cat:'commercial', en:'Should Cost',        trad:'目標成本',  simp:'目标成本',  context:'Your internal estimate of what a part should cost. Use as negotiation anchor. Do not share directly with supplier.' },
+  { cat:'commercial', en:'RFQ — Request for Quotation', trad:'詢價單',    simp:'询价单',         py:'xún jià dān',                     context:'Formal document requesting a price quote from a supplier. Include: quantity tiers, target cost, and lead time.' },
+  { cat:'commercial', en:'Quotation / Quote',      trad:'報價單',         simp:'报价单',         py:'bào jià dān',                     context:'Supplier\'s formal price response to an RFQ. <strong>Review:</strong> unit cost, tooling cost, lead time, and payment terms.' },
+  { cat:'commercial', en:'Purchase Order (PO)',    trad:'採購訂單',       simp:'采购订单',       py:'cǎi gòu dìng dān',                context:'Formal order issued to a supplier. Legally binding. Include: part number, revision, quantity, price, and delivery date.' },
+  { cat:'commercial', en:'Proforma Invoice',       trad:'形式發票',       simp:'形式发票',       py:'xíng shì fā piào',                context:'Preliminary invoice issued before goods are shipped. Used for customs, payment, and LC applications.' },
+  { cat:'commercial', en:'Commercial Invoice',     trad:'商業發票',       simp:'商业发票',       py:'shāng yè fā piào',                context:'Final invoice issued with shipment. Required for customs clearance.' },
+  { cat:'commercial', en:'Payment Terms',          trad:'付款條件',       simp:'付款条件',       py:'fù kuǎn tiáo jiàn',               context:'Agreement on when and how payment is made. Common: 30% deposit / 70% before shipment; Net 30; Net 60.' },
+  { cat:'commercial', en:'Incoterms — FOB',        trad:'離岸價',         simp:'离岸价',         py:'lí àn jià',                       context:'Free On Board — seller delivers goods to the named port. Buyer assumes risk and cost from that point.' },
+  { cat:'commercial', en:'Incoterms — EXW',        trad:'工廠交貨價',     simp:'工厂交货价',     py:'gōng chǎng jiāo huò jià',         context:'Ex Works — buyer collects from supplier\'s premises and assumes all transport cost and risk.' },
+  { cat:'commercial', en:'DDP — Delivered Duty Paid', trad:'完稅後交貨', simp:'完税后交货',     py:'wán shuì hòu jiāo huò',           context:'Seller covers all costs including import duties to the destination. Best for buyers with less logistics experience.' },
+  { cat:'commercial', en:'HS Code',                trad:'海關編碼',       simp:'海关编码',       py:'hǎi guān biān mǎ',                context:'Harmonized System code for classifying goods in international trade. Required on all customs documents.' },
+  { cat:'commercial', en:'Unit Cost',              trad:'單價',           simp:'单价',           py:'dān jià',                         context:'Cost per single unit. <strong>Important:</strong> always confirm whether unit cost includes or excludes tooling amortization.' },
+  { cat:'commercial', en:'Should Cost',            trad:'目標成本',       simp:'目标成本',       py:'mù biāo chéng běn',               context:'Your internal estimate of what a part should cost. Use as negotiation anchor. Do not share directly with supplier.' },
 ];
 
-// ── STATE ─────────────────────────────────────────────────────────────────
-let activeCategory = 'all';
-let searchQuery = '';
+// ── CONSTANTS ─────────────────────────────────────────────────────────────
+const CAT_LABELS = {
+  general:'General', process:'Process', me:'ME / CAD', ee:'EE / PCB',
+  tooling:'Tooling', cmf:'CMF', packaging:'Packaging',
+  quality:'Quality', commercial:'Commercial'
+};
+const SRS_KEY = 'cn-srs-v1';
+const DAY = 86400000;
 
-// ── RENDER ────────────────────────────────────────────────────────────────
+// ── SRS STATE ─────────────────────────────────────────────────────────────
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(SRS_KEY)) || {}; } catch(e) { return {}; }
+}
+function saveState(s) { localStorage.setItem(SRS_KEY, JSON.stringify(s)); }
+
+function getDueCount() {
+  const state = loadState(), now = Date.now();
+  return TERMS.filter((t, i) => { const s = state[i]; return !s || s.due <= now; }).length;
+}
+
+function buildQueue() {
+  const state = loadState(), now = Date.now();
+  const due = [], newCards = [];
+  TERMS.forEach((t, i) => {
+    const s = state[i];
+    if (!s) { newCards.push(i); return; }
+    if (s.due <= now) due.push(i);
+  });
+  due.sort((a, b) => state[a].due - state[b].due);
+  return [...due, ...newCards];
+}
+
+function fmtInterval(days) {
+  if (days < 1) return '<1d';
+  if (days === 1) return '1d';
+  if (days < 30) return days + 'd';
+  if (days < 365) return Math.round(days / 30) + 'mo';
+  return Math.round(days / 365) + 'yr';
+}
+
+function getIntervals(idx) {
+  const state = loadState();
+  const s = state[idx] || { ivl: 0, ef: 2.5, reps: 0 };
+  const ivl = s.ivl || 0, ef = s.ef || 2.5, reps = s.reps || 0;
+  const hard = Math.max(1, Math.ceil((ivl || 1) * 1.2));
+  const good = reps === 0 ? 1 : reps === 1 ? 6 : Math.round(ivl * ef);
+  const easy = Math.max(4, Math.round((ivl || 1) * ef * 1.3));
+  return { hard, good, easy };
+}
+
+function resetSRS() {
+  if (!confirm('Reset all study progress? This cannot be undone.')) return;
+  localStorage.removeItem(SRS_KEY);
+  updateDueBadge();
+  startStudy();
+}
+
+// ── MODE ──────────────────────────────────────────────────────────────────
+let mode = 'ref';
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-ref').classList.toggle('active', m === 'ref');
+  document.getElementById('btn-study').classList.toggle('active', m === 'study');
+  document.getElementById('ref-view').style.display   = m === 'ref' ? '' : 'none';
+  document.getElementById('study-view').style.display = m === 'study' ? '' : 'none';
+  if (m === 'study') startStudy();
+}
+
+// ── FLASHCARD ─────────────────────────────────────────────────────────────
+let queue = [], currentIdx = 0, sessionTotal = 0, flipped = false;
+
+function startStudy() {
+  queue = buildQueue();
+  currentIdx = 0;
+  sessionTotal = queue.length;
+  flipped = false;
+  document.getElementById('fc-done').style.display = 'none';
+  if (queue.length === 0) { showDone(); } else { showCard(); }
+}
+
+function showCard() {
+  if (currentIdx >= queue.length) { showDone(); return; }
+  const idx = queue[currentIdx];
+  const t = TERMS[idx];
+  flipped = false;
+
+  const done = currentIdx;
+  const total = Math.max(sessionTotal, queue.length);
+  document.getElementById('fc-prog-text').textContent = done + ' / ' + total;
+  document.getElementById('fc-prog-fill').style.width = (total > 0 ? (done / total * 100) : 0) + '%';
+
+  const badge = document.getElementById('fc-cat-badge');
+  badge.textContent = CAT_LABELS[t.cat] || t.cat;
+  badge.className = 'fc-cat-badge cat-' + t.cat;
+
+  document.getElementById('fc-en').textContent = t.en;
+  document.getElementById('fc-front').style.display = '';
+  document.getElementById('fc-back').style.display = 'none';
+  document.getElementById('fc-card').style.display = '';
+  document.getElementById('fc-ratings').style.display = 'none';
+  document.getElementById('fc-kb-hint').style.display = 'none';
+  document.getElementById('fc-done').style.display = 'none';
+}
+
+function flipCard() {
+  if (flipped) return;
+  flipped = true;
+  const idx = queue[currentIdx];
+  const t = TERMS[idx];
+  const same = t.trad === t.simp;
+
+  document.getElementById('fc-front').style.display = 'none';
+  document.getElementById('fc-back').style.display = '';
+
+  document.getElementById('fc-trad').textContent = t.trad;
+  const divEl  = document.getElementById('fc-zh-div');
+  const simpEl = document.getElementById('fc-simp');
+  if (same) {
+    divEl.style.display  = 'none';
+    simpEl.style.display = 'none';
+  } else {
+    divEl.style.display  = '';
+    simpEl.style.display = '';
+    simpEl.textContent = t.simp;
+  }
+
+  let pyText = t.py;
+  if (t.py_simp && !same) pyText += '  ·  ' + t.py_simp;
+  document.getElementById('fc-py').textContent = pyText;
+  document.getElementById('fc-ctx').innerHTML = t.context;
+
+  const ivls = getIntervals(idx);
+  document.getElementById('int-hard').textContent = fmtInterval(ivls.hard);
+  document.getElementById('int-good').textContent = fmtInterval(ivls.good);
+  document.getElementById('int-easy').textContent = fmtInterval(ivls.easy);
+
+  document.getElementById('fc-ratings').style.display = '';
+  document.getElementById('fc-kb-hint').style.display = '';
+}
+
+function rate(score) {
+  const state = loadState(), now = Date.now();
+  const idx = queue[currentIdx];
+  let s = state[idx] ? Object.assign({}, state[idx]) : { ivl: 0, ef: 2.5, reps: 0, due: 0 };
+
+  if (score === 1) {
+    s.due = now + 60000;
+    s.ef = Math.max(1.3, (s.ef || 2.5) - 0.2);
+    queue.push(idx);
+  } else if (score === 2) {
+    s.ivl = Math.max(1, Math.ceil((s.ivl || 1) * 1.2));
+    s.ef = Math.max(1.3, (s.ef || 2.5) - 0.15);
+    s.due = now + s.ivl * DAY;
+    s.reps = (s.reps || 0) + 1;
+  } else if (score === 3) {
+    const reps = s.reps || 0;
+    s.ivl = reps === 0 ? 1 : reps === 1 ? 6 : Math.round((s.ivl || 1) * (s.ef || 2.5));
+    s.due = now + s.ivl * DAY;
+    s.reps = reps + 1;
+  } else if (score === 4) {
+    s.ivl = Math.max(4, Math.round((s.ivl || 1) * (s.ef || 2.5) * 1.3));
+    s.ef = Math.min(2.5, (s.ef || 2.5) + 0.15);
+    s.due = now + s.ivl * DAY;
+    s.reps = (s.reps || 0) + 1;
+  }
+
+  state[idx] = s;
+  saveState(state);
+  updateDueBadge();
+  currentIdx++;
+  showCard();
+}
+
+function showDone() {
+  document.getElementById('fc-card').style.display = 'none';
+  document.getElementById('fc-ratings').style.display = 'none';
+  document.getElementById('fc-kb-hint').style.display = 'none';
+  const doneEl = document.getElementById('fc-done');
+  doneEl.style.display = '';
+
+  const nextDue = getNextDueTime();
+  const reviewed = Math.min(currentIdx, sessionTotal);
+  let sub = reviewed + ' card' + (reviewed !== 1 ? 's' : '') + ' reviewed this session.';
+  if (nextDue) sub += ' Next due: ' + nextDue + '.';
+  document.getElementById('fc-done-sub').textContent = sub;
+}
+
+function getNextDueTime() {
+  const state = loadState(), now = Date.now();
+  let min = Infinity;
+  Object.values(state).forEach(s => { if (s && s.due > now && s.due < min) min = s.due; });
+  if (min === Infinity) return null;
+  const d = new Date(min);
+  return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+}
+
+function updateDueBadge() {
+  const count = getDueCount();
+  const badge = document.getElementById('due-count');
+  badge.textContent = count;
+  badge.style.display = count > 0 ? '' : 'none';
+}
+
+// ── KEYBOARD SHORTCUTS ────────────────────────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  if (mode !== 'study') return;
+  if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    if (!flipped) flipCard();
+  } else if (flipped) {
+    if (e.key === '1') rate(1);
+    else if (e.key === '2') rate(2);
+    else if (e.key === '3') rate(3);
+    else if (e.key === '4') rate(4);
+  }
+});
+
+// ── REFERENCE GRID ────────────────────────────────────────────────────────
+let activeCategory = 'all', searchQuery = '';
+
 function getFiltered() {
   return TERMS.filter(t => {
     const matchCat = activeCategory === 'all' || t.cat === activeCategory;
@@ -331,6 +688,8 @@ function getFiltered() {
       t.en.toLowerCase().includes(q) ||
       t.trad.includes(q) ||
       t.simp.includes(q) ||
+      t.py.toLowerCase().includes(q) ||
+      (t.py_simp && t.py_simp.toLowerCase().includes(q)) ||
       t.context.toLowerCase().includes(q);
     return matchCat && matchSearch;
   });
@@ -339,39 +698,33 @@ function getFiltered() {
 function renderGrid() {
   const terms = getFiltered();
   const grid = document.getElementById('term-grid');
-  document.getElementById('search-count').textContent =
-    terms.length + ' of ' + TERMS.length + ' terms';
+  document.getElementById('search-count').textContent = terms.length + ' of ' + TERMS.length + ' terms';
 
   if (!terms.length) {
-    grid.innerHTML = `<div class="no-results"><div class="big">🔍</div><p>No terms match your search.</p></div>`;
+    grid.innerHTML = '<div class="no-results"><div class="big">🔍</div><p>No terms match your search.</p></div>';
     return;
   }
-
-  const CAT_LABELS = {
-    general:'General', process:'Process', me:'ME / CAD', ee:'EE / PCB',
-    tooling:'Tooling', cmf:'CMF', packaging:'Packaging',
-    quality:'Quality', commercial:'Commercial'
-  };
 
   grid.innerHTML = terms.map(t => {
     const same = t.trad === t.simp;
     const zhRow = same
-      ? `<div class="term-zh-row"><span class="term-trad">${t.trad}</span><span class="term-same">same in both scripts</span></div>`
-      : `<div class="term-zh-row"><span class="term-trad">${t.trad}</span><span class="term-zh-divider">|</span><span class="term-simp">${t.simp}</span></div>`;
-    return `
-      <div class="term-card" data-cat="${t.cat}">
-        <span class="term-cat-badge">${CAT_LABELS[t.cat]||t.cat}</span>
-        <div class="term-en">${t.en}</div>
-        ${zhRow}
-        <div class="term-context">${t.context}</div>
-      </div>`;
+      ? '<div class="term-zh-row"><span class="term-trad">' + t.trad + '</span><span class="term-same">same in both scripts</span></div>'
+      : '<div class="term-zh-row"><span class="term-trad">' + t.trad + '</span><span class="term-zh-divider">|</span><span class="term-simp">' + t.simp + '</span></div>';
+    let pyLine = t.py;
+    if (t.py_simp) pyLine = '繁: ' + t.py + '  ·  簡: ' + t.py_simp;
+    return '<div class="term-card" data-cat="' + t.cat + '">' +
+      '<span class="term-cat-badge">' + (CAT_LABELS[t.cat] || t.cat) + '</span>' +
+      '<div class="term-en">' + t.en + '</div>' +
+      zhRow +
+      '<div class="term-py">' + pyLine + '</div>' +
+      '<div class="term-context">' + t.context + '</div>' +
+      '</div>';
   }).join('');
 }
 
 function updateCounts() {
   const cats = ['general','process','me','ee','tooling','cmf','packaging','quality','commercial'];
-  const all = TERMS.length;
-  document.getElementById('cnt-all').textContent = all;
+  document.getElementById('cnt-all').textContent = TERMS.length;
   cats.forEach(c => {
     const el = document.getElementById('cnt-' + c);
     if (el) el.textContent = TERMS.filter(t => t.cat === c).length;
@@ -386,14 +739,15 @@ function setCategory(cat) {
   renderGrid();
 }
 
-document.getElementById('search').addEventListener('input', e => {
+document.getElementById('search').addEventListener('input', function(e) {
   searchQuery = e.target.value;
   renderGrid();
 });
 
-// Init
+// ── INIT ──────────────────────────────────────────────────────────────────
 updateCounts();
 renderGrid();
+updateDueBadge();
 </script>
 </body>
 </html>
