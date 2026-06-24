@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Odoo Playbook — SCM Bridge OS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/scm-styles.css">
+  <style>
+
+  /* ── PAGE LAYOUT ─────────────────────────────────────────────── */
+  .playbook-intro{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:24px 28px;margin-bottom:40px}
+  .playbook-intro p{font-size:14px;color:var(--muted);line-height:1.7;max-width:720px}
+
+  /* ── SECTION HEADERS ─────────────────────────────────────────── */
+  .pb-section{margin-bottom:48px}
+  .pb-section-title{font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:12px}
+  .pb-section-title::after{content:"";flex:1;height:1px;background:var(--bdr)}
+
+  /* ── GAP CARD ────────────────────────────────────────────────── */
+  .gap-card{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;overflow:hidden;margin-bottom:20px}
+  .gap-card-head{display:flex;align-items:flex-start;gap:20px;padding:20px 24px;border-bottom:1px solid var(--bdr);background:var(--mid)}
+  .gap-card-stripe{width:4px;border-radius:2px;align-self:stretch;flex-shrink:0}
+  .stripe-red{background:var(--scm-warn)}
+  .stripe-amber{background:var(--scm-amber)}
+  .stripe-green{background:var(--scm-green)}
+  .gap-area{font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .gap-title{font-family:"Barlow Condensed",sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+  .gap-meta{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+  .meta-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:3px;border:1px solid}
+  .badge-status-red{color:var(--scm-warn);background:rgba(252,129,129,.1);border-color:rgba(252,129,129,.25)}
+  .badge-status-amber{color:var(--scm-amber);background:rgba(246,173,85,.1);border-color:rgba(246,173,85,.25)}
+  .badge-status-green{color:var(--scm-green);background:rgba(125,194,66,.1);border-color:rgba(125,194,66,.25)}
+  .badge-effort{color:var(--scm-blue);background:rgba(27,155,212,.1);border-color:rgba(27,155,212,.25)}
+  .badge-owner{color:var(--scm-purple);background:rgba(183,148,244,.1);border-color:rgba(183,148,244,.25)}
+
+  /* ── GAP BODY ────────────────────────────────────────────────── */
+  .gap-body{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .gap-col{padding:24px 28px}
+  .gap-col+.gap-col{border-left:1px solid var(--bdr)}
+  .gap-label{font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  .gap-text{font-size:14px;line-height:1.7;color:var(--text)}
+  .impact-list{list-style:none;padding:0;margin:0}
+  .impact-list li{font-size:14px;padding:5px 0;border-bottom:1px solid rgba(30,58,85,.4);display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+  .impact-list li:last-child{border-bottom:none}
+  .impact-list li::before{content:"!";color:var(--scm-warn);font-weight:800;font-size:13px;flex-shrink:0;margin-top:1px}
+
+  /* ── BACKLOG ─────────────────────────────────────────────────── */
+  .gap-backlog{padding:0 28px 24px}
+  .backlog-label{font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .backlog-items{display:flex;flex-direction:column;gap:8px}
+  .backlog-item{display:flex;align-items:flex-start;gap:12px;background:var(--dark);border:1px solid var(--bdr);border-radius:5px;padding:12px 14px}
+  .backlog-rank{font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--scm-blue);background:rgba(27,155,212,.1);border:1px solid rgba(27,155,212,.2);padding:2px 8px;border-radius:3px;flex-shrink:0;align-self:center}
+  .backlog-text{font-size:13px;line-height:1.6}
+  .backlog-trigger{color:var(--scm-amber);font-weight:600}
+  .backlog-action{color:var(--text)}
+  .backlog-arrow{color:var(--scm-blue);font-weight:700;margin:0 4px}
+
+  /* ── SOLUTION BOX ────────────────────────────────────────────── */
+  .gap-solution{margin:0 28px 24px;padding:16px 18px;background:rgba(27,155,212,.06);border:1px solid rgba(27,155,212,.2);border-radius:6px}
+  .solution-label{font-family:"Barlow Condensed",sans-serif;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--scm-blue);margin-bottom:6px}
+  .solution-text{font-size:13px;line-height:1.6}
+  .solution-path{font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;color:var(--scm-blue);margin-top:4px}
+  .path-sep{color:var(--muted);margin:0 4px}
+
+  /* ── PLACEHOLDER ─────────────────────────────────────────────── */
+  .gap-placeholder{border:2px dashed var(--bdr);border-radius:8px;padding:32px;text-align:center;color:var(--muted);font-size:13px}
+  .gap-placeholder-icon{font-size:28px;margin-bottom:10px;opacity:.4}
+
+  /* ── RESPONSIVE ──────────────────────────────────────────────── */
+  @media(max-width:700px){
+    .gap-body{grid-template-columns:1fr}
+    .gap-col+.gap-col{border-left:none;border-top:1px solid var(--bdr)}
+  }
+  </style>
+</head>
+<body>
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a href="../index.html" class="nav-brand">
+      <span class="s">S</span><span class="c">C</span><span class="m">M</span>
+      <span class="sol"> Bridge OS</span>
+    </a>
+    <div class="nav-links">
+      <a href="../index.html" class="nav-link">Phase Map</a>
+      <div class="nav-sep"></div>
+      <a href="../checklists/me-assets.html" class="nav-link">ME Assets</a>
+      <a href="../checklists/ee-assets.html" class="nav-link">EE Assets</a>
+      <a href="../checklists/cmf-materials.html" class="nav-link">CMF</a>
+      <a href="../checklists/tooling-molds.html" class="nav-link">Tooling</a>
+      <a href="../checklists/packaging.html" class="nav-link">Packaging</a>
+      <div class="nav-sep"></div>
+      <a href="handoff-manifest.html" class="nav-link">Handoff</a>
+      <a href="project-asset-registry.html" class="nav-link">Registry</a>
+      <a href="chinese-srs.html" class="nav-link">CN Ref</a>
+      <a href="odoo-playbook.html" class="nav-link active">Odoo</a>
+      <a href="scm-playbook.html" class="nav-link">Playbook</a>
+    </div>
+  </div>
+</nav>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>Odoo <span class="text-blue">Playbook</span></h1>
+      <p class="subtitle" style="margin-bottom:0">Known gaps, automation backlog, and implementation guidance for the SCM Bridge OS Odoo instance.</p>
+    </div>
+    <div class="header-badge">Rev 1.0</div>
+  </header>
+
+  <div class="playbook-intro">
+    <p>This playbook tracks gaps between how SCM Bridge OS currently operates inside Odoo and how it should operate. Each gap card states the problem, its operational impact, the prioritised fix list, and a concrete solution path. Cards are ordered by priority — address red items first.</p>
+  </div>
+
+  <!-- ── KNOWN GAPS ──────────────────────────────────────────── -->
+  <div class="pb-section">
+    <div class="pb-section-title">Known Gaps</div>
+
+    <!-- GAP 001 — Workflow Automation -->
+    <div class="gap-card">
+
+      <div class="gap-card-head">
+        <div class="gap-card-stripe stripe-red"></div>
+        <div style="flex:1">
+          <div class="gap-area">Gap 001 &mdash; Odoo Workflow Automation</div>
+          <div class="gap-title">No Automated Action Triggers</div>
+          <div class="gap-meta">
+            <span class="meta-badge badge-status-red">&#x1F534; Not started</span>
+            <span class="meta-badge badge-effort">Effort: Low–Medium</span>
+            <span class="meta-badge badge-owner">Owner: PM</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gap-body">
+        <div class="gap-col">
+          <div class="gap-label">Issue</div>
+          <div class="gap-text">No automated action triggers exist for key pipeline transitions. All handoffs are currently manual and memory-dependent — each step only moves forward if someone remembers to check.</div>
+        </div>
+        <div class="gap-col">
+          <div class="gap-label">Impact</div>
+          <ul class="impact-list">
+            <li>Steps get missed when attention shifts to other projects</li>
+            <li>RFQ sends are delayed because there is no prompt after NDA closes</li>
+            <li>PM is a single point of failure for noticing completed NDAs and acting on them</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="gap-backlog">
+        <div class="backlog-label">Backlog — priority order</div>
+        <div class="backlog-items">
+
+          <div class="backlog-item">
+            <div class="backlog-rank">P1</div>
+            <div class="backlog-text">
+              <span class="backlog-trigger">NDA fully signed</span>
+              <span class="backlog-arrow">→</span>
+              <span class="backlog-action">Auto-create <strong>Send RFQ</strong> task assigned to PM</span>
+            </div>
+          </div>
+
+          <div class="backlog-item">
+            <div class="backlog-rank">P2</div>
+            <div class="backlog-text">
+              <span class="backlog-trigger">Vendor replies to outreach</span>
+              <span class="backlog-arrow">→</span>
+              <span class="backlog-action">Auto-notify PM to step in and qualify</span>
+            </div>
+          </div>
+
+          <div class="backlog-item">
+            <div class="backlog-rank">P3</div>
+            <div class="backlog-text">
+              <span class="backlog-trigger">RFQ sent</span>
+              <span class="backlog-arrow">→</span>
+              <span class="backlog-action">Auto-create <strong>Chase quote</strong> task with a due date</span>
+            </div>
+          </div>
+
+          <div class="backlog-item">
+            <div class="backlog-rank">P4</div>
+            <div class="backlog-text">
+              <span class="backlog-trigger">Quote received</span>
+              <span class="backlog-arrow">→</span>
+              <span class="backlog-action">Auto-notify PM for review and approval</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="gap-solution">
+        <div class="solution-label">Solution</div>
+        <div class="solution-text">Use Odoo's native <strong>Automated Actions</strong> feature — no custom development needed.</div>
+        <div class="solution-path">
+          Settings
+          <span class="path-sep">›</span>
+          Developer Mode
+          <span class="path-sep">›</span>
+          Technical
+          <span class="path-sep">›</span>
+          Automated Actions
+        </div>
+        <div class="solution-text" style="margin-top:8px;color:var(--muted)">First rule: ~1 hour. Remaining three rules: ~half a day total.</div>
+      </div>
+
+    </div>
+    <!-- /GAP 001 -->
+
+    <!-- Placeholder for future gaps -->
+    <div class="gap-placeholder">
+      <div class="gap-placeholder-icon">+</div>
+      Additional gaps will be logged here as they are identified.
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>

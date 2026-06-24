@@ -3,18 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EE Asset Checklist — SCM Hardware System</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
-<!-- Root pages (index.html) -->
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/scm-styles.css">
-
-<!-- Subpages (checklists/, tools/) -->
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<title>EE Asset Checklist — SCM Bridge OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/scm-styles.css">
-<style></style>
 </head>
 <body>
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a href="../index.html" class="nav-brand">
+      <span class="s">S</span><span class="c">C</span><span class="m">M</span>
+      <span class="sol"> Bridge OS</span>
+    </a>
+    <div class="nav-links">
+      <a href="../index.html" class="nav-link">Phase Map</a>
+      <div class="nav-sep"></div>
+      <a href="me-assets.html" class="nav-link">ME Assets</a>
+      <a href="ee-assets.html" class="nav-link active">EE Assets</a>
+      <a href="cmf-materials.html" class="nav-link">CMF</a>
+      <a href="tooling-molds.html" class="nav-link">Tooling</a>
+      <a href="packaging.html" class="nav-link">Packaging</a>
+      <div class="nav-sep"></div>
+      <a href="../tools/handoff-manifest.html" class="nav-link">Handoff</a>
+      <a href="../tools/project-asset-registry.html" class="nav-link">Registry</a>
+      <a href="../tools/chinese-srs.html" class="nav-link">CN Ref</a>
+      <a href="../tools/odoo-playbook.html" class="nav-link">Odoo</a>
+    </div>
+  </div>
+</nav>
 <div class="wrap">
   <nav>
     <a href="../index.html">← Phase Map</a>
@@ -24,11 +39,11 @@
     <span>EE Asset Checklist</span>
   </nav>
 
-  <header>
+  <div class="page-header">
     <div class="phase-tag">Design Phase — DR2</div>
     <h1>Electrical Engineering<br>Asset Checklist</h1>
     <p class="subtitle">All EE files must be checked off before the DR2 gate can be passed. Native schematic and layout files are IP sensitive — confirm NDA before sending to any external partner.</p>
-  </header>
+  </div>
 
   <div class="progress-wrap">
     <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
@@ -118,7 +133,7 @@ const badgeMap = {
   odm:  { label: "→ ODM",        cls: "badge-odm" },
   ip:   { label: "IP Sensitive",  cls: "badge-ip" },
   safe: { label: "External Safe", cls: "badge-safe" },
-  rev:  { label: "Review First",  cls: "badge-rev" },
+  rev:  { label: "Review First",  cls: "badge-review" },
 };
 
 let state = {};

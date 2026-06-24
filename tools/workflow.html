@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PM Workflow — SCM Bridge OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/scm-styles.css">
+<style>
+
+/* ── PHASE BAR ──────────────────────────────────────────────── */
+.phase-bar { display:flex; gap:0; position:relative; margin-bottom:0; }
+.phase-arrow {
+  flex:1; position:relative; padding:14px 14px 14px 28px;
+  background:var(--surf); border:1px solid var(--bdr);
+  cursor:pointer; transition:all .2s;
+  clip-path:polygon(0 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,0 100%,16px 50%);
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  text-align:center; min-height:80px; user-select:none;
+}
+.phase-arrow:first-child {
+  clip-path:polygon(0 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,0 100%);
+  padding-left:14px;
+}
+.phase-arrow:last-child {
+  clip-path:polygon(0 0,100% 0,100% 100%,0 100%,16px 50%);
+}
+.phase-arrow:hover { background:rgba(27,155,212,.12); border-color:var(--scm-blue); z-index:1; }
+.phase-arrow.active { z-index:2; }
+.pa-label {
+  font-family:"Barlow Condensed",sans-serif; font-size:15px; font-weight:800;
+  text-transform:uppercase; letter-spacing:.08em;
+}
+.pa-gate { font-size:11px; color:var(--muted); margin-top:3px; font-weight:600; }
+
+/* Phase-specific active colours */
+.phase-arrow[data-phase="idea"].active   { background:rgba(27,155,212,.18);  border-color:#1B9BD4; }
+.phase-arrow[data-phase="poc"].active    { background:rgba(42,171,110,.15);  border-color:#2AAB6E; }
+.phase-arrow[data-phase="design"].active { background:rgba(125,194,66,.15);  border-color:#7DC242; }
+.phase-arrow[data-phase="test"].active   { background:rgba(245,166,35,.15);  border-color:#F5A623; }
+.phase-arrow[data-phase="factory"].active{ background:rgba(232,98,74,.15);   border-color:#E8624A; }
+.phase-arrow[data-phase="mp"].active     { background:rgba(155,107,212,.15); border-color:#9B6BD4; }
+
+.phase-arrow[data-phase="idea"].active   .pa-label { color:#1B9BD4; }
+.phase-arrow[data-phase="poc"].active    .pa-label { color:#2AAB6E; }
+.phase-arrow[data-phase="design"].active .pa-label { color:#7DC242; }
+.phase-arrow[data-phase="test"].active   .pa-label { color:#F5A623; }
+.phase-arrow[data-phase="factory"].active .pa-label { color:#E8624A; }
+.phase-arrow[data-phase="mp"].active     .pa-label { color:#9B6BD4; }
+
+/* ── DETAIL PANEL ────────────────────────────────────────────── */
+.wf-panel {
+  display:none;
+  background:var(--surf);
+  border:1px solid var(--bdr);
+  border-top:none;
+  border-radius:0 0 8px 8px;
+  margin-top:-1px;
+  margin-bottom:32px;
+  overflow:hidden;
+}
+.wf-panel.open { display:block; }
+
+.wf-band { height:3px; flex-shrink:0; }
+
+.wf-inner { padding:28px 32px; }
+
+.wf-top {
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:20px; margin-bottom:24px; padding-bottom:20px;
+  border-bottom:1px solid var(--bdr);
+}
+.wf-top-title {
+  font-family:"Barlow Condensed",sans-serif; font-size:22px; font-weight:800;
+  text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px;
+}
+.wf-top-sub { font-size:13px; color:var(--muted); line-height:1.6; max-width:560px; }
+.wf-gate-badge {
+  font-family:"Barlow Condensed",sans-serif; font-size:11px; font-weight:800;
+  letter-spacing:.12em; text-transform:uppercase; padding:5px 14px;
+  border-radius:4px; color:#fff; white-space:nowrap; flex-shrink:0; align-self:flex-start;
+}
+
+/* ── 3-COLUMN BODY ──────────────────────────────────────────── */
+.wf-cols { display:grid; grid-template-columns:1fr 1fr 1fr; gap:28px; }
+
+.wf-col-head {
+  font-family:"Barlow Condensed",sans-serif; font-size:11px; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+  margin-bottom:14px; padding-bottom:6px; border-bottom:1px solid var(--bdr);
+}
+
+/* ── STEPPER (action steps) ─────────────────────────────────── */
+.steps-list { display:flex; flex-direction:column; gap:0; }
+.step { display:flex; gap:12px; padding-bottom:14px; position:relative; }
+.step:not(:last-child)::after {
+  content:""; position:absolute;
+  left:12px; top:27px; bottom:0;
+  width:1px; background:var(--bdr);
+}
+.step-num {
+  width:26px; height:26px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:"Barlow Condensed",sans-serif; font-size:12px; font-weight:800;
+  flex-shrink:0; z-index:1; position:relative;
+  background:rgba(27,155,212,.12); border:1px solid rgba(27,155,212,.28);
+  color:var(--scm-blue);
+}
+.step-text { font-size:13px; line-height:1.5; color:var(--text); padding-top:4px; }
+.step-note { font-size:12px; color:var(--muted); margin-top:2px; }
+
+/* ── DELIVERABLES LIST ──────────────────────────────────────── */
+.del-list { display:flex; flex-direction:column; gap:0; }
+.del-item {
+  font-size:13px; padding:6px 0; border-bottom:1px solid rgba(30,58,85,.4);
+  display:flex; align-items:flex-start; gap:8px; line-height:1.45;
+}
+.del-item:last-child { border-bottom:none; }
+.del-item::before { content:"→"; color:var(--scm-blue); flex-shrink:0; font-size:12px; margin-top:1px; }
+
+/* ── RESOURCES ──────────────────────────────────────────────── */
+.res-list { display:flex; flex-direction:column; gap:6px; margin-bottom:20px; }
+.res-link {
+  display:flex; align-items:center; gap:8px;
+  font-size:13px; color:var(--scm-blue); text-decoration:none;
+  padding:7px 10px; border-radius:5px;
+  background:rgba(27,155,212,.07); border:1px solid rgba(27,155,212,.18);
+  transition:all .15s;
+}
+.res-link:hover { background:rgba(27,155,212,.15); border-color:rgba(27,155,212,.35); }
+.res-link-icon { font-size:14px; flex-shrink:0; }
+.res-link-text { font-size:12px; font-weight:600; letter-spacing:.02em; }
+
+/* ── GATE BOX ───────────────────────────────────────────────── */
+.gate-box {
+  border-radius:6px; padding:14px 16px;
+  border:1px solid rgba(255,255,255,.08);
+}
+.gate-box-label {
+  font-family:"Barlow Condensed",sans-serif; font-size:10px; font-weight:800;
+  letter-spacing:.16em; text-transform:uppercase; margin-bottom:10px;
+}
+.gate-item {
+  font-size:12px; padding:4px 0; border-bottom:1px solid rgba(255,255,255,.06);
+  display:flex; align-items:flex-start; gap:7px; line-height:1.4;
+}
+.gate-item:last-child { border-bottom:none; }
+.gate-item::before { content:"✓"; font-weight:800; font-size:11px; flex-shrink:0; margin-top:1px; }
+
+/* ── NEXT PHASE STRIP ───────────────────────────────────────── */
+.next-strip {
+  display:flex; align-items:center; justify-content:flex-end; gap:10px;
+  margin-top:24px; padding-top:18px; border-top:1px solid var(--bdr);
+  font-size:12px; color:var(--muted);
+}
+.next-label { font-weight:600; letter-spacing:.04em; text-transform:uppercase; font-size:11px; }
+.next-phase-btn {
+  font-family:"Barlow Condensed",sans-serif; font-size:12px; font-weight:800;
+  letter-spacing:.1em; text-transform:uppercase; padding:6px 16px;
+  border-radius:4px; cursor:pointer; border:1px solid var(--bdr);
+  background:var(--mid); color:var(--text); transition:all .15s;
+  display:inline-flex; align-items:center; gap:6px;
+}
+.next-phase-btn:hover { border-color:var(--scm-blue); color:var(--scm-blue); }
+
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media(max-width:960px) {
+  .wf-cols { grid-template-columns:1fr 1fr; }
+  .wf-cols > *:last-child { grid-column:1/-1; }
+}
+@media(max-width:640px) {
+  .phase-bar { overflow-x:auto; }
+  .phase-arrow { min-width:110px; flex-shrink:0; }
+  .wf-inner { padding:20px 16px; }
+  .wf-cols { grid-template-columns:1fr; }
+  .wf-top { flex-direction:column; }
+}
+
+/* ── TRACK SWITCHER ─────────────────────────────────────────── */
+.track-switch{display:flex;gap:4px;margin-bottom:28px;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:4px}
+.track-btn{flex:1;padding:10px 16px;border-radius:5px;font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:7px}
+.track-btn:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.track-btn.active-pm{background:rgba(27,155,212,.15);color:var(--scm-blue)}
+.track-btn.active-bd{background:rgba(246,173,85,.15);color:var(--scm-amber)}
+.track-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* ── BD PIPELINE ────────────────────────────────────────────── */
+#track-bd{display:none}
+.phase-arrow[data-bd].active{background:rgba(246,173,85,.15);border-color:var(--scm-amber)}
+.phase-arrow[data-bd].active .pa-label{color:var(--scm-amber)}
+.bd-panel{display:none;background:var(--surf);border:1px solid var(--bdr);border-top:none;border-radius:0 0 8px 8px;margin-top:-1px;margin-bottom:32px;overflow:hidden}
+.bd-panel.open{display:block}
+.bd-band{height:3px;background:var(--scm-amber)}
+.bd-inner{padding:28px 32px}
+.bd-cols-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px}
+
+/* BANT accordion */
+.bant-card{border:1px solid var(--bdr);border-radius:6px;margin-bottom:8px;overflow:hidden}
+.bant-card-head{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;background:var(--surf);user-select:none;transition:background .15s}
+.bant-card-head:hover{background:rgba(246,173,85,.06)}
+.bant-card.open .bant-card-head{background:rgba(246,173,85,.08);border-bottom:1px solid var(--bdr)}
+.bant-letter{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Barlow Condensed",sans-serif;font-size:16px;font-weight:800;background:rgba(246,173,85,.15);border:1px solid rgba(246,173,85,.3);color:var(--scm-amber);flex-shrink:0}
+.bant-card-title{font-family:"Barlow Condensed",sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.bant-card-sub{font-size:12px;color:var(--muted);margin-top:1px}
+.bant-body{display:none;padding:18px 16px;background:var(--mid)}
+.bant-card.open .bant-body{display:block}
+.bant-chevron{margin-left:auto;color:var(--muted);font-size:11px;transition:transform .2s}
+.bant-card.open .bant-chevron{transform:rotate(180deg)}
+
+/* Decision cards */
+.decision-card{border-radius:6px;padding:18px 20px;border:1px solid var(--bdr)}
+.decision-card-head{font-family:"Barlow Condensed",sans-serif;font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.decision-badge{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:3px}
+
+/* SOW journey */
+.sow-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-bottom:32px}
+.sow-step{text-align:center;padding:0 8px 20px;position:relative}
+.sow-step:not(:last-child)::after{content:"→";position:absolute;right:-8px;top:18px;color:var(--scm-amber);font-size:16px;z-index:1}
+.sow-circle{width:44px;height:44px;border-radius:50%;background:rgba(246,173,85,.12);border:2px solid rgba(246,173,85,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-family:"Barlow Condensed",sans-serif;font-size:15px;font-weight:800;color:var(--scm-amber)}
+.sow-step-name{font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+.sow-step-detail{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* Step rows (cold outreach) */
+.step-row{display:flex;gap:14px;padding:11px 0;border-bottom:1px solid rgba(30,58,85,.4)}
+.step-row:last-child{border-bottom:none}
+.step-num-amb{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Barlow Condensed",sans-serif;font-size:12px;font-weight:800;flex-shrink:0;background:rgba(246,173,85,.12);border:1px solid rgba(246,173,85,.28);color:var(--scm-amber)}
+
+/* Walk-away box */
+.walkaway-box{background:rgba(252,129,129,.06);border:1px solid rgba(252,129,129,.2);border-radius:6px;padding:14px 16px;margin-top:16px}
+.walkaway-title{font-family:"Barlow Condensed",sans-serif;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--scm-warn);margin-bottom:8px}
+.walkaway-item{font-size:12px;color:var(--muted);padding:3px 0 3px 14px;position:relative;line-height:1.4}
+.walkaway-item::before{content:"✕";position:absolute;left:0;color:var(--scm-warn);font-size:10px;font-weight:800;top:4px}
+
+/* Vertical quick-ref cards */
+.vertical-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:40px}
+.vertical-card{background:var(--surf);border:1px solid var(--bdr);border-radius:6px;padding:14px 16px;transition:border-color .15s}
+.vertical-card:hover{border-color:var(--scm-amber)}
+.vertical-name{font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--scm-amber);margin-bottom:5px}
+.vertical-pain{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* BD checklist */
+.bd-check-group{margin-bottom:24px}
+.bd-cg-title{font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bdr)}
+.bd-ci{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(30,58,85,.3);cursor:pointer}
+.bd-ci:last-child{border-bottom:none}
+.bd-cb{width:16px;height:16px;min-width:16px;border:2px solid var(--bdr);border-radius:3px;margin-top:2px;display:flex;align-items:center;justify-content:center;background:var(--dark);transition:all .15s;flex-shrink:0}
+.bd-ci.checked .bd-cb{background:var(--scm-amber);border-color:var(--scm-amber)}
+.bd-tick{display:none;color:#0D1B2E;font-size:10px;font-weight:800}
+.bd-ci.checked .bd-tick{display:block}
+.bd-ci.checked .bd-cl{text-decoration:line-through;color:var(--muted)}
+.bd-cl{font-size:13px;line-height:1.4}
+.bd-cn{font-size:11px;color:var(--muted);margin-top:2px}
+
+@media(max-width:900px){.bd-cols-3{grid-template-columns:1fr 1fr}.sow-steps{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:640px){.bd-cols-3{grid-template-columns:1fr}.sow-steps{grid-template-columns:1fr}.bd-inner{padding:20px 16px}}
+</style>
+</head>
+<body>
+<div id="site-nav-root"></div>
+<script src="../nav.js"></script>
+
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>Project <span class="text-blue">Workflow</span></h1>
+      <p class="subtitle" style="margin-bottom:0">PM delivery guide and BD sales pipeline — click a phase or stage to expand.</p>
+    </div>
+  </header>
+
+  <!-- ── Track Switcher ─────────────────────────────────────── -->
+  <div class="track-switch">
+    <button class="track-btn active-pm" id="btn-pm" onclick="showTrack('pm')">
+      <span class="track-dot" style="background:var(--scm-blue)"></span>PM Workflow
+    </button>
+    <button class="track-btn" id="btn-bd" onclick="showTrack('bd')">
+      <span class="track-dot" style="background:var(--scm-amber)"></span>BD Pipeline
+    </button>
+  </div>
+
+  <div id="track-pm">
+  <!-- ── Phase Bar ───────────────────────────────────────────── -->
+  <div class="phase-bar">
+    <div class="phase-arrow" data-phase="idea" onclick="togglePhase('idea')">
+      <div class="pa-label">Idea</div>
+      <div class="pa-gate">DR0 · Concept</div>
+    </div>
+    <div class="phase-arrow" data-phase="poc" onclick="togglePhase('poc')">
+      <div class="pa-label">PoC</div>
+      <div class="pa-gate">DR1 · Prelim</div>
+    </div>
+    <div class="phase-arrow" data-phase="design" onclick="togglePhase('design')">
+      <div class="pa-label">Design</div>
+      <div class="pa-gate">DR2 · Critical</div>
+    </div>
+    <div class="phase-arrow" data-phase="test" onclick="togglePhase('test')">
+      <div class="pa-label">Test</div>
+      <div class="pa-gate">DR3 · EVT / DVT</div>
+    </div>
+    <div class="phase-arrow" data-phase="factory" onclick="togglePhase('factory')">
+      <div class="pa-label">Factory</div>
+      <div class="pa-gate">DR4 · PVT</div>
+    </div>
+    <div class="phase-arrow" data-phase="mp" onclick="togglePhase('mp')">
+      <div class="pa-label">MP</div>
+      <div class="pa-gate">Mass Production</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       IDEA PHASE
+  ════════════════════════════════════════════════════════════ -->
+  <div id="panel-idea" class="wf-panel">
+    <div class="wf-band" style="background:#1B9BD4"></div>
+    <div class="wf-inner">
+      <div class="wf-top">
+        <div>
+          <div class="wf-top-title" style="color:#1B9BD4">Idea Phase</div>
+          <div class="wf-top-sub">Validate the opportunity, align stakeholders, select partners, and establish the project foundation before any engineering begins.</div>
+        </div>
+        <div class="wf-gate-badge" style="background:#1B9BD4">Gate: DR0 — Concept Review</div>
+      </div>
+
+      <div class="wf-cols">
+        <!-- Actions -->
+        <div>
+          <div class="wf-col-head">PM Actions — in order</div>
+          <div class="steps-list">
+            <div class="step">
+              <div class="step-num" style="background:rgba(27,155,212,.15);border-color:rgba(27,155,212,.35);color:#1B9BD4">1</div>
+              <div><div class="step-text">Define the problem and confirm the market need</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(27,155,212,.15);border-color:rgba(27,155,212,.35);color:#1B9BD4">2</div>
+              <div><div class="step-text">Draft the Market Requirements Document (MRD)</div><div class="step-note">Include market context, user stories, and success criteria</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(27,155,212,.15);border-color:rgba(27,155,212,.35);color:#1B9BD4">3</div>
+              <div><div class="step-text">Schedule and run the DR0 stakeholder review</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(27,155,212,.15);border-color:rgba(27,155,212,.35);color:#1B9BD4">4</div>
+              <div><div class="step-text">Collect stakeholder sign-off on the MRD</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(27,155,212,.15);border-color:rgba(27,155,212,.35);color:#1B9BD4">5</div>
+              <div><div class="step-text">Identify and longlist candidate manufacturing and service partners</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(27,155,212,.15);border-color:rgba(27,155,212,.35);color:#1B9BD4">6</div>
+              <div><div class="step-text">Issue RFIs to candidate factories — collect capability, capacity, and quality system data</div><div class="step-note">Use responses to shortlist before investing in site visits</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(27,155,212,.15);border-color:rgba(27,155,212,.35);color:#1B9BD4">7</div>
+              <div><div class="step-text">Conduct onsite vetting audits for shortlisted factories — score and build the comparison matrix</div><div class="step-note">Use the Factory Audit App for structured scoring and exportable reports</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(27,155,212,.15);border-color:rgba(27,155,212,.35);color:#1B9BD4">8</div>
+              <div><div class="step-text">Select and confirm partners based on audit scores and capability fit</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(27,155,212,.15);border-color:rgba(27,155,212,.35);color:#1B9BD4">9</div>
+              <div><div class="step-text">Circulate and execute NDAs with all selected partners</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(27,155,212,.15);border-color:rgba(27,155,212,.35);color:#1B9BD4">10</div>
+              <div><div class="step-text">Create the Google Drive project folder structure</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(27,155,212,.15);border-color:rgba(27,155,212,.35);color:#1B9BD4">11</div>
+              <div><div class="step-text">Open the project contact log</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deliverables -->
+        <div>
+          <div class="wf-col-head">Deliverables</div>
+          <div class="del-list">
+            <div class="del-item">MRD — drafted and reviewed</div>
+            <div class="del-item">Stakeholder sign-off sheet</div>
+            <div class="del-item">RFI responses from candidate factories</div>
+            <div class="del-item">Factory audit reports + comparison matrix</div>
+            <div class="del-item">Selected partner list (confirmed)</div>
+            <div class="del-item">NDAs signed by all partners</div>
+            <div class="del-item">Google Drive folder structure</div>
+            <div class="del-item">Project contact log (open)</div>
+          </div>
+        </div>
+
+        <!-- Resources + Gate -->
+        <div>
+          <div class="wf-col-head">Resources</div>
+          <div class="res-list">
+            <a href="../index.html#" class="res-link"><span class="res-link-icon">🗺️</span><span class="res-link-text">Phase Map</span></a>
+            <a href="Factory-Onsite-Audit-APP%20.html" class="res-link"><span class="res-link-icon">🏭</span><span class="res-link-text">Factory Audit App — partner vetting</span></a>
+            <a href="nda-template.html" class="res-link"><span class="res-link-icon">📄</span><span class="res-link-text">Mutual NDA Template</span></a>
+            <a href="scm-playbook.html" class="res-link"><span class="res-link-icon">📖</span><span class="res-link-text">SCM Bridge OS Playbook</span></a>
+          </div>
+          <div class="gate-box" style="background:rgba(27,155,212,.07);border-color:rgba(27,155,212,.22)">
+            <div class="gate-box-label" style="color:#1B9BD4">DR0 Gate Criteria</div>
+            <div class="gate-item" style="color:var(--text)"><span style="color:#1B9BD4">✓</span> MRD drafted and reviewed</div>
+            <div class="gate-item" style="color:var(--text)"><span style="color:#1B9BD4">✓</span> Stakeholder sign-off complete</div>
+            <div class="gate-item" style="color:var(--text)"><span style="color:#1B9BD4">✓</span> RFIs issued and responses received</div>
+            <div class="gate-item" style="color:var(--text)"><span style="color:#1B9BD4">✓</span> Factory audits complete — comparison matrix signed off</div>
+            <div class="gate-item" style="color:var(--text)"><span style="color:#1B9BD4">✓</span> Partners selected and NDAs signed</div>
+            <div class="gate-item" style="color:var(--text)"><span style="color:#1B9BD4">✓</span> Drive folder structure created</div>
+            <div class="gate-item" style="color:var(--text)"><span style="color:#1B9BD4">✓</span> Contact log opened</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-strip">
+        <span class="next-label">DR0 passed? Move to</span>
+        <button class="next-phase-btn" onclick="togglePhase('poc')">PoC Phase →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       POC PHASE
+  ════════════════════════════════════════════════════════════ -->
+  <div id="panel-poc" class="wf-panel">
+    <div class="wf-band" style="background:#2AAB6E"></div>
+    <div class="wf-inner">
+      <div class="wf-top">
+        <div>
+          <div class="wf-top-title" style="color:#2AAB6E">Proof of Concept Phase</div>
+          <div class="wf-top-sub">Reduce technical and market risk by validating core technology and locking architecture before committing to full design.</div>
+        </div>
+        <div class="wf-gate-badge" style="background:#2AAB6E">Gate: DR1 — Preliminary Design Review</div>
+      </div>
+
+      <div class="wf-cols">
+        <div>
+          <div class="wf-col-head">PM Actions — in order</div>
+          <div class="steps-list">
+            <div class="step">
+              <div class="step-num" style="background:rgba(42,171,110,.15);border-color:rgba(42,171,110,.35);color:#2AAB6E">1</div>
+              <div><div class="step-text">Assemble the PoC engineering team and brief on requirements</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(42,171,110,.15);border-color:rgba(42,171,110,.35);color:#2AAB6E">2</div>
+              <div><div class="step-text">Kick off market validation activities</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(42,171,110,.15);border-color:rgba(42,171,110,.35);color:#2AAB6E">3</div>
+              <div><div class="step-text">Source components and engineering services for the PoC</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(42,171,110,.15);border-color:rgba(42,171,110,.35);color:#2AAB6E">4</div>
+              <div><div class="step-text">Explore off-the-shelf alternatives before custom design</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(42,171,110,.15);border-color:rgba(42,171,110,.35);color:#2AAB6E">5</div>
+              <div><div class="step-text">Build the non-form-factor PoC sample</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(42,171,110,.15);border-color:rgba(42,171,110,.35);color:#2AAB6E">6</div>
+              <div><div class="step-text">Test PoC against core technical requirements — document results</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(42,171,110,.15);border-color:rgba(42,171,110,.35);color:#2AAB6E">7</div>
+              <div><div class="step-text">Draft the PRD based on PoC and market validation findings</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(42,171,110,.15);border-color:rgba(42,171,110,.35);color:#2AAB6E">8</div>
+              <div><div class="step-text">Prepare the preliminary BOM — flag all long-lead items</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(42,171,110,.15);border-color:rgba(42,171,110,.35);color:#2AAB6E">9</div>
+              <div><div class="step-text">Confirm factory partners for the full design phase</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(42,171,110,.15);border-color:rgba(42,171,110,.35);color:#2AAB6E">10</div>
+              <div><div class="step-text">Schedule and run the DR1 review meeting</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="wf-col-head">Deliverables</div>
+          <div class="del-list">
+            <div class="del-item">PoC sample — built and tested</div>
+            <div class="del-item">Market validation report</div>
+            <div class="del-item">PRD — drafted and approved internally</div>
+            <div class="del-item">Preliminary BOM with long-lead flags</div>
+            <div class="del-item">Factory partner confirmation</div>
+            <div class="del-item">System interface diagram</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="wf-col-head">Resources</div>
+          <div class="res-list">
+            <a href="scm-playbook.html" class="res-link"><span class="res-link-icon">📖</span><span class="res-link-text">SCM Bridge OS Playbook</span></a>
+          </div>
+          <div class="gate-box" style="background:rgba(42,171,110,.07);border-color:rgba(42,171,110,.22)">
+            <div class="gate-box-label" style="color:#2AAB6E">DR1 Gate Criteria</div>
+            <div class="gate-item"><span style="color:#2AAB6E">✓</span> PoC sample built and tested</div>
+            <div class="gate-item"><span style="color:#2AAB6E">✓</span> Market validation done</div>
+            <div class="gate-item"><span style="color:#2AAB6E">✓</span> PRD approved internally</div>
+            <div class="gate-item"><span style="color:#2AAB6E">✓</span> Preliminary BOM drafted</div>
+            <div class="gate-item"><span style="color:#2AAB6E">✓</span> Factory partners confirmed</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-strip">
+        <span class="next-label">DR1 passed? Move to</span>
+        <button class="next-phase-btn" onclick="togglePhase('design')">Design Phase →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       DESIGN PHASE
+  ════════════════════════════════════════════════════════════ -->
+  <div id="panel-design" class="wf-panel">
+    <div class="wf-band" style="background:#7DC242"></div>
+    <div class="wf-inner">
+      <div class="wf-top">
+        <div>
+          <div class="wf-top-title" style="color:#7DC242">Design Phase</div>
+          <div class="wf-top-sub">Coordinate all engineering disciplines to complete design, gather DFM feedback, and produce manufacturer-ready file packages.</div>
+        </div>
+        <div class="wf-gate-badge" style="background:#7DC242">Gate: DR2 — Critical Design Review</div>
+      </div>
+
+      <div class="wf-cols">
+        <div>
+          <div class="wf-col-head">PM Actions — in order</div>
+          <div class="steps-list">
+            <div class="step">
+              <div class="step-num" style="background:rgba(125,194,66,.15);border-color:rgba(125,194,66,.35);color:#7DC242">1</div>
+              <div><div class="step-text">Formally brief ME, EE, SW, and Packaging design teams</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(125,194,66,.15);border-color:rgba(125,194,66,.35);color:#7DC242">2</div>
+              <div><div class="step-text">Coordinate DFM review sessions with CM/ODM during design — not after</div><div class="step-note">Early DFM feedback prevents costly late-stage redesigns</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(125,194,66,.15);border-color:rgba(125,194,66,.35);color:#7DC242">3</div>
+              <div><div class="step-text">Track ME assets checklist to completion with the ME team</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(125,194,66,.15);border-color:rgba(125,194,66,.35);color:#7DC242">4</div>
+              <div><div class="step-text">Track EE assets checklist to completion with the EE team</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(125,194,66,.15);border-color:rgba(125,194,66,.35);color:#7DC242">5</div>
+              <div><div class="step-text">Compile the Technical Requirements Document (TRD)</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(125,194,66,.15);border-color:rgba(125,194,66,.35);color:#7DC242">6</div>
+              <div><div class="step-text">Confirm all DFM feedback is incorporated into the design</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(125,194,66,.15);border-color:rgba(125,194,66,.35);color:#7DC242">7</div>
+              <div><div class="step-text">Lock the master BOM with all MPNs and alternates confirmed</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(125,194,66,.15);border-color:rgba(125,194,66,.35);color:#7DC242">8</div>
+              <div><div class="step-text">Build handoff manifests for CM and ODM using the Manifest Builder</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(125,194,66,.15);border-color:rgba(125,194,66,.35);color:#7DC242">9</div>
+              <div><div class="step-text">Complete IP review with legal</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(125,194,66,.15);border-color:rgba(125,194,66,.35);color:#7DC242">10</div>
+              <div><div class="step-text">Schedule and run the DR2 review meeting</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="wf-col-head">Deliverables</div>
+          <div class="del-list">
+            <div class="del-item">ME asset checklist — signed off</div>
+            <div class="del-item">EE asset checklist — signed off</div>
+            <div class="del-item">TRD — compiled and reviewed</div>
+            <div class="del-item">DFM feedback incorporated (documented)</div>
+            <div class="del-item">Master BOM with MPNs locked</div>
+            <div class="del-item">Handoff manifests — CM and ODM</div>
+            <div class="del-item">IP review sign-off</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="wf-col-head">Resources</div>
+          <div class="res-list">
+            <a href="../checklists/me-assets.html" class="res-link"><span class="res-link-icon">⚙️</span><span class="res-link-text">ME Asset Checklist</span></a>
+            <a href="../checklists/ee-assets.html" class="res-link"><span class="res-link-icon">⚡</span><span class="res-link-text">EE Asset Checklist</span></a>
+            <a href="../checklists/cmf-materials.html" class="res-link"><span class="res-link-icon">🎨</span><span class="res-link-text">CMF &amp; Materials</span></a>
+            <a href="../checklists/tooling-molds.html" class="res-link"><span class="res-link-icon">🔧</span><span class="res-link-text">Tooling &amp; Molds</span></a>
+            <a href="../checklists/packaging.html" class="res-link"><span class="res-link-icon">📦</span><span class="res-link-text">Packaging Engineering</span></a>
+            <a href="handoff-manifest.html" class="res-link"><span class="res-link-icon">📋</span><span class="res-link-text">Handoff Manifest Builder</span></a>
+          </div>
+          <div class="gate-box" style="background:rgba(125,194,66,.07);border-color:rgba(125,194,66,.22)">
+            <div class="gate-box-label" style="color:#7DC242">DR2 Gate Criteria</div>
+            <div class="gate-item"><span style="color:#7DC242">✓</span> ME + EE checklists signed off</div>
+            <div class="gate-item"><span style="color:#7DC242">✓</span> All drawings released</div>
+            <div class="gate-item"><span style="color:#7DC242">✓</span> TRD reviewed and approved</div>
+            <div class="gate-item"><span style="color:#7DC242">✓</span> DFM feedback incorporated</div>
+            <div class="gate-item"><span style="color:#7DC242">✓</span> IP review complete</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-strip">
+        <span class="next-label">DR2 passed? Move to</span>
+        <button class="next-phase-btn" onclick="togglePhase('test')">Test Phase →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       TEST PHASE
+  ════════════════════════════════════════════════════════════ -->
+  <div id="panel-test" class="wf-panel">
+    <div class="wf-band" style="background:#F5A623"></div>
+    <div class="wf-inner">
+      <div class="wf-top">
+        <div>
+          <div class="wf-top-title" style="color:#F5A623">Test Phase</div>
+          <div class="wf-top-sub">Send files to factory, build and validate first physical prototypes, complete regulatory certifications, and freeze the BOM.</div>
+        </div>
+        <div class="wf-gate-badge" style="background:#F5A623;color:#0D1B2E">Gate: DR3 · EVT · DVT</div>
+      </div>
+
+      <div class="wf-cols">
+        <div>
+          <div class="wf-col-head">PM Actions — in order</div>
+          <div class="steps-list">
+            <div class="step">
+              <div class="step-num" style="background:rgba(245,166,35,.15);border-color:rgba(245,166,35,.35);color:#F5A623">1</div>
+              <div><div class="step-text">Send complete handoff packages to CM and ODM with signed manifests</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(245,166,35,.15);border-color:rgba(245,166,35,.35);color:#F5A623">2</div>
+              <div><div class="step-text">Coordinate and attend the EVT build at factory</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(245,166,35,.15);border-color:rgba(245,166,35,.35);color:#F5A623">3</div>
+              <div><div class="step-text">Document all EVT results — track every pass/fail item to resolution</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(245,166,35,.15);border-color:rgba(245,166,35,.35);color:#F5A623">4</div>
+              <div><div class="step-text">Issue updated design package for DVT once EVT issues are resolved</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(245,166,35,.15);border-color:rgba(245,166,35,.35);color:#F5A623">5</div>
+              <div><div class="step-text">Oversee DVT — reliability testing and regulatory compliance verification</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(245,166,35,.15);border-color:rgba(245,166,35,.35);color:#F5A623">6</div>
+              <div><div class="step-text">Commission and supervise the First Article Inspection (FAI)</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(245,166,35,.15);border-color:rgba(245,166,35,.35);color:#F5A623">7</div>
+              <div><div class="step-text">Submit certifications for all target markets (CE, FCC, RoHS, etc.)</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(245,166,35,.15);border-color:rgba(245,166,35,.35);color:#F5A623">8</div>
+              <div><div class="step-text">Complete vendor audit</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(245,166,35,.15);border-color:rgba(245,166,35,.35);color:#F5A623">9</div>
+              <div><div class="step-text">Freeze the BOM on DVT pass — no further changes without ECO</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(245,166,35,.15);border-color:rgba(245,166,35,.35);color:#F5A623">10</div>
+              <div><div class="step-text">Schedule and run the DR3 review meeting</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="wf-col-head">Deliverables</div>
+          <div class="del-list">
+            <div class="del-item">CM + ODM handoff packages sent (with manifests)</div>
+            <div class="del-item">EVT report — pass/fail documented</div>
+            <div class="del-item">DVT report — reliability and regulatory</div>
+            <div class="del-item">FAI report — signed off</div>
+            <div class="del-item">Vendor audit report</div>
+            <div class="del-item">Certifications obtained for all markets</div>
+            <div class="del-item">BOM frozen</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="wf-col-head">Resources</div>
+          <div class="res-list">
+            <a href="handoff-manifest.html" class="res-link"><span class="res-link-icon">📋</span><span class="res-link-text">Handoff Manifest Builder</span></a>
+            <a href="project-asset-registry.html" class="res-link"><span class="res-link-icon">🗂️</span><span class="res-link-text">Project Asset Registry</span></a>
+            <a href="Factory-Onsite-Audit-APP%20.html" class="res-link"><span class="res-link-icon">🏭</span><span class="res-link-text">Factory Audit App</span></a>
+          </div>
+          <div class="gate-box" style="background:rgba(245,166,35,.07);border-color:rgba(245,166,35,.22)">
+            <div class="gate-box-label" style="color:#F5A623">DR3 Gate Criteria</div>
+            <div class="gate-item"><span style="color:#F5A623">✓</span> EVT passed</div>
+            <div class="gate-item"><span style="color:#F5A623">✓</span> DVT passed</div>
+            <div class="gate-item"><span style="color:#F5A623">✓</span> FAI signed off</div>
+            <div class="gate-item"><span style="color:#F5A623">✓</span> Vendor audit complete</div>
+            <div class="gate-item"><span style="color:#F5A623">✓</span> BOM frozen</div>
+            <div class="gate-item"><span style="color:#F5A623">✓</span> All certifications obtained</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-strip">
+        <span class="next-label">DR3 passed? Move to</span>
+        <button class="next-phase-btn" onclick="togglePhase('factory')">Factory Phase →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       FACTORY PHASE
+  ════════════════════════════════════════════════════════════ -->
+  <div id="panel-factory" class="wf-panel">
+    <div class="wf-band" style="background:#E8624A"></div>
+    <div class="wf-inner">
+      <div class="wf-top">
+        <div>
+          <div class="wf-top-title" style="color:#E8624A">Factory Phase</div>
+          <div class="wf-top-sub">Set up and validate the production line, run PVT to confirm yield and quality, then confirm the factory is ready for mass production.</div>
+        </div>
+        <div class="wf-gate-badge" style="background:#E8624A">Gate: DR4 · PVT</div>
+      </div>
+
+      <div class="wf-cols">
+        <div>
+          <div class="wf-col-head">PM Actions — in order</div>
+          <div class="steps-list">
+            <div class="step">
+              <div class="step-num" style="background:rgba(232,98,74,.15);border-color:rgba(232,98,74,.35);color:#E8624A">1</div>
+              <div><div class="step-text">Review and sign off production SOPs with CM</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(232,98,74,.15);border-color:rgba(232,98,74,.35);color:#E8624A">2</div>
+              <div><div class="step-text">Validate all test fixtures on the production line</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(232,98,74,.15);border-color:rgba(232,98,74,.35);color:#E8624A">3</div>
+              <div><div class="step-text">Verify operator training records are complete</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(232,98,74,.15);border-color:rgba(232,98,74,.35);color:#E8624A">4</div>
+              <div><div class="step-text">Run the PVT (Production Validation Test) build</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(232,98,74,.15);border-color:rgba(232,98,74,.35);color:#E8624A">5</div>
+              <div><div class="step-text">Review PVT results against yield and quality targets</div><div class="step-note">Resolve all failures before signing off</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(232,98,74,.15);border-color:rgba(232,98,74,.35);color:#E8624A">6</div>
+              <div><div class="step-text">Activate QC inline inspection process</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(232,98,74,.15);border-color:rgba(232,98,74,.35);color:#E8624A">7</div>
+              <div><div class="step-text">Confirm capacity plan meets the MP production schedule</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(232,98,74,.15);border-color:rgba(232,98,74,.35);color:#E8624A">8</div>
+              <div><div class="step-text">Obtain official MP readiness sign-off from factory</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(232,98,74,.15);border-color:rgba(232,98,74,.35);color:#E8624A">9</div>
+              <div><div class="step-text">Schedule and run the DR4 review meeting</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="wf-col-head">Deliverables</div>
+          <div class="del-list">
+            <div class="del-item">Production SOPs — reviewed and approved</div>
+            <div class="del-item">Test fixtures — validated on line</div>
+            <div class="del-item">Operator training records — verified</div>
+            <div class="del-item">PVT report — yield targets met</div>
+            <div class="del-item">QC inline inspection plan — active</div>
+            <div class="del-item">Capacity confirmation</div>
+            <div class="del-item">MP readiness sign-off</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="wf-col-head">Resources</div>
+          <div class="res-list">
+            <a href="Factory-Onsite-Audit-APP%20.html" class="res-link"><span class="res-link-icon">🏭</span><span class="res-link-text">Factory Audit App</span></a>
+            <a href="project-asset-registry.html" class="res-link"><span class="res-link-icon">🗂️</span><span class="res-link-text">Project Asset Registry</span></a>
+          </div>
+          <div class="gate-box" style="background:rgba(232,98,74,.07);border-color:rgba(232,98,74,.22)">
+            <div class="gate-box-label" style="color:#E8624A">DR4 Gate Criteria</div>
+            <div class="gate-item"><span style="color:#E8624A">✓</span> PVT passed</div>
+            <div class="gate-item"><span style="color:#E8624A">✓</span> Production SOPs confirmed</div>
+            <div class="gate-item"><span style="color:#E8624A">✓</span> Operator training verified</div>
+            <div class="gate-item"><span style="color:#E8624A">✓</span> QC inspection active</div>
+            <div class="gate-item"><span style="color:#E8624A">✓</span> BOM locked</div>
+            <div class="gate-item"><span style="color:#E8624A">✓</span> MP readiness sign-off obtained</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-strip">
+        <span class="next-label">DR4 passed? Move to</span>
+        <button class="next-phase-btn" onclick="togglePhase('mp')">Mass Production →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       MASS PRODUCTION
+  ════════════════════════════════════════════════════════════ -->
+  <div id="panel-mp" class="wf-panel">
+    <div class="wf-band" style="background:#9B6BD4"></div>
+    <div class="wf-inner">
+      <div class="wf-top">
+        <div>
+          <div class="wf-top-title" style="color:#9B6BD4">Mass Production</div>
+          <div class="wf-top-sub">Run sustained production, monitor quality and yield continuously, manage logistics, and maintain rigorous documentation throughout the product lifecycle.</div>
+        </div>
+        <div class="wf-gate-badge" style="background:#9B6BD4">Gate: MP — Ship Product</div>
+      </div>
+
+      <div class="wf-cols">
+        <div>
+          <div class="wf-col-head">PM Actions — in order</div>
+          <div class="steps-list">
+            <div class="step">
+              <div class="step-num" style="background:rgba(155,107,212,.15);border-color:rgba(155,107,212,.35);color:#9B6BD4">1</div>
+              <div><div class="step-text">Place MP purchase orders (POs) and confirm with factory</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(155,107,212,.15);border-color:rgba(155,107,212,.35);color:#9B6BD4">2</div>
+              <div><div class="step-text">Confirm production schedule and capacity commitments</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(155,107,212,.15);border-color:rgba(155,107,212,.35);color:#9B6BD4">3</div>
+              <div><div class="step-text">Set up yield and quality metrics tracking</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(155,107,212,.15);border-color:rgba(155,107,212,.35);color:#9B6BD4">4</div>
+              <div><div class="step-text">Activate final inspection process for outgoing goods</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(155,107,212,.15);border-color:rgba(155,107,212,.35);color:#9B6BD4">5</div>
+              <div><div class="step-text">Arrange logistics, freight, and shipping for first delivery</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(155,107,212,.15);border-color:rgba(155,107,212,.35);color:#9B6BD4">6</div>
+              <div><div class="step-text">Establish the 8D failure analysis process for quality issues</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(155,107,212,.15);border-color:rgba(155,107,212,.35);color:#9B6BD4">7</div>
+              <div><div class="step-text">Keep the project contact log current throughout MP</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(155,107,212,.15);border-color:rgba(155,107,212,.35);color:#9B6BD4">8</div>
+              <div><div class="step-text">Track and communicate all ECOs to factory — document every change</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(155,107,212,.15);border-color:rgba(155,107,212,.35);color:#9B6BD4">9</div>
+              <div><div class="step-text">Log all quality escapes with 8D reference numbers</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num" style="background:rgba(155,107,212,.15);border-color:rgba(155,107,212,.35);color:#9B6BD4">10</div>
+              <div><div class="step-text">Conduct periodic production line reviews to optimize yield</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="wf-col-head">Deliverables (ongoing)</div>
+          <div class="del-list">
+            <div class="del-item">MP POs placed and confirmed</div>
+            <div class="del-item">Production schedule — running</div>
+            <div class="del-item">Yield and quality metrics reports</div>
+            <div class="del-item">Final inspection records</div>
+            <div class="del-item">Logistics and shipping documents</div>
+            <div class="del-item">8D reports — as quality issues arise</div>
+            <div class="del-item">ECO log — all changes documented</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="wf-col-head">Resources</div>
+          <div class="res-list">
+            <a href="scm-dashboard-v3.html" class="res-link"><span class="res-link-icon">📊</span><span class="res-link-text">Operations Dashboard</span></a>
+            <a href="project-report.html" class="res-link"><span class="res-link-icon">📄</span><span class="res-link-text">Project Report</span></a>
+            <a href="Factory-Onsite-Audit-APP%20.html" class="res-link"><span class="res-link-icon">🏭</span><span class="res-link-text">Factory Audit App</span></a>
+          </div>
+          <div class="gate-box" style="background:rgba(155,107,212,.07);border-color:rgba(155,107,212,.22)">
+            <div class="gate-box-label" style="color:#9B6BD4">Ongoing Requirements</div>
+            <div class="gate-item"><span style="color:#9B6BD4">✓</span> Contact log kept current</div>
+            <div class="gate-item"><span style="color:#9B6BD4">✓</span> ECOs tracked and communicated</div>
+            <div class="gate-item"><span style="color:#9B6BD4">✓</span> Quality issues logged with 8D ref</div>
+            <div class="gate-item"><span style="color:#9B6BD4">✓</span> Partner communications documented</div>
+            <div class="gate-item"><span style="color:#9B6BD4">✓</span> Yield metrics reviewed regularly</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /#track-pm -->
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!--  BD PIPELINE TRACK                                         -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div id="track-bd" style="display:none">
+
+    <!-- BD Stage Arrow Bar -->
+    <div class="phase-bar">
+      <div class="phase-arrow" data-bd="outreach" onclick="toggleBD('outreach')">
+        <div class="pa-label">Outreach</div>
+        <div class="pa-gate">SMYKM · 7-Step</div>
+      </div>
+      <div class="phase-arrow" data-bd="discovery" onclick="toggleBD('discovery')">
+        <div class="pa-label">Discovery</div>
+        <div class="pa-gate">BANT Call</div>
+      </div>
+      <div class="phase-arrow" data-bd="decision" onclick="toggleBD('decision')">
+        <div class="pa-label">Decision</div>
+        <div class="pa-gate">Audit · Go / No-Go</div>
+      </div>
+      <div class="phase-arrow" data-bd="sow" onclick="toggleBD('sow')">
+        <div class="pa-label">SOW</div>
+        <div class="pa-gate">Scoping → Kickoff</div>
+      </div>
+    </div>
+
+    <!-- ── BD Panel: Cold Outreach ─────────────────────────── -->
+    <div id="bd-panel-outreach" class="bd-panel">
+      <div class="bd-band"></div>
+      <div class="bd-inner">
+        <div class="wf-top">
+          <div>
+            <div class="wf-top-title" style="color:var(--scm-amber)">Cold Outreach</div>
+            <div class="wf-top-sub">Apollo 7-Step Framework — Show Me You Know Me (#SMYKM). Research first, always. Goal is a reply, not a close.</div>
+          </div>
+          <div class="wf-gate-badge" style="background:var(--scm-amber);color:#0D1B2E">No calendar links in first email</div>
+        </div>
+
+        <div class="wf-cols">
+          <div>
+            <div class="wf-col-head">The 7 Steps</div>
+            <div class="step-row">
+              <div class="step-num-amb">1</div>
+              <div><div class="step-text"><strong>Subject Line</strong> — SMYKM. Personal detail + implied problem.</div><div class="step-note">"Paul's aluminum sourcing + Stoney Creek fire rescue" — not "Quick question"</div></div>
+            </div>
+            <div class="step-row">
+              <div class="step-num-amb">2</div>
+              <div><div class="step-text"><strong>First Sentence</strong> — non-salesy opener. Prove you looked them up.</div><div class="step-note">"I noticed you closed your Series A last month." — not "I hope this finds you well."</div></div>
+            </div>
+            <div class="step-row">
+              <div class="step-num-amb">3</div>
+              <div><div class="step-text"><strong>Transition</strong> — "The real reason for my outreach, however, is —"</div><div class="step-note">Bridges the hook to the business problem without feeling like bait-and-switch.</div></div>
+            </div>
+            <div class="step-row">
+              <div class="step-num-amb">4</div>
+              <div><div class="step-text"><strong>Challenge</strong> — suspect a pain point. Hypothesis, not certainty.</div><div class="step-note">"Given your fire rescue vertical, I suspect sourcing stable aluminum vendors is harder than it should be."</div></div>
+            </div>
+            <div class="step-row">
+              <div class="step-num-amb">5</div>
+              <div><div class="step-text"><strong>Value Prop</strong> — ONE angle: hook, pain insight, or loss aversion.</div><div class="step-note">Loss aversion is 2× more powerful than gain framing. "Every month without a second source is a production risk."</div></div>
+            </div>
+            <div class="step-row">
+              <div class="step-num-amb">6</div>
+              <div><div class="step-text"><strong>Objection Handle</strong> — pre-handle the obvious objection.</div><div class="step-note">"I know you likely have vendor relationships. What we do differently is continuous qualification."</div></div>
+            </div>
+            <div class="step-row">
+              <div class="step-num-amb">7</div>
+              <div><div class="step-text"><strong>Close</strong> — end with a question, never a calendar link.</div><div class="step-note">"Worth a 20-minute call to compare notes?" — sign off: "Cheers!" or "Thanks!"</div></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="wf-col-head">Follow-Up Cadence</div>
+            <div class="steps-list">
+              <div class="step">
+                <div class="step-num" style="background:rgba(246,173,85,.15);border-color:rgba(246,173,85,.35);color:var(--scm-amber)">D0</div>
+                <div><div class="step-text">Send initial SMYKM email</div></div>
+              </div>
+              <div class="step">
+                <div class="step-num" style="background:rgba(246,173,85,.15);border-color:rgba(246,173,85,.35);color:var(--scm-amber)">D3</div>
+                <div><div class="step-text">First follow-up — reply to same thread, one sentence</div><div class="step-note">"Wanted to bump this in case it got buried — thoughts?"</div></div>
+              </div>
+              <div class="step">
+                <div class="step-num" style="background:rgba(246,173,85,.15);border-color:rgba(246,173,85,.35);color:var(--scm-amber)">D7</div>
+                <div><div class="step-text">Second follow-up — add a new value hook</div><div class="step-note">"We recently helped a similar company qualify a new CM in Vietnam in under 8 weeks."</div></div>
+              </div>
+              <div class="step">
+                <div class="step-num" style="background:rgba(246,173,85,.15);border-color:rgba(246,173,85,.35);color:var(--scm-amber)">D14</div>
+                <div><div class="step-text">Break-up email — graceful close, no pressure</div><div class="step-note">"I'll stop here so I'm not adding noise. If [pain] ever becomes urgent, happy to reconnect."</div></div>
+              </div>
+              <div class="step">
+                <div class="step-num" style="background:rgba(246,173,85,.15);border-color:rgba(246,173,85,.35);color:var(--scm-amber)">+90d</div>
+                <div><div class="step-text">Tag in Odoo for 90-day re-check</div><div class="step-note">Situations change. A graceful walk-away often gets a reply within 30 days.</div></div>
+              </div>
+            </div>
+            <div class="walkaway-box">
+              <div class="walkaway-title">Walk Away From Outreach If</div>
+              <div class="walkaway-item">No response after 4 touches</div>
+              <div class="walkaway-item">"Not the right person" with no referral offered</div>
+              <div class="walkaway-item">"Happy with current setup" — no pain signal</div>
+              <div class="walkaway-item">Decision-maker won't engage at all</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BD Panel: BANT Discovery ────────────────────────── -->
+    <div id="bd-panel-discovery" class="bd-panel">
+      <div class="bd-band"></div>
+      <div class="bd-inner">
+        <div class="wf-top">
+          <div>
+            <div class="wf-top-title" style="color:var(--scm-amber)">BANT Discovery Call</div>
+            <div class="wf-top-sub">Junior BD leads. Senior BD (Patrick / Kara) observes silently on mute. 30–45 min. Goal is diagnosis — not pitch. Log Odoo BANT record within 2 hours.</div>
+          </div>
+          <div class="wf-gate-badge" style="background:var(--scm-amber);color:#0D1B2E">Don't pitch. Listen for pain.</div>
+        </div>
+
+        <div class="gate-box" style="background:rgba(246,173,85,.06);border-color:rgba(246,173,85,.2);margin-bottom:24px">
+          <div class="gate-box-label" style="color:var(--scm-amber)">Opening Line</div>
+          <div class="gate-item" style="font-style:italic;color:var(--text);border:none;padding:0">"Thanks for making the time. Before I say anything about what we do, I want to understand your situation. What's the main supply chain challenge you're dealing with right now?"</div>
+        </div>
+
+        <div class="wf-col-head" style="margin-bottom:12px">BANT Question Bank — click to expand</div>
+
+        <div class="bant-card" id="bant-b">
+          <div class="bant-card-head" onclick="toggleBANT('b')">
+            <div class="bant-letter">B</div>
+            <div><div class="bant-card-title">Budget</div><div class="bant-card-sub">What budget have you allocated for solving this?</div></div>
+            <div class="bant-chevron">▼</div>
+          </div>
+          <div class="bant-body">
+            <div class="wf-cols">
+              <div>
+                <div class="dp-col-title">Follow-Up Probes</div>
+                <div class="del-list">
+                  <div class="del-item">"Is that budget already approved, or does it need sign-off?"</div>
+                  <div class="del-item">"Is this an ops budget, capex line, or project budget?"</div>
+                  <div class="del-item">"What's the approval process — one sign-off or multiple layers?"</div>
+                  <div class="del-item">"What would you expect to pay to have this fully resolved?"</div>
+                </div>
+              </div>
+              <div>
+                <div class="gate-box" style="background:rgba(125,194,66,.06);border-color:rgba(125,194,66,.2);margin-bottom:10px">
+                  <div class="gate-box-label" style="color:var(--scm-green)">Green Light</div>
+                  <div class="gate-item" style="color:var(--text)"><span style="color:var(--scm-green)">✓</span> Specific number, approved or clear path to approval</div>
+                </div>
+                <div class="walkaway-box">
+                  <div class="walkaway-title">Red Flag</div>
+                  <div class="walkaway-item">"We don't have budget right now"</div>
+                  <div class="walkaway-item">"We were hoping this would be cheap"</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bant-card" id="bant-a">
+          <div class="bant-card-head" onclick="toggleBANT('a')">
+            <div class="bant-letter">A</div>
+            <div><div class="bant-card-title">Authority</div><div class="bant-card-sub">Who else needs to be involved in a decision like this?</div></div>
+            <div class="bant-chevron">▼</div>
+          </div>
+          <div class="bant-body">
+            <div class="wf-cols">
+              <div>
+                <div class="dp-col-title">Follow-Up Probes</div>
+                <div class="del-list">
+                  <div class="del-item">"Is the final call yours to make, or does it go up the chain?"</div>
+                  <div class="del-item">"Does procurement or finance need to sign off?"</div>
+                  <div class="del-item">"Who would veto this if they disagreed?"</div>
+                  <div class="del-item">"Are there other stakeholders we should loop in early?"</div>
+                </div>
+              </div>
+              <div>
+                <div class="gate-box" style="background:rgba(125,194,66,.06);border-color:rgba(125,194,66,.2);margin-bottom:10px">
+                  <div class="gate-box-label" style="color:var(--scm-green)">Green Light</div>
+                  <div class="gate-item" style="color:var(--text)"><span style="color:var(--scm-green)">✓</span> DM on call, or strong influencer with a clear path to DM</div>
+                </div>
+                <div class="walkaway-box">
+                  <div class="walkaway-title">Red Flag</div>
+                  <div class="walkaway-item">"My boss decides" — no path to that person</div>
+                  <div class="walkaway-item">Influencer only, DM refuses to engage</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bant-card" id="bant-n">
+          <div class="bant-card-head" onclick="toggleBANT('n')">
+            <div class="bant-letter">N</div>
+            <div><div class="bant-card-title">Need</div><div class="bant-card-sub">What happens if you don't solve this problem?</div></div>
+            <div class="bant-chevron">▼</div>
+          </div>
+          <div class="bant-body">
+            <div class="wf-cols">
+              <div>
+                <div class="dp-col-title">Follow-Up Probes</div>
+                <div class="del-list">
+                  <div class="del-item">"What does this cost you right now — dollars, time, or risk?"</div>
+                  <div class="del-item">"Has this caused operational failures — missed deliveries, quality escapes?"</div>
+                  <div class="del-item">"Is this a 'nice to fix' or a 'must fix before [event]'?"</div>
+                  <div class="del-item">"How long has this been a problem? What changed that makes now the moment?"</div>
+                </div>
+              </div>
+              <div>
+                <div class="gate-box" style="background:rgba(125,194,66,.06);border-color:rgba(125,194,66,.2);margin-bottom:10px">
+                  <div class="gate-box-label" style="color:var(--scm-green)">Green Light</div>
+                  <div class="gate-item" style="color:var(--text)"><span style="color:var(--scm-green)">✓</span> Financial or operational urgency articulated, specific event driving action</div>
+                </div>
+                <div class="walkaway-box">
+                  <div class="walkaway-title">Red Flag</div>
+                  <div class="walkaway-item">"It would be nice to improve this someday"</div>
+                  <div class="walkaway-item">No operational or financial consequence if unsolved</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bant-card" id="bant-t">
+          <div class="bant-card-head" onclick="toggleBANT('t')">
+            <div class="bant-letter">T</div>
+            <div><div class="bant-card-title">Timeline</div><div class="bant-card-sub">When do you need this solved by?</div></div>
+            <div class="bant-chevron">▼</div>
+          </div>
+          <div class="bant-body">
+            <div class="wf-cols">
+              <div>
+                <div class="dp-col-title">Follow-Up Probes</div>
+                <div class="del-list">
+                  <div class="del-item">"Is there an external deadline driving that — contract, launch, audit?"</div>
+                  <div class="del-item">"What happens if you miss that date?"</div>
+                  <div class="del-item">"How long have you been looking at this? Why now?"</div>
+                  <div class="del-item">"If we could start next month, would you be ready to move?"</div>
+                </div>
+              </div>
+              <div>
+                <div class="gate-box" style="background:rgba(125,194,66,.06);border-color:rgba(125,194,66,.2);margin-bottom:10px">
+                  <div class="gate-box-label" style="color:var(--scm-green)">Green Light</div>
+                  <div class="gate-item" style="color:var(--text)"><span style="color:var(--scm-green)">✓</span> Specific date or hard external trigger (contract, launch, production start)</div>
+                </div>
+                <div class="walkaway-box">
+                  <div class="walkaway-title">Red Flag</div>
+                  <div class="walkaway-item">"Eventually" / "next year" / "when the time is right"</div>
+                  <div class="walkaway-item">No external trigger — purely internal and soft</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="next-strip">
+          <span class="next-label">Call done? Log BANT in Odoo within 2 hours, then</span>
+          <button type="button" class="next-phase-btn" onclick="toggleBD('decision')">Audit &amp; Decision →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BD Panel: Audit & Decision ──────────────────────── -->
+    <div id="bd-panel-decision" class="bd-panel">
+      <div class="bd-band"></div>
+      <div class="bd-inner">
+        <div class="wf-top">
+          <div>
+            <div class="wf-top-title" style="color:var(--scm-amber)">Audit &amp; Decision</div>
+            <div class="wf-top-sub">Senior BD (Patrick or Kara) reviews the BANT log and makes the call. Junior BD never decides independently. Decision within 24 hrs of log submission.</div>
+          </div>
+          <div class="wf-gate-badge" style="background:var(--scm-amber);color:#0D1B2E">Senior BD decides within 24 hrs</div>
+        </div>
+
+        <div class="bd-cols-3" style="margin-bottom:28px">
+          <div class="decision-card" style="background:rgba(125,194,66,.06);border-color:rgba(125,194,66,.25)">
+            <div class="decision-card-head">
+              <span style="color:var(--scm-green)">✓</span>
+              <span style="color:var(--scm-green)">Qualified</span>
+              <span class="decision-badge" style="background:rgba(125,194,66,.15);color:var(--scm-green);border:1px solid rgba(125,194,66,.3)">GO</span>
+            </div>
+            <div class="del-list">
+              <div class="del-item" style="color:var(--text)">Budget real and approved (or clear path)</div>
+              <div class="del-item" style="color:var(--text)">Authority clear — DM or strong influencer</div>
+              <div class="del-item" style="color:var(--text)">Need is urgent with financial/operational impact</div>
+              <div class="del-item" style="color:var(--text)">Timeline specific — this or next quarter</div>
+            </div>
+            <div style="margin-top:12px;font-size:12px;color:var(--scm-green);font-weight:600">→ Senior BD schedules scoping call within 5 days</div>
+          </div>
+
+          <div class="decision-card" style="background:rgba(246,173,85,.06);border-color:rgba(246,173,85,.25)">
+            <div class="decision-card-head">
+              <span style="color:var(--scm-amber)">?</span>
+              <span style="color:var(--scm-amber)">Maybe</span>
+              <span class="decision-badge" style="background:rgba(246,173,85,.15);color:var(--scm-amber);border:1px solid rgba(246,173,85,.3)">1 MORE Q</span>
+            </div>
+            <div class="del-list">
+              <div class="del-item" style="color:var(--text)">Need is real but timeline is soft</div>
+              <div class="del-item" style="color:var(--text)">Authority unclear — too many stakeholders</div>
+              <div class="del-item" style="color:var(--text)">Budget exists but approval path is murky</div>
+            </div>
+            <div style="margin-top:12px;font-size:12px;color:var(--scm-amber);font-weight:600">→ Junior BD sends one targeted follow-up. Still fuzzy = No-Go.</div>
+          </div>
+
+          <div class="decision-card" style="background:rgba(252,129,129,.06);border-color:rgba(252,129,129,.25)">
+            <div class="decision-card-head">
+              <span style="color:var(--scm-warn)">✕</span>
+              <span style="color:var(--scm-warn)">No-Go</span>
+              <span class="decision-badge" style="background:rgba(252,129,129,.1);color:var(--scm-warn);border:1px solid rgba(252,129,129,.3)">WALK</span>
+            </div>
+            <div class="del-list">
+              <div class="del-item" style="color:var(--text)">No real budget, or "too expensive" without value discussion</div>
+              <div class="del-item" style="color:var(--text)">No path to decision-maker</div>
+              <div class="del-item" style="color:var(--text)">Pain is theoretical — no operational urgency</div>
+              <div class="del-item" style="color:var(--text)">"Maybe next year" / "someday" timeline</div>
+            </div>
+            <div style="margin-top:12px;font-size:12px;color:var(--scm-warn);font-weight:600">→ Junior BD sends decline within 24 hrs. Tag for 6-month re-check.</div>
+          </div>
+        </div>
+
+        <div class="wf-col-head" style="margin-bottom:12px">Decline Templates</div>
+        <div class="wf-cols">
+          <div class="gate-box" style="background:rgba(252,129,129,.04);border-color:rgba(252,129,129,.15)">
+            <div class="gate-box-label" style="color:var(--muted)">General Walk-Away</div>
+            <div style="font-size:13px;color:var(--text);font-style:italic;line-height:1.6">"After our conversation, I don't think we're the right fit for your timeline and scope right now — our process is thorough, and rushing it doesn't serve you well. Happy to reconnect in [timeframe]. Good luck with [specific thing they mentioned]."</div>
+          </div>
+          <div class="gate-box" style="background:rgba(252,129,129,.04);border-color:rgba(252,129,129,.15)">
+            <div class="gate-box-label" style="color:var(--muted)">No Timeline</div>
+            <div style="font-size:13px;color:var(--text);font-style:italic;line-height:1.6">"Without a clear timeline driving this, we wouldn't be adding value right now. When [event or urgency] shows up, reach back out — we'd love to help."</div>
+          </div>
+        </div>
+
+        <div class="next-strip">
+          <span class="next-label">Qualified? Move to</span>
+          <button type="button" class="next-phase-btn" onclick="toggleBD('sow')">SOW Journey →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BD Panel: SOW Journey ────────────────────────────── -->
+    <div id="bd-panel-sow" class="bd-panel">
+      <div class="bd-band"></div>
+      <div class="bd-inner">
+        <div class="wf-top">
+          <div>
+            <div class="wf-top-title" style="color:var(--scm-amber)">Post-Qualification Journey</div>
+            <div class="wf-top-sub">Junior BD hands off to senior BD here. Kara signs all SOWs. Target: scoping call within 5 business days of qualified decision.</div>
+          </div>
+          <div class="wf-gate-badge" style="background:var(--scm-amber);color:#0D1B2E">Kara signs every SOW</div>
+        </div>
+
+        <div class="sow-steps">
+          <div class="sow-step">
+            <div class="sow-circle">1</div>
+            <div class="sow-step-name">Scoping Call</div>
+            <div class="sow-step-detail">Senior BD + prospect · 45–60 min · Full scope, deliverables, timeline, team · Scope summary email within 24 hrs</div>
+          </div>
+          <div class="sow-step">
+            <div class="sow-circle">2</div>
+            <div class="sow-step-name">SOW Prep</div>
+            <div class="sow-step-detail">Kara reviews · 3–5 business days · Outcome-based pricing, milestones, success criteria, payment schedule</div>
+          </div>
+          <div class="sow-step">
+            <div class="sow-circle">3</div>
+            <div class="sow-step-name">SOW Review</div>
+            <div class="sow-step-detail">~1 week · Minor adjustments OK · Major scope changes = revised SOW · No discounts without Kara approval</div>
+          </div>
+          <div class="sow-step">
+            <div class="sow-circle">4</div>
+            <div class="sow-step-name">Sign + NDA</div>
+            <div class="sow-step-detail">NDA executed (SCM standard) · Signed SOW filed in project Drive · Odoo deal → "Won"</div>
+          </div>
+          <div class="sow-step">
+            <div class="sow-circle">5</div>
+            <div class="sow-step-name">Kickoff</div>
+            <div class="sow-step-detail">Kara leads · Drive folder setup · Contact log opened · Delivery team briefed · First status call scheduled</div>
+          </div>
+        </div>
+
+        <div class="wf-col-head" style="margin-bottom:10px">Pricing Rule</div>
+        <div class="gate-box" style="background:rgba(246,173,85,.06);border-color:rgba(246,173,85,.2);margin-bottom:24px">
+          <div class="gate-item" style="border:none;padding:0;color:var(--text);font-size:13px">Internal anchor: <strong style="color:var(--scm-amber)">$100 / hr</strong> — never shared with client. Client sees an outcome-based project price. Quote what solving the problem is worth, not hours worked.</div>
+        </div>
+
+        <div class="wf-col-head" style="margin-bottom:10px">Resources</div>
+        <div class="res-list" style="max-width:320px">
+          <a href="nda-template.html" class="res-link"><span class="res-link-icon">📄</span><span class="res-link-text">Mutual NDA Template</span></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Quick Reference ──────────────────────────────────── -->
+    <div style="margin-top:44px">
+      <div class="dp-col-title" style="margin-bottom:16px;display:flex;align-items:center;gap:12px">Target Verticals <span style="flex:1;height:1px;background:var(--bdr);display:block"></span></div>
+      <div class="vertical-grid">
+        <div class="vertical-card">
+          <div class="vertical-name">Hardware Startups</div>
+          <div class="vertical-pain">Post-prototype, pre-scale. Founder is DM. Taiwan / Vietnam manufacturing. Budget = seed/Series A capex. Timeline = investor milestones.</div>
+        </div>
+        <div class="vertical-card">
+          <div class="vertical-name">Consumer Electronics</div>
+          <div class="vertical-pain">CM quality or pricing pain, DFM friction. Need: second-source or new CM. Timeline = product launch or retailer window.</div>
+        </div>
+        <div class="vertical-card">
+          <div class="vertical-name">Medical Devices</div>
+          <div class="vertical-pain">ISO 13485 / FDA-aware sourcing. Supplier documentation gaps. Timeline = submission date (hard wall). Authority = VP Supply Chain + Regulatory.</div>
+        </div>
+        <div class="vertical-card">
+          <div class="vertical-name">EV / Auto Components</div>
+          <div class="vertical-pain">Tier 2/3 supplier scaling. SOP date = non-negotiable. Need: second-source before ramp. Authority = Procurement + Engineering joint decision.</div>
+        </div>
+        <div class="vertical-card">
+          <div class="vertical-name">Industrial / B2B</div>
+          <div class="vertical-pain">Safety-critical, reliability-driven. Vendor instability or single-source risk. Value-based buyers. (ref: Motis Fire Rescue)</div>
+        </div>
+      </div>
+
+      <div class="dp-col-title" style="margin-bottom:16px;display:flex;align-items:center;gap:12px">Junior BD Checklist <span style="flex:1;height:1px;background:var(--bdr);display:block"></span></div>
+      <div class="bd-cols-3">
+        <div class="bd-check-group">
+          <div class="bd-cg-title">Before Outreach</div>
+          <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Research company — size, vertical, funding, recent news</div></div></div>
+          <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Identify likely DM on LinkedIn</div></div></div>
+          <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Map probable supply chain pain (vertical-specific)</div></div></div>
+          <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Find one SMYKM hook — personal or business detail</div></div></div>
+        </div>
+        <div class="bd-check-group">
+          <div class="bd-cg-title">Before the Call</div>
+          <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Re-read company research and prior email thread</div></div></div>
+          <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Prepare 3–5 BANT discovery questions</div></div></div>
+          <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Open Odoo call record before the call starts</div></div></div>
+          <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">5-min pre-call sync with senior BD observer</div></div></div>
+        </div>
+        <div class="bd-check-group">
+          <div class="bd-cg-title">After the Call</div>
+          <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Log BANT findings in Odoo within 2 hours</div></div></div>
+          <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Write the need in their exact words, not your interpretation</div></div></div>
+          <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">List red flags and green lights observed</div></div></div>
+          <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Submit record — wait for senior BD decision</div></div></div>
+          <div class="bd-ci" onclick="toggleBDCheck(this)"><div class="bd-cb"><span class="bd-tick">✓</span></div><div><div class="bd-cl">Attend 15-min post-call debrief</div></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /#track-bd -->
+
+</div><!-- /.wrap -->
+
+<script>
+function showTrack(track) {
+  var pm = document.getElementById('track-pm');
+  var bd = document.getElementById('track-bd');
+  var btnPm = document.getElementById('btn-pm');
+  var btnBd = document.getElementById('btn-bd');
+  if (track === 'bd') {
+    pm.style.display = 'none';
+    bd.style.display = 'block';
+    btnPm.className = 'track-btn';
+    btnBd.className = 'track-btn active-bd';
+  } else {
+    bd.style.display = 'none';
+    pm.style.display = 'block';
+    btnPm.className = 'track-btn active-pm';
+    btnBd.className = 'track-btn';
+  }
+}
+
+function togglePhase(phase) {
+  var panel = document.getElementById('panel-' + phase);
+  var arrow = document.querySelector('[data-phase="' + phase + '"]');
+  var isOpen = panel.classList.contains('open');
+  document.querySelectorAll('.wf-panel').forEach(function(p) { p.classList.remove('open'); });
+  document.querySelectorAll('[data-phase]').forEach(function(a) { a.classList.remove('active'); });
+  if (!isOpen) {
+    panel.classList.add('open');
+    arrow.classList.add('active');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function toggleBD(stage) {
+  var panel = document.getElementById('bd-panel-' + stage);
+  var arrow = document.querySelector('[data-bd="' + stage + '"]');
+  var isOpen = panel.classList.contains('open');
+  document.querySelectorAll('.bd-panel').forEach(function(p) { p.classList.remove('open'); });
+  document.querySelectorAll('[data-bd]').forEach(function(a) { a.classList.remove('active'); });
+  if (!isOpen) {
+    panel.classList.add('open');
+    arrow.classList.add('active');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function toggleBANT(letter) {
+  var card = document.getElementById('bant-' + letter);
+  card.classList.toggle('open');
+}
+
+function toggleBDCheck(el) {
+  el.classList.toggle('checked');
+}
+</script>
+</body>
+</html>

@@ -8,15 +8,37 @@
 <link rel="stylesheet" href="../css/scm-styles.css">
 <style>
   /* Amber accent overrides */
-  .cl-section-num  { color:var(--scm-amber);background:rgba(246,173,85,.1);border-color:rgba(246,173,85,.2); }
-  .cl-item-ext     { color:var(--scm-amber); }
-  .cl-section-hdr:hover { background:#1f3550; }
-  .cl-item:hover   { background:rgba(246,173,85,.04); }
+  .section-num     { color:var(--scm-amber);background:rgba(246,173,85,.1);border-color:rgba(246,173,85,.2); }
+  .item-ext        { color:var(--scm-amber); }
+  .section-header:hover { background:#1f3550; }
+  .item:hover      { background:rgba(246,173,85,.04); }
   .progress-fill   { background:linear-gradient(90deg,var(--scm-amber),var(--scm-green)); }
   .progress-label  { color:var(--scm-amber); }
 </style>
 </head>
 <body>
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a href="../index.html" class="nav-brand">
+      <span class="s">S</span><span class="c">C</span><span class="m">M</span>
+      <span class="sol"> Bridge OS</span>
+    </a>
+    <div class="nav-links">
+      <a href="../index.html" class="nav-link">Phase Map</a>
+      <div class="nav-sep"></div>
+      <a href="me-assets.html" class="nav-link">ME Assets</a>
+      <a href="ee-assets.html" class="nav-link">EE Assets</a>
+      <a href="cmf-materials.html" class="nav-link active">CMF</a>
+      <a href="tooling-molds.html" class="nav-link">Tooling</a>
+      <a href="packaging.html" class="nav-link">Packaging</a>
+      <div class="nav-sep"></div>
+      <a href="../tools/handoff-manifest.html" class="nav-link">Handoff</a>
+      <a href="../tools/project-asset-registry.html" class="nav-link">Registry</a>
+      <a href="../tools/chinese-srs.html" class="nav-link">CN Ref</a>
+      <a href="../tools/odoo-playbook.html" class="nav-link">Odoo</a>
+    </div>
+  </div>
+</nav>
 <div class="wrap">
 
 <nav class="nav-breadcrumb">
@@ -25,9 +47,11 @@
   <span>/</span><span>CMF & Materials</span>
 </nav>
 
+<div class="page-header">
 <div class="phase-tag">Design Phase — DR2 · Factory — DR4</div>
 <h1>CMF &amp; Materials<br>Checklist</h1>
 <p class="subtitle">CMF defines how the product looks, feels, and is finished. Lock every spec before tooling is cut and confirm again at FAI. Ambiguous CMF is one of the most common causes of expensive late-stage rework.</p>
+</div>
 
 <div class="ref-panel">
   <div class="ref-card"><div class="rct">Color Systems</div><div class="ri">Pantone PMS — plastics &amp; print</div><div class="ri">RAL — industrial coatings</div><div class="ri">NCS — Scandinavian standard</div><div class="ri">Delta-E (ΔE) — tolerance measure</div></div>
