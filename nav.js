@@ -31,7 +31,7 @@
     + '          <a href="' + base + 'checklists/packaging.html" class="nav-link' + a('packaging.html') + '">Packaging</a>\n'
     + '        </div>\n'
     + '      </div>\n'
-    + '      <a href="' + base + 'tools/workflow.html" class="nav-link' + (fwActive ? ' active' : '') + '">Workflow</a>\n'
+    + '      <a href="' + base + 'tools/workflow.html" class="nav-link' + (fwActive ? ' active' : '') + '">Framework</a>\n'
     + '      <div class="nav-dropdown' + (tlActive ? ' active' : '') + '">\n'
     + '        <span class="nav-link nav-dropdown-toggle" tabindex="0">Tools</span>\n'
     + '        <div class="nav-dropdown-menu">\n'
