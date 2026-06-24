@@ -2,7 +2,7 @@
 # Purpose: Master operational framework for cold outreach, BANT discovery, and senior BD audit
 # Version: 2.0
 # Last Updated: June 2026
-# Authors: Patrick McGuinness (v1.0), expanded with Kara
+# Authors: Patrick (v1.0), expanded with Kara
 
 ---
 # ============================================================================
@@ -40,7 +40,7 @@ philosophy:
     internal_anchor: "$100/hour (never shared with client)"
     customer_sees: "Outcome-based price — what the solution is worth, not hours"
     example: |
-      Motis Fire Rescue: 50 hours of vendor sourcing → quoted as $5,000
+      Ridgeline Fire Rescue: 50 hours of vendor sourcing → quoted as $5,000
       The outcome they bought: "a stable supplier found and qualified"
       Not what they paid for: "50 billable hours of someone's time"
 
@@ -73,7 +73,7 @@ philosophy:
 team_structure:
   senior_bd:
     who:
-      - "Patrick McGuinness"
+      - "Patrick"
       - "Kara (Founder)"
     responsibilities: |
       - Silently observe or audit all discovery calls
@@ -259,9 +259,9 @@ target_icp:
 
     industrial_b2b_equipment:
       description: |
-        Safety-critical industrial equipment manufacturers. Similar profile to Motis
-        Fire Rescue — mid-market, ops-heavy, supply chain pain driven by component
-        reliability and lead times rather than cost.
+        Safety-critical industrial equipment manufacturers. Similar profile to
+        Ridgeline Fire Rescue — mid-market, ops-heavy, supply chain pain driven by
+        component reliability and lead times rather than cost.
       bant_signals:
         budget:
           source: "Operations or procurement budget"
@@ -302,8 +302,8 @@ cold_outreach:
       rule: "Prove you did research. Specific > clever."
       formula: "[Personal/company detail] + [implied problem]"
       examples:
-        - "Paul's aluminum sourcing + Stoney Creek fire rescue"
-        - "KoreLock's IoT expansion — Taiwan CM question"
+        - "Sam's aluminum sourcing + Highpoint fire rescue"
+        - "VaultCore's IoT expansion — Taiwan CM question"
         - "Saw the Kickstarter hit $800K — supply chain next?"
       anti_patterns:
         - "Quick question" (lazy)
@@ -314,7 +314,7 @@ cold_outreach:
       rule: "Non-salesy opener. Not 'I hope this finds you well.'"
       what_to_do: "Reference the research. Make them think: this person actually looked me up."
       examples:
-        - "We haven't met, but I saw you onboarded with Motis last quarter."
+        - "We haven't met, but I saw you onboarded with Ridgeline last quarter."
         - "I noticed [company] just closed your Series A — congrats."
         - "Your post on LinkedIn about Vietnam manufacturing caught my eye."
 
@@ -808,11 +808,11 @@ summary_checklist_for_junior_bd:
 version_history:
   v1_0:
     date: "2026-06-24"
-    author: "Patrick McGuinness"
+    author: "Patrick"
     summary: "Initial framework — philosophy, outreach, BANT, audit, Odoo schema"
   v2_0:
     date: "2026-06-24"
-    author: "Patrick McGuinness + Kara"
+    author: "Patrick + Kara"
     summary: |
       Major expansion:
       - Added 5 vertical ICPs with detailed BANT signals (early-stage hardware
