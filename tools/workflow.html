@@ -298,6 +298,55 @@
     </div>
   </div>
 
+  <!-- ── Create Odoo Tasks ──────────────────────────────────── -->
+  <div style="background:rgba(27,155,212,.06);border:1px solid rgba(27,155,212,.2);border-radius:8px;padding:20px 24px;margin-bottom:24px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--scm-blue)">Create Odoo Tasks — AI-Assisted</div>
+      <div style="flex:1;height:1px;background:rgba(27,155,212,.2)"></div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">Each phase has a standard task list (below). Feed that + client context into AI to get Odoo-ready tasks tailored to this project. Once data flows consistently through the pipeline, this step can be automated.</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--bdr)">1 — Gather inputs</div>
+        <div style="font-size:12px;color:var(--text);display:flex;gap:7px;padding:3px 0"><span style="color:var(--scm-blue);flex-shrink:0">→</span> Current phase (from Phase Map — logged in handoff)</div>
+        <div style="font-size:12px;color:var(--text);display:flex;gap:7px;padding:3px 0"><span style="color:var(--scm-blue);flex-shrink:0">→</span> Client name and company context</div>
+        <div style="font-size:12px;color:var(--text);display:flex;gap:7px;padding:3px 0"><span style="color:var(--scm-blue);flex-shrink:0">→</span> SOW scope summary (copy from signed SOW)</div>
+        <div style="font-size:12px;color:var(--text);display:flex;gap:7px;padding:3px 0"><span style="color:var(--scm-blue);flex-shrink:0">→</span> Key risks or flags from BD project brief</div>
+        <div style="font-size:12px;color:var(--text);display:flex;gap:7px;padding:3px 0"><span style="color:var(--scm-blue);flex-shrink:0">→</span> Phase task list (open the relevant phase below, copy PM Actions)</div>
+      </div>
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--bdr)">3 — Set up in Odoo</div>
+        <div style="font-size:12px;color:var(--text);display:flex;gap:7px;padding:3px 0"><span style="color:var(--scm-blue);flex-shrink:0">→</span> Create project — link to Won deal record</div>
+        <div style="font-size:12px;color:var(--text);display:flex;gap:7px;padding:3px 0"><span style="color:var(--scm-blue);flex-shrink:0">→</span> Add tasks from AI output — one card per task</div>
+        <div style="font-size:12px;color:var(--text);display:flex;gap:7px;padding:3px 0"><span style="color:var(--scm-blue);flex-shrink:0">→</span> Assign owners and set due dates</div>
+        <div style="font-size:12px;color:var(--text);display:flex;gap:7px;padding:3px 0"><span style="color:var(--scm-blue);flex-shrink:0">→</span> Tag phase gate as milestone</div>
+        <div style="font-size:12px;color:var(--text);display:flex;gap:7px;padding:3px 0"><span style="color:var(--scm-blue);flex-shrink:0">→</span> Share project view with client contact</div>
+      </div>
+    </div>
+
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--bdr)">2 — AI prompt template</div>
+    <div style="background:var(--dark);border:1px solid var(--bdr);border-radius:5px;padding:14px 16px;font-family:monospace;font-size:12px;color:var(--text);line-height:1.7;white-space:pre-wrap;user-select:all">You are helping set up an SCM Bridge project in Odoo.
+
+Project context:
+- Client: [CLIENT NAME AND COMPANY]
+- Current phase: [PHASE — Idea / PoC / Design / Test / Factory / MP]
+- SOW scope: [PASTE SCOPE SUMMARY FROM SOW]
+- Key context / risks from BD: [PASTE BD PROJECT BRIEF NOTES]
+
+Standard phase task list:
+[PASTE PM ACTIONS FROM THE RELEVANT PHASE PANEL BELOW]
+
+Using the standard task list above, generate a tailored Odoo task list for this client. For each task output:
+- Task name (specific to this client, not generic)
+- One-line description
+- Suggested owner: PM / Kara / Client
+- Blocked by (any dependency)
+
+Keep the list tight — only tasks that apply to this client's scope and phase.</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:8px">Select all text above → copy → paste into Claude or ChatGPT. Fill in the [BRACKETS] before sending.</div>
+  </div>
+
   <!-- ── Phase Bar ───────────────────────────────────────────── -->
   <div class="phase-bar">
     <div class="phase-arrow" data-phase="idea" onclick="togglePhase('idea')">
