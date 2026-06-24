@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SCM Solution — Hardware Development Phase Map</title>
+<title>SCM Bridge OS</title>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/scm-styles.css">
   <style>
@@ -87,41 +87,180 @@
   @media(max-width:400px){
     .bridge-grid{grid-template-columns:1fr}
   }
+  /* ── Overview Diagram ───────────────────────────────────── */
+  .ov-diagram{margin-bottom:48px}
+  .ov-wrapper{overflow-x:auto}
+  .ov-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--bdr);border:1px solid var(--bdr);border-radius:8px;overflow:hidden;min-width:640px}
+  .ov-phase-head{padding:13px 8px;text-align:center;font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#fff}
+  .ov-phase-head.ph-idea{background:var(--idea)}
+  .ov-phase-head.ph-poc{background:var(--poc)}
+  .ov-phase-head.ph-design{background:var(--design);color:#0D1B2E}
+  .ov-phase-head.ph-test{background:var(--test);color:#0D1B2E}
+  .ov-phase-head.ph-factory{background:var(--factory)}
+  .ov-phase-head.ph-mp{background:var(--mp)}
+  .ov-content-cell{padding:14px 12px}
+  .ov-content-cell.ph-idea{background:rgba(27,155,212,.12)}
+  .ov-content-cell.ph-poc{background:rgba(42,171,110,.12)}
+  .ov-content-cell.ph-design{background:rgba(125,194,66,.12)}
+  .ov-content-cell.ph-test{background:rgba(245,166,35,.12)}
+  .ov-content-cell.ph-factory{background:rgba(232,98,74,.12)}
+  .ov-content-cell.ph-mp{background:rgba(155,107,212,.12)}
+  .ov-cell-title{font-size:13px;font-weight:700;margin-bottom:8px;line-height:1.35}
+  .ph-idea .ov-cell-title{color:var(--idea)}
+  .ph-poc .ov-cell-title{color:var(--poc)}
+  .ph-design .ov-cell-title{color:var(--design)}
+  .ph-test .ov-cell-title{color:var(--test)}
+  .ph-factory .ov-cell-title{color:var(--factory)}
+  .ph-mp .ov-cell-title{color:var(--mp)}
+  .ov-cell-list{list-style:none;padding:0;margin:0}
+  .ov-cell-list li{font-size:12px;color:var(--muted);line-height:1.5;padding:2px 0 2px 12px;position:relative}
+  .ov-cell-list li::before{content:"•";position:absolute;left:0}
+  .ov-divider-row{grid-column:1/-1;background:var(--mid);padding:12px 20px;display:flex;align-items:center;gap:6px;font-family:"Barlow Condensed",sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text)}
+  .ov-service-cell{padding:14px 12px;background:var(--surf)}
   </style>
 </head>
 <body>
-<nav class="site-nav">
-  <div class="site-nav-inner">
-    <a href="index.html" class="nav-brand">
-      <span class="s">S</span><span class="c">C</span><span class="m">M</span>
-      <span class="sol"> Bridge OS</span>
-    </a>
-    <div class="nav-links">
-      <a href="index.html" class="nav-link active">Phase Map</a>
-      <div class="nav-sep"></div>
-      <a href="checklists/me-assets.html" class="nav-link">ME Assets</a>
-      <a href="checklists/ee-assets.html" class="nav-link">EE Assets</a>
-      <a href="checklists/cmf-materials.html" class="nav-link">CMF</a>
-      <a href="checklists/tooling-molds.html" class="nav-link">Tooling</a>
-      <a href="checklists/packaging.html" class="nav-link">Packaging</a>
-      <div class="nav-sep"></div>
-      <a href="tools/handoff-manifest.html" class="nav-link">Handoff</a>
-      <a href="tools/project-asset-registry.html" class="nav-link">Registry</a>
-      <a href="tools/chinese-srs.html" class="nav-link">CN Ref</a>
-      <a href="tools/odoo-playbook.html" class="nav-link">Odoo</a>
-    </div>
-  </div>
-</nav>
+<div id="site-nav-root"></div>
+<script src="nav.js"></script>
 <div class="wrap">
 
   <!-- Header -->
   <header>
     <div>
-      <h1>Hardware Development <span class="text-blue">Phase Map</span></h1>
+      <h1><span class="s">S</span><span class="c">C</span><span class="m">M</span> Bridge OS</h1>
       <p class="subtitle" style="margin-bottom:0">From Idea to Mass Production — click any phase to expand deliverables and gate criteria.</p>
     </div>
     <div class="header-badge">Rev 1.0</div>
   </header>
+
+  <!-- Overview Diagram — Typical Product Development Phases -->
+  <div class="ov-diagram">
+    <div class="section-title">Typical Product Development Phases</div>
+    <div class="ov-wrapper">
+      <div class="ov-grid">
+
+        <!-- Phase headers -->
+        <div class="ov-phase-head ph-idea">Idea</div>
+        <div class="ov-phase-head ph-poc">PoC</div>
+        <div class="ov-phase-head ph-design">Design</div>
+        <div class="ov-phase-head ph-test">Test</div>
+        <div class="ov-phase-head ph-factory">Factory</div>
+        <div class="ov-phase-head ph-mp">MP</div>
+
+        <!-- Product development objectives -->
+        <div class="ov-content-cell ph-idea">
+          <div class="ov-cell-title">Identify Market Needs</div>
+          <ul class="ov-cell-list">
+            <li>PRD</li>
+            <li>Stakeholder &amp; resource review</li>
+            <li>User Stories</li>
+          </ul>
+        </div>
+        <div class="ov-content-cell ph-poc">
+          <div class="ov-cell-title">Reduce Risk</div>
+          <ul class="ov-cell-list">
+            <li>Market Validation</li>
+            <li>System Interface Diagram</li>
+            <li>Build non-form factor sample</li>
+          </ul>
+        </div>
+        <div class="ov-content-cell ph-design">
+          <div class="ov-cell-title">Create and Document</div>
+          <ul class="ov-cell-list">
+            <li>Schematics</li>
+            <li>Layout</li>
+            <li>Mechanical</li>
+            <li>Software</li>
+          </ul>
+        </div>
+        <div class="ov-content-cell ph-test">
+          <div class="ov-cell-title">Testing and Release Tools</div>
+          <ul class="ov-cell-list">
+            <li>EVT</li>
+            <li>DVT</li>
+          </ul>
+        </div>
+        <div class="ov-content-cell ph-factory">
+          <div class="ov-cell-title">Production Readiness</div>
+          <ul class="ov-cell-list">
+            <li>PVT</li>
+            <li>SOPs</li>
+            <li>Training</li>
+          </ul>
+        </div>
+        <div class="ov-content-cell ph-mp">
+          <div class="ov-cell-title">Ship Product</div>
+          <ul class="ov-cell-list">
+            <li>Optimize</li>
+            <li>Failure Analysis</li>
+            <li>Logistics</li>
+          </ul>
+        </div>
+
+        <!-- SCM Bridge divider -->
+        <div class="ov-divider-row">
+          Use <span class="scm">&nbsp;SCM</span>&nbsp;<span class="bridge">BRIDGE</span>&nbsp;for Supply Chain Services:
+        </div>
+
+        <!-- SCM Bridge services per phase -->
+        <div class="ov-service-cell">
+          <ul class="ov-cell-list">
+            <li>Document Review</li>
+            <li>Get Supplier Input</li>
+            <li>Translation</li>
+            <li>Find Factory Partners</li>
+          </ul>
+        </div>
+        <div class="ov-service-cell">
+          <ul class="ov-cell-list">
+            <li>Test Prototypes</li>
+            <li>Source Components &amp; Engineering Services</li>
+            <li>Explore off-the-shelf solutions</li>
+          </ul>
+        </div>
+        <div class="ov-service-cell">
+          <ul class="ov-cell-list">
+            <li>Support EE, ME, SW &amp; Packaging teams</li>
+            <li>BOM Costing</li>
+            <li>Material Selection</li>
+            <li>3rd party checks</li>
+            <li>FMEA support</li>
+          </ul>
+        </div>
+        <div class="ov-service-cell">
+          <ul class="ov-cell-list">
+            <li>FAI support</li>
+            <li>Check EVT &amp; DVT results</li>
+            <li>Oversee Reliability testing</li>
+            <li>Certifications</li>
+            <li>Test fixture design</li>
+            <li>RFQs — POs — PIs</li>
+          </ul>
+        </div>
+        <div class="ov-service-cell">
+          <ul class="ov-cell-list">
+            <li>Check Production line SOPs</li>
+            <li>Check PVT results</li>
+            <li>Verify Operator Training</li>
+            <li>Check capacity</li>
+            <li>Test production line</li>
+            <li>Determine MP readiness</li>
+          </ul>
+        </div>
+        <div class="ov-service-cell">
+          <ul class="ov-cell-list">
+            <li>Verify Quality processes</li>
+            <li>Final Inspection</li>
+            <li>Logistics &amp; Shipping</li>
+            <li>Metrics &amp; 8D reports</li>
+            <li>Failure Analysis</li>
+            <li>Arrange shipping/logistics</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
   <!-- Phase Arrow Bar -->
   <div class="phase-bar">
@@ -405,68 +544,6 @@
     </div>
   </div>
 
-  <!-- Gate Flow Diagram -->
-  <div class="flow-section">
-    <div class="section-title">Design Review Gates</div>
-    <div class="gate-flow">
-      <div class="gate-node">
-        <div class="gate-diamond" title="DR0 — Concept Review">
-          <div class="gate-inner"><span class="gate-id">DR0</span></div>
-        </div>
-        <div class="gate-name-label">Concept</div>
-      </div>
-      <div class="gate-connector"></div>
-      <div class="gate-node">
-        <div class="gate-diamond" title="DR1 — Preliminary Design">
-          <div class="gate-inner"><span class="gate-id">DR1</span></div>
-        </div>
-        <div class="gate-name-label">Prelim Design</div>
-      </div>
-      <div class="gate-connector"></div>
-      <div class="gate-node">
-        <div class="gate-diamond" title="DR2 — Critical Design Review">
-          <div class="gate-inner"><span class="gate-id">DR2</span></div>
-        </div>
-        <div class="gate-name-label">Critical Design</div>
-      </div>
-      <div class="gate-connector"></div>
-      <div class="gate-node">
-        <div class="gate-diamond" title="DR3 — Build Readiness">
-          <div class="gate-inner"><span class="gate-id">DR3</span></div>
-        </div>
-        <div class="gate-name-label">Build Ready</div>
-      </div>
-      <div class="gate-connector"></div>
-      <div class="gate-node">
-        <div class="gate-diamond" title="EVT — Engineering Validation">
-          <div class="gate-inner"><span class="gate-id">EVT</span></div>
-        </div>
-        <div class="gate-name-label">Eng. Validation</div>
-      </div>
-      <div class="gate-connector"></div>
-      <div class="gate-node">
-        <div class="gate-diamond" title="DVT — Design Validation">
-          <div class="gate-inner"><span class="gate-id">DVT</span></div>
-        </div>
-        <div class="gate-name-label">Design Validation</div>
-      </div>
-      <div class="gate-connector"></div>
-      <div class="gate-node">
-        <div class="gate-diamond" title="DR4 — Production Readiness">
-          <div class="gate-inner"><span class="gate-id">DR4</span></div>
-        </div>
-        <div class="gate-name-label">Prod. Ready</div>
-      </div>
-      <div class="gate-connector"></div>
-      <div class="gate-node">
-        <div class="gate-diamond" style="border-color:var(--scm-green);background:rgba(125,194,66,0.15)" title="MP — Mass Production">
-          <div class="gate-inner"><span class="gate-id" style="color:var(--scm-green)">MP</span></div>
-        </div>
-        <div class="gate-name-label">Mass Production</div>
-      </div>
-    </div>
-  </div>
-
   <!-- SCM Bridge Services -->
   <div class="bridge-section">
     <div class="bridge-title">
@@ -583,6 +660,18 @@
     </div>
 
     <div class="resources-group">
+      <div class="resources-group-label">Workflow</div>
+      <div class="resources-grid">
+        <a href="tools/workflow.html" class="res-card res-card-tool">
+          <div class="res-icon">🧭</div>
+          <div class="res-name">SCM Bridge Workflow</div>
+          <div class="res-desc">End-to-end operational guide — BD pipeline from outreach to client onboard, and PM delivery across all six development phases</div>
+          <div class="res-tag res-tag-tool">Workflow</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="resources-group">
       <div class="resources-group-label">Project Tools</div>
       <div class="resources-grid">
         <a href="tools/handoff-manifest.html" class="res-card res-card-tool">
@@ -602,6 +691,36 @@
           <div class="res-name">Chinese SCM Reference</div>
           <div class="res-desc">Supply chain vocabulary in Traditional &amp; Simplified Chinese — for working with suppliers and factories</div>
           <div class="res-tag res-tag-tool">Reference</div>
+        </a>
+        <a href="tools/odoo-playbook.html" class="res-card res-card-tool">
+          <div class="res-icon">🛠️</div>
+          <div class="res-name">Odoo Playbook</div>
+          <div class="res-desc">Known gaps, automation backlog, and implementation guidance for the SCM Bridge OS Odoo instance</div>
+          <div class="res-tag res-tag-tool">Playbook</div>
+        </a>
+        <a href="tools/scm-dashboard-v3.html" class="res-card res-card-tool">
+          <div class="res-icon">📊</div>
+          <div class="res-name">Operations Dashboard</div>
+          <div class="res-desc">Live operations view — project status, metrics, and supply chain activity at a glance</div>
+          <div class="res-tag res-tag-tool">Dashboard</div>
+        </a>
+        <a href="tools/Factory-Onsite-Audit-APP%20.html" class="res-card res-card-tool">
+          <div class="res-icon">🏭</div>
+          <div class="res-name">Factory Audit App</div>
+          <div class="res-desc">Structured onsite audit platform with guided prompts, scoring, and exportable audit reports</div>
+          <div class="res-tag res-tag-tool">Tool</div>
+        </a>
+        <a href="tools/project-report.html" class="res-card res-card-tool">
+          <div class="res-icon">📄</div>
+          <div class="res-name">Project Report</div>
+          <div class="res-desc">Build and export structured project status reports for clients and stakeholders</div>
+          <div class="res-tag res-tag-tool">Tool</div>
+        </a>
+        <a href="tools/nda-template.html" class="res-card res-card-tool">
+          <div class="res-icon">🤝</div>
+          <div class="res-name">Mutual NDA Template</div>
+          <div class="res-desc">Standard mutual NDA for SCM Solution Ltd. — fill in counterparty, print or save as PDF</div>
+          <div class="res-tag res-tag-tool">Template</div>
         </a>
       </div>
     </div>
@@ -662,8 +781,8 @@
   </div>
 
   <footer>
-    <span>SCM Solution LTD. — Hardware Development System</span>
-    <span>© 2025 · Phase Map Rev 1.0</span>
+    <span>SCM Solution LTD. — SCM Bridge OS</span>
+    <span>© 2025 · Rev 1.0</span>
   </footer>
 
 </div>
