@@ -298,13 +298,13 @@
     </div>
   </div>
 
-  <!-- ── Create Odoo Tasks ──────────────────────────────────── -->
+  <!-- ── Odoo Workflow & Automation ─────────────────────────── -->
   <div style="background:rgba(27,155,212,.06);border:1px solid rgba(27,155,212,.2);border-radius:8px;padding:20px 24px;margin-bottom:24px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--scm-blue)">Create Odoo Tasks — AI-Assisted</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--scm-blue)">Odoo Workflow &amp; Automation</div>
       <div style="flex:1;height:1px;background:rgba(27,155,212,.2)"></div>
     </div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">Each phase has a standard task list (below). Feed that + client context into AI to get Odoo-ready tasks tailored to this project. Once data flows consistently through the pipeline, this step can be automated.</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.6">Central hub for Odoo task creation and workflow automation. Near-term: AI-assisted task setup from handoff data. Long-term: stage transitions trigger tasks automatically as data flows through the pipeline.</div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
       <div>
@@ -345,6 +345,37 @@ Using the standard task list above, generate a tailored Odoo task list for this 
 
 Keep the list tight — only tasks that apply to this client's scope and phase.</div>
     <div style="font-size:11px;color:var(--muted);margin-top:8px">Select all text above → copy → paste into Claude or ChatGPT. Fill in the [BRACKETS] before sending.</div>
+
+    <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(27,155,212,.15)">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Workflow Automation — pipeline</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-bottom:16px">
+        <div style="text-align:center;padding:0 6px 16px;position:relative">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--scm-amber);margin-bottom:5px">BD Won</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5">Odoo deal → Won triggers project record creation</div>
+          <div style="position:absolute;right:-8px;top:8px;color:var(--scm-blue);font-size:14px">→</div>
+        </div>
+        <div style="text-align:center;padding:0 6px 16px;position:relative">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--scm-blue);margin-bottom:5px">Project Setup</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5">Handoff data populates project fields — phase, scope, contacts</div>
+          <div style="position:absolute;right:-8px;top:8px;color:var(--scm-blue);font-size:14px">→</div>
+        </div>
+        <div style="text-align:center;padding:0 6px 16px;position:relative">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--scm-blue);margin-bottom:5px">Task Gen</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5">AI generates phase-matched task list from templates + client data</div>
+          <div style="position:absolute;right:-8px;top:8px;color:var(--scm-blue);font-size:14px">→</div>
+        </div>
+        <div style="text-align:center;padding:0 6px 16px;position:relative">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--scm-blue);margin-bottom:5px">Delivery</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5">Tasks run in Odoo — gate completion triggers next phase tasks</div>
+          <div style="position:absolute;right:-8px;top:8px;color:var(--scm-blue);font-size:14px">→</div>
+        </div>
+        <div style="text-align:center;padding:0 6px 16px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--scm-green);margin-bottom:5px">Close</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5">All gates passed — project closes, client record archived</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);font-style:italic">Automation rules to be built in Odoo Studio — see <a href="odoo-playbook.html" style="color:var(--scm-blue)">Odoo Playbook</a> for pipeline configuration.</div>
+    </div>
   </div>
 
   <!-- ── Phase Bar ───────────────────────────────────────────── -->
