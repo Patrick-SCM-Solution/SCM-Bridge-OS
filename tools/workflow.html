@@ -270,15 +270,15 @@
 
   <!-- ── Track Switcher ─────────────────────────────────────── -->
   <div class="track-switch">
-    <button class="track-btn active-pm" id="btn-pm" onclick="showTrack('pm')">
-      <span class="track-dot" style="background:var(--scm-blue)"></span>PM Workflow
-    </button>
-    <button class="track-btn" id="btn-bd" onclick="showTrack('bd')">
+    <button class="track-btn active-bd" id="btn-bd" onclick="showTrack('bd')">
       <span class="track-dot" style="background:var(--scm-amber)"></span>BD Pipeline
+    </button>
+    <button class="track-btn" id="btn-pm" onclick="showTrack('pm')">
+      <span class="track-dot" style="background:var(--scm-blue)"></span>PM Workflow
     </button>
   </div>
 
-  <div id="track-pm">
+  <div id="track-pm" style="display:none">
 
   <!-- ── Receive Handoff ─────────────────────────────────────── -->
   <div style="background:rgba(246,173,85,.06);border:1px solid rgba(246,173,85,.2);border-radius:8px;padding:18px 24px;margin-bottom:24px">
@@ -1008,7 +1008,7 @@ Keep the list tight — only tasks that apply to this client's scope and phase.<
   <!-- ══════════════════════════════════════════════════════════ -->
   <!--  BD PIPELINE TRACK                                         -->
   <!-- ══════════════════════════════════════════════════════════ -->
-  <div id="track-bd" style="display:none">
+  <div id="track-bd">
 
     <!-- BD Stage Arrow Bar -->
     <div class="phase-bar">
