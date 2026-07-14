@@ -167,6 +167,9 @@ canvas{border:2px dashed var(--gray-line);background:var(--gray-bg);border-radiu
       <div class="form-group"><label>Lead Auditor Name</label><input type="text" id="auditor-name" placeholder="e.g. Patrick"/></div>
       <div class="form-group"><label>Factory Manager Name</label><input type="text" id="manager-name" placeholder="e.g. Mr. Wang"/></div>
       <div class="form-group"><label>Testing Assistant</label><input type="text" id="assistant-name" placeholder="e.g. Lin"/></div>
+      <hr class="divider"/>
+      <div class="form-group"><label>Client / Project <span style="font-weight:400;color:var(--gray-mid);font-size:11px">— optional</span></label><input type="text" id="client-name" placeholder="e.g. Acme Corp — Home Lock"/></div>
+      <div class="form-group"><label>Factory / Vendor Name <span style="font-weight:400;color:var(--gray-mid);font-size:11px">— optional</span></label><input type="text" id="factory-name" placeholder="e.g. Shenzhen ABC Electronics Co."/></div>
       <div class="btn-group">
         <button type="button" class="btn btn-ghost" onclick="show('screen-home')">← Templates</button>
         <button type="button" class="btn btn-primary" onclick="goToLotCheck()">Next: Lot Check →</button>
@@ -180,11 +183,40 @@ canvas{border:2px dashed var(--gray-line);background:var(--gray-bg);border-radiu
   <div class="page-wrap">
     <div class="container">
       <h2>Phase 2 — Lot Verification</h2>
+      <div class="tmpl-grid" style="margin-bottom:18px">
+        <div class="form-group" style="margin-bottom:0">
+          <label>Audit Date <span style="font-weight:400;color:var(--gray-mid);font-size:11px">— optional</span></label>
+          <input type="date" id="audit-date"/>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>PO / Batch Reference <span style="font-weight:400;color:var(--gray-mid);font-size:11px">— optional</span></label>
+          <input type="text" id="po-ref" placeholder="e.g. PO-2024-0042"/>
+        </div>
+      </div>
       <div class="form-group">
-        <label>Master Carton Barcodes & Box Markings Acceptable?</label>
+        <label>Master Carton Barcodes & Box Markings <span style="font-weight:400;color:var(--gray-mid);font-size:11px">— tap again to deselect</span></label>
         <div class="btn-group">
-          <button type="button" class="toggle-btn" id="lbl-pass" onclick="setGlobalCheck(true)">Yes / Pass</button>
-          <button type="button" class="toggle-btn" id="lbl-fail" onclick="setGlobalCheck(false)">No / Fail</button>
+          <button type="button" class="toggle-btn" id="carton-pass" onclick="setLotCheck('carton',true)">Yes / Pass</button>
+          <button type="button" class="toggle-btn" id="carton-fail" onclick="setLotCheck('carton',false)">No / Fail</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Regulatory / Compliance Labels OK? <span style="font-weight:400;color:var(--gray-mid);font-size:11px">CE, UL, FCC, UPC scan — tap again to deselect</span></label>
+        <div class="btn-group">
+          <button type="button" class="toggle-btn" id="comp-pass" onclick="setLotCheck('compliance',true)">Yes / Pass</button>
+          <button type="button" class="toggle-btn" id="comp-fail" onclick="setLotCheck('compliance',false)">No / Fail</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Lot / Carton Stack Photo <span style="font-weight:400;color:var(--gray-mid);font-size:11px">— optional, pre-sampling documentation</span></label>
+        <div class="photo-slot" id="lot-photo-tile" onclick="document.getElementById('lot-photo-inp').click()">
+          <div class="photo-prompt">
+            <span class="photo-cam-icon">📷</span>
+            <span class="photo-slot-label">Lot Overview</span>
+            <span class="photo-slot-hint" id="lot-photo-hint">Tap to photograph carton stack</span>
+          </div>
+          <img id="lot-photo-prev" class="photo-preview">
+          <input type="file" id="lot-photo-inp" accept="image/*" capture="environment" style="display:none" onchange="processLotPhoto(this)"/>
         </div>
       </div>
       <div class="btn-group">
@@ -199,15 +231,30 @@ canvas{border:2px dashed var(--gray-line);background:var(--gray-bg);border-radiu
 <div id="screen-3" class="screen">
   <div class="page-wrap">
     <div class="container">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <h2 style="border:none;padding:0;margin:0">Unit <span id="current-unit-num">1</span> of <span id="total-units">20</span></h2>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <h2 style="border:none;padding:0;margin:0">Phase 3 — Unit Inspection</h2>
         <span class="badge badge-amber" id="s3-iso-badge"></span>
       </div>
-      <div id="unit-loop-body"></div>
-      <div class="btn-group" style="margin-top:24px">
-        <button type="button" class="btn btn-ghost" onclick="exportProgress()">💾 Export Progress</button>
-        <button type="button" class="btn btn-primary" onclick="submitUnit()">Submit Unit →</button>
+      <div style="font-size:12px;color:var(--gray-mid);margin-bottom:16px">
+        Unit <span id="current-unit-num">1</span> of <span id="total-units">20</span>
+        &nbsp;·&nbsp; <span id="s3-fail-label" style="font-weight:600">0 failures</span> / <span id="s3-threshold">0</span> allowed
       </div>
+      <div id="unit-loop-body"></div>
+      <div style="margin-top:24px;display:flex;flex-direction:column;gap:8px">
+        <button type="button" class="btn btn-primary" onclick="submitUnit()">Submit Unit →</button>
+        <button type="button" style="background:none;border:none;color:var(--gray-mid);font-size:12px;cursor:pointer;padding:6px;text-align:center;font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em;text-transform:uppercase" onclick="exportProgress()">💾 Export Progress</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCREEN COMPLETE: SAMPLING BRIDGE ──────────────── -->
+<div id="screen-complete" class="screen">
+  <div class="page-wrap">
+    <div class="container">
+      <h2>Sampling Complete</h2>
+      <div id="complete-summary" class="summary-box" style="margin-bottom:20px"></div>
+      <button type="button" class="btn btn-primary" style="width:100%" onclick="showSummary()">View Statistical Verdict →</button>
     </div>
   </div>
 </div>
@@ -252,10 +299,14 @@ var BUILTINS = [
     isoLevel:'S-2', passThreshold:0, builtin:true,
     photoSlots:[{id:'packaging',label:'Packaging'},{id:'contents',label:'Contents / Accessories'},{id:'product',label:'Physical Product'}],
     tests:[
+      {label:'Cosmetic Appearance Acceptable? (No scratches, finish uniform, keypad centred)'},
       {label:'Retail Box Inventory Complete? (Keys, Accessories, Manual, Hardware)'},
+      {label:'Battery: Correct Type Installed & Pull Tab Removed?'},
+      {label:'Electronic Power-Up: Audio Chime & Keypad Backlight Active?'},
       {label:'Mechanical Key Rotation & Latch Throw Smooth?'},
-      {label:'Electronic Power-Up (Audio Chime & Keypad Backlight Active)?'},
-      {label:'Digital Verification (Bluetooth Pairing & Code Unlock Success)?'},
+      {label:'Digital Verification: Bluetooth Pairing & Code Unlock Success?'},
+      {label:'Auto-Lock Function Confirmed? (Set delay — verify auto-engages)'},
+      {label:'Tamper Alarm Active? (Knock / tilt lock — chime triggers?)'},
       {label:'Factory Reset Performed? (Per User Manual Standard)',yesLabel:'Yes / Reset Done',noLabel:'No / Reset Failed'}
     ],
     disclaimer:''
@@ -280,7 +331,9 @@ var ACTIVE_CFG=null;
 var appData={meta:{},units:[],currentUnitIndex:1};
 var unitAnswers=[];
 var unitPhotos={};
-var globalLabelPass=true;
+var globalCartonCheck=null;     // null=not checked/skip, true=pass, false=fail
+var globalComplianceCheck=null;
+var lotPhoto=null;
 var _editingId=null;
 
 function loadCustom(){ try{customConfigs=JSON.parse(localStorage.getItem(CUSTOM_KEY)||'[]');}catch(e){customConfigs=[];} }
@@ -292,10 +345,12 @@ function saveSession(){
   try{
     localStorage.setItem(SESSION_KEY,JSON.stringify({
       cfgId:ACTIVE_CFG.id, cfgBuiltin:!!ACTIVE_CFG.builtin,
-      appData:appData, globalLabelPass:globalLabelPass,
+      appData:appData,
+      globalCartonCheck:globalCartonCheck,
+      globalComplianceCheck:globalComplianceCheck,
       savedAt:new Date().toISOString()
     }));
-  }catch(e){ /* localStorage full — photos may be too large, skip silently */ }
+  }catch(e){ /* localStorage full — skip silently */ }
 }
 function clearSession(){ localStorage.removeItem(SESSION_KEY); }
 function loadSession(){ try{ return JSON.parse(localStorage.getItem(SESSION_KEY)||'null'); }catch(e){ return null; } }
@@ -308,16 +363,58 @@ function resumeSession(){
   if(!cfg){ clearSession(); return; }
   ACTIVE_CFG=cfg;
   appData=s.appData;
-  globalLabelPass=s.globalLabelPass;
+  globalCartonCheck=s.globalCartonCheck!==undefined?s.globalCartonCheck:null;
+  globalComplianceCheck=s.globalComplianceCheck!==undefined?s.globalComplianceCheck:null;
   unitAnswers=new Array(ACTIVE_CFG.tests.length).fill(null);
   unitPhotos={};
   document.getElementById('s1-iso-badge').textContent='ISO 2859-1 Level '+ACTIVE_CFG.isoLevel+' · '+ACTIVE_CFG.name;
   document.getElementById('s2-sample-label').textContent=ACTIVE_CFG.sampleSize;
   document.getElementById('total-units').textContent=ACTIVE_CFG.sampleSize;
+  document.getElementById('s3-threshold').textContent=ACTIVE_CFG.passThreshold;
   document.getElementById('s3-iso-badge').textContent='Level '+ACTIVE_CFG.isoLevel;
   document.getElementById('current-unit-num').textContent=appData.currentUnitIndex;
+  updateTally();
   renderUnitLoop();
   show('screen-3');
+}
+
+/* ── LOT CHECK HELPERS ──────────────────────────────────── */
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+
+function setLotCheck(field,val){
+  if(field==='carton') globalCartonCheck=(globalCartonCheck===val?null:val);
+  else globalComplianceCheck=(globalComplianceCheck===val?null:val);
+  updateLotCheckBtns();
+}
+function updateLotCheckBtns(){
+  var cp=document.getElementById('carton-pass');
+  var cf=document.getElementById('carton-fail');
+  var cc=document.getElementById('comp-pass');
+  var cd=document.getElementById('comp-fail');
+  if(cp) cp.className='toggle-btn'+(globalCartonCheck===true?' selected-pass':'');
+  if(cf) cf.className='toggle-btn'+(globalCartonCheck===false?' selected-fail':'');
+  if(cc) cc.className='toggle-btn'+(globalComplianceCheck===true?' selected-pass':'');
+  if(cd) cd.className='toggle-btn'+(globalComplianceCheck===false?' selected-fail':'');
+}
+function processLotPhoto(inp){
+  var file=inp.files[0]; if(!file)return;
+  resizePhoto(file,function(dataUrl){
+    lotPhoto=dataUrl;
+    var tile=document.getElementById('lot-photo-tile');
+    if(tile) tile.classList.add('filled');
+    var prev=document.getElementById('lot-photo-prev');
+    if(prev){prev.src=dataUrl;prev.style.display='block';}
+    var hint=document.getElementById('lot-photo-hint');
+    if(hint){hint.textContent='✓ Photo taken — tap to replace';hint.style.color='var(--teal-dk)';}
+  });
+}
+function updateTally(){
+  var failed=appData.units.filter(function(u){return u.status==='FAILED';}).length;
+  var el=document.getElementById('s3-fail-label');
+  if(!el)return;
+  el.textContent=failed+(failed===1?' failure':' failures');
+  el.style.color=failed>0?'var(--coral)':'var(--gray-mid)';
+  el.style.fontWeight=failed>0?'700':'600';
 }
 
 /* ── IMPORT / EXPORT PROGRESS ──────────────────────────── */
@@ -332,7 +429,8 @@ function exportProgress(){
     cfgId:ACTIVE_CFG.id,
     cfgBuiltin:!!ACTIVE_CFG.builtin,
     appData:appData,
-    globalLabelPass:globalLabelPass,
+    globalCartonCheck:globalCartonCheck,
+    globalComplianceCheck:globalComplianceCheck,
     savedAt:new Date().toISOString()
   };
   var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
@@ -462,13 +560,25 @@ function startAudit(id,isBuiltin){
   appData={meta:{},units:[],currentUnitIndex:1};
   unitAnswers=new Array(ACTIVE_CFG.tests.length).fill(null);
   unitPhotos={};
-  globalLabelPass=true;
+  globalCartonCheck=null;
+  globalComplianceCheck=null;
+  lotPhoto=null;
   document.getElementById('s1-iso-badge').textContent='ISO 2859-1 Level '+ACTIVE_CFG.isoLevel+' · '+ACTIVE_CFG.name;
   document.getElementById('s2-sample-label').textContent=ACTIVE_CFG.sampleSize;
   document.getElementById('total-units').textContent=ACTIVE_CFG.sampleSize;
   document.getElementById('s3-iso-badge').textContent='Level '+ACTIVE_CFG.isoLevel;
-  document.getElementById('lbl-pass').className='toggle-btn';
-  document.getElementById('lbl-fail').className='toggle-btn';
+  document.getElementById('s3-threshold').textContent=ACTIVE_CFG.passThreshold;
+  document.getElementById('audit-date').value=todayISO();
+  document.getElementById('po-ref').value='';
+  document.getElementById('client-name').value='';
+  document.getElementById('factory-name').value='';
+  updateLotCheckBtns();
+  var tile=document.getElementById('lot-photo-tile');
+  if(tile) tile.classList.remove('filled');
+  var prev=document.getElementById('lot-photo-prev');
+  if(prev){prev.src='';prev.style.display='none';}
+  var hint=document.getElementById('lot-photo-hint');
+  if(hint){hint.textContent='Tap to photograph carton stack';hint.style.color='';}
   show('screen-1');
 }
 
@@ -545,22 +655,23 @@ function deleteTemplate(id){
 }
 
 // ── AUDIT FLOW ────────────────────────────────────────────────
-function setGlobalCheck(pass){
-  globalLabelPass=pass;
-  document.getElementById('lbl-pass').className=pass?'toggle-btn selected-pass':'toggle-btn';
-  document.getElementById('lbl-fail').className=!pass?'toggle-btn selected-fail':'toggle-btn';
-}
 function goToLotCheck(){
   var a=document.getElementById('auditor-name').value.trim();
   if(!a){alert('Please enter the lead auditor name.');return;}
   appData.meta.auditor=a;
   appData.meta.manager=document.getElementById('manager-name').value.trim()||'Factory Representative';
   appData.meta.assistant=document.getElementById('assistant-name').value.trim()||'Factory Assistant';
+  appData.meta.client=document.getElementById('client-name').value.trim();
+  appData.meta.factory=document.getElementById('factory-name').value.trim();
   show('screen-2');
 }
 function startLoop(){
+  appData.meta.auditDate=document.getElementById('audit-date').value||todayISO();
+  appData.meta.poRef=document.getElementById('po-ref').value.trim();
+  appData.meta.lotPhoto=lotPhoto;
   appData.currentUnitIndex=1;
   document.getElementById('current-unit-num').textContent=1;
+  updateTally();
   renderUnitLoop();
   show('screen-3');
 }
@@ -614,6 +725,8 @@ function renderUnitLoop(){
     +'<img id="prev-defect" class="photo-preview" '+(unitPhotos['defect']?'src="'+unitPhotos['defect']+'" style="display:block"':'')+'>'
     +'<input type="file" id="inp-defect" accept="image/*" capture="environment" style="display:none" onchange="processPhoto(\'defect\',this)"/>'
     +'</div>'
+    +'<label style="margin-top:12px">Unit Serial Number <span style="font-weight:400;color:var(--gray-mid);font-size:11px">— optional, for traceability</span></label>'
+    +'<input type="text" id="unit-serial" placeholder="e.g. SN2024-0042" style="margin-top:4px"/>'
     +'<label style="margin-top:12px">Technical Notes / Defect Description</label>'
     +'<input type="text" id="defect-notes" placeholder="e.g. Lock failed to power on; backup key stuck" style="margin-top:4px"/>'
     +'</div>';
@@ -655,6 +768,7 @@ function submitUnit(){
     unit_id:appData.currentUnitIndex,
     results:unitAnswers.slice(),
     status:isDefective?'FAILED':'PASSED',
+    serial:isDefective?(document.getElementById('unit-serial')?document.getElementById('unit-serial').value.trim():''):'',
     witness:isDefective?(document.getElementById('witness-dropdown')?document.getElementById('witness-dropdown').value:'N/A'):'N/A',
     notes:isDefective?(document.getElementById('defect-notes')?document.getElementById('defect-notes').value:''):'',
     photos:Object.assign({},unitPhotos)
@@ -667,33 +781,61 @@ function submitUnit(){
     unitPhotos={};
     if(ACTIVE_CFG.photoSlots)ACTIVE_CFG.photoSlots.forEach(function(s){s._src=null;});
     saveSession();
+    updateTally();
     renderUnitLoop();
     window.scrollTo(0,0);
   } else {
     clearSession();
-    showSummary();
+    showComplete();
   }
+}
+
+function showComplete(){
+  var passed=appData.units.filter(function(u){return u.status==='PASSED';}).length;
+  var failed=appData.units.filter(function(u){return u.status==='FAILED';}).length;
+  var cfg=ACTIVE_CFG;
+  var lotFailed=globalCartonCheck===false||globalComplianceCheck===false;
+  var reject=failed>cfg.passThreshold||lotFailed;
+  document.getElementById('complete-summary').innerHTML=
+    '<div style="text-align:center;padding:8px 0 16px">'
+    +'<div style="font-size:36px;margin-bottom:6px">'+(reject?'⚠️':'✅')+'</div>'
+    +'<div style="font-size:20px;font-weight:700;color:'+(reject?'var(--coral)':'var(--teal)')+';">'+(reject?'Lot Likely Rejected':'Lot Likely Accepted')+'</div>'
+    +'<div style="font-size:11px;color:var(--gray-mid);margin-top:4px">Statistical verdict on next screen</div>'
+    +'</div>'
+    +'<div style="display:flex;justify-content:space-around;text-align:center;border-top:1px solid var(--gray-line);padding-top:14px">'
+    +'<div><div style="font-size:28px;font-weight:700;color:var(--teal)">'+passed+'</div><div style="font-size:11px;color:var(--gray-mid);text-transform:uppercase;letter-spacing:.06em">Passed</div></div>'
+    +'<div><div style="font-size:28px;font-weight:700;color:var(--coral)">'+failed+'</div><div style="font-size:11px;color:var(--gray-mid);text-transform:uppercase;letter-spacing:.06em">Failed</div></div>'
+    +'<div><div style="font-size:28px;font-weight:700;color:var(--gray-dk)">'+cfg.passThreshold+'</div><div style="font-size:11px;color:var(--gray-mid);text-transform:uppercase;letter-spacing:.06em">Allowed</div></div>'
+    +'</div>';
+  show('screen-complete');
 }
 
 function showSummary(){
   var passed=appData.units.filter(function(u){return u.status==='PASSED';}).length;
   var failed=appData.units.filter(function(u){return u.status==='FAILED';}).length;
   var cfg=ACTIVE_CFG;
-  var reject=failed>cfg.passThreshold||!globalLabelPass;
+  var lotFailed=globalCartonCheck===false||globalComplianceCheck===false;
+  var reject=failed>cfg.passThreshold||lotFailed;
   var verdictColor=reject?'var(--coral)':'var(--teal)';
   var verdictText=reject
     ?(failed>cfg.passThreshold
         ?'CRITICAL DEFECT RATE BREACHED — WITHHOLD SHIPMENT'
-        :'LOT LABELLING FAILED — WITHHOLD SHIPMENT')
+        :'LOT CHECKS FAILED — WITHHOLD SHIPMENT')
     :'SAMPLE CONFORMS — PENDING FINAL CORPORATE RELEASE';
 
   document.getElementById('summary-box').innerHTML=
-    '<strong>Sampling Protocol:</strong> ISO 2859-1 Level '+esc(cfg.isoLevel)+'<br/>'
+    (appData.meta.client?'<strong>Client / Project:</strong> '+esc(appData.meta.client)+'<br/>':'')
+    +(appData.meta.factory?'<strong>Factory:</strong> '+esc(appData.meta.factory)+'<br/>':'')
+    +(appData.meta.auditDate?'<strong>Audit Date:</strong> '+esc(appData.meta.auditDate)+'<br/>':'')
+    +(appData.meta.poRef?'<strong>PO / Batch Ref:</strong> '+esc(appData.meta.poRef)+'<br/>':'')
+    +'<strong>Sampling Protocol:</strong> ISO 2859-1 Level '+esc(cfg.isoLevel)+'<br/>'
     +'<strong>Template:</strong> '+esc(cfg.name)+'<br/>'
     +'<strong>Sample Evaluated:</strong> '+cfg.sampleSize+' units (from lot of '+cfg.lotSize+')<br/>'
     +'<strong>Conforming:</strong> <span style="color:var(--teal);font-weight:700">'+passed+'</span><br/>'
     +'<strong>Non-Conforming:</strong> <span style="color:var(--coral);font-weight:700">'+failed+'</span><br/>'
     +'<strong>Max Defects Allowed:</strong> '+cfg.passThreshold+'<br/>'
+    +(globalCartonCheck!==null?'<strong>Carton / Box Labels:</strong> '+(globalCartonCheck?'✓ Pass':'✗ Fail')+'<br/>':'')
+    +(globalComplianceCheck!==null?'<strong>Compliance Labels:</strong> '+(globalComplianceCheck?'✓ Pass':'✗ Fail')+'<br/>':'')
     +'<strong>Verdict:</strong> <span style="color:'+verdictColor+';font-weight:700">'+verdictText+'</span>';
 
   var disc=cfg.disclaimer||
@@ -753,11 +895,12 @@ function exportReport(){
   var cfg=ACTIVE_CFG;
   var passed=appData.units.filter(function(u){return u.status==='PASSED';}).length;
   var failed=appData.units.filter(function(u){return u.status==='FAILED';}).length;
-  var reject=failed>cfg.passThreshold||!globalLabelPass;
+  var lotFailed=globalCartonCheck===false||globalComplianceCheck===false;
+  var reject=failed>cfg.passThreshold||lotFailed;
   var verdict=reject?'REJECTED — DEFECT THRESHOLD BREACHED':'SAMPLE CONFORMS (PENDING FINAL HQ RELEASE)';
   var audSig=document.getElementById('sig-canvas-auditor').toDataURL();
   var mgrSig=document.getElementById('sig-canvas-manager').toDataURL();
-  var date=new Date().toLocaleDateString();
+  var date=appData.meta.auditDate||new Date().toLocaleDateString();
 
   function photoRowHtml(label,src){
     return src?'<div style="margin-top:8px"><strong style="font-size:12px;color:#555">'+label+'</strong><br/><img src="'+src+'" style="max-width:100%;max-height:200px;border-radius:6px;border:1px solid #ddd;margin-top:4px;display:block"/></div>':'';
@@ -782,7 +925,7 @@ function exportReport(){
       +'</div>'
       +'<table style="width:100%;border-collapse:collapse;margin-bottom:8px"><tbody>'+testRows+'</tbody></table>'
       +photoHtml
-      +(u.status==='FAILED'?'<div style="margin-top:8px;font-size:12px;color:#666"><strong>Witness:</strong> '+u.witness+'<br/><strong>Notes:</strong> '+(u.notes||'—')+'</div>':'')
+      +(u.status==='FAILED'?'<div style="margin-top:8px;font-size:12px;color:#666">'+(u.serial?'<strong>Serial:</strong> '+esc(u.serial)+'<br/>':'')+'<strong>Witness:</strong> '+esc(u.witness)+'<br/><strong>Notes:</strong> '+esc(u.notes||'—')+'</div>':'')
       +'</div>';
   }).join('');
 
@@ -804,18 +947,22 @@ function exportReport(){
     +'</style></head><body><div class="card">'
     +'<div class="hdr"><div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#1D9E75;margin-bottom:4px">SCM Solution LTD</div>'
     +'<h1 style="font-size:22px;margin-bottom:2px">FQC Technical Evaluation Report</h1>'
-    +'<div style="font-size:13px;color:#666">'+esc(cfg.name)+(cfg.client?' · '+esc(cfg.client):'')+'</div></div>'
+    +'<div style="font-size:13px;color:#666">'+esc(cfg.name)+(appData.meta.client?' · '+esc(appData.meta.client):'')+'</div></div>'
     +'<div class="meta">'
-    +'<div><strong>Date:</strong> '+date+'</div>'
+    +'<div><strong>Audit Date:</strong> '+esc(date)+'</div>'
+    +(appData.meta.poRef?'<div><strong>PO / Batch Ref:</strong> '+esc(appData.meta.poRef)+'</div>':'')
+    +(appData.meta.factory?'<div><strong>Factory:</strong> '+esc(appData.meta.factory)+'</div>':'')
     +'<div><strong>Lead Auditor:</strong> '+esc(appData.meta.auditor)+'</div>'
     +'<div><strong>Factory Manager:</strong> '+esc(appData.meta.manager)+'</div>'
     +'<div><strong>Assistant:</strong> '+esc(appData.meta.assistant)+'</div>'
     +'<div><strong>Protocol:</strong> ISO 2859-1 Level '+esc(cfg.isoLevel)+' · '+cfg.sampleSize+' units / lot of '+cfg.lotSize+'</div>'
-    +'<div><strong>Lot Labels:</strong> '+(globalLabelPass?'✓ Pass':'✗ Fail')+'</div>'
+    +(globalCartonCheck!==null?'<div><strong>Carton / Box Labels:</strong> '+(globalCartonCheck?'✓ Pass':'✗ FAIL')+'</div>':'')
+    +(globalComplianceCheck!==null?'<div><strong>Compliance Labels:</strong> '+(globalComplianceCheck?'✓ Pass':'✗ FAIL')+'</div>':'')
     +'<div><strong>Conforming:</strong> '+passed+'</div>'
     +'<div><strong>Non-Conforming:</strong> '+failed+'</div>'
     +'<div style="grid-column:span 2;border-top:1px solid #ddd;padding-top:8px"><strong>Verdict:</strong> <span style="color:'+(reject?'#D85A30':'#1D9E75')+';font-weight:700">'+verdict+'</span></div>'
     +'</div>'
+    +(appData.meta.lotPhoto?'<div style="margin-bottom:20px"><strong>Lot Overview Photo:</strong><br/><img src="'+appData.meta.lotPhoto+'" style="max-width:100%;max-height:220px;border-radius:6px;border:1px solid #ddd;margin-top:6px;display:block"/></div>':'')
     +'<h3 style="margin-bottom:12px">Unit Testing Matrix</h3>'
     +unitRows
     +'<div class="disc">'+esc(disc)+'</div>'
