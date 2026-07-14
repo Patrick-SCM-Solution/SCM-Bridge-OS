@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TRD — Technical Requirements Document — SCM Bridge OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1A2E3B;--navy2:#2C4A5E;
+  --teal:#1D9E75;--teal-dk:#085041;--teal-lt:#E1F5EE;--teal-bd:#5DCAA5;
+  --amber:#EF9F27;--amber-lt:#FAEEDA;
+  --coral:#D85A30;--coral-lt:#FAECE7;
+  --purple:#6C4EBF;--purple-lt:#EDE8F8;
+  --gray-bg:#F5F4F1;--gray-line:#E0DED8;--gray-mid:#888780;--gray-dk:#444441;
+  --white:#fff;--black:#1A1A19;--blue-btn:#1B6FA8;
+}
+body{font-family:'Barlow',sans-serif;background:var(--gray-bg);color:var(--black);font-size:14px;line-height:1.5}
+input,textarea,select,button{font-family:inherit}
+button{cursor:pointer;border:none;background:none}
+textarea{resize:vertical}
+.screen{display:none;min-height:100vh}.screen.active{display:block}
+
+#home{background:var(--navy)}
+.home-wrap{max-width:720px;margin:0 auto;padding:36px 24px 60px}
+.home-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:6px}
+.home-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--white);line-height:1.1;margin-bottom:4px}
+.home-sub{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:6px}
+.home-service-note{background:rgba(108,78,191,.15);border:1px solid rgba(108,78,191,.3);border-radius:10px;padding:12px 16px;margin-bottom:28px;font-size:12px;color:rgba(255,255,255,.65);line-height:1.6}
+.home-service-note strong{color:#A98EF5}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.btn-primary{background:var(--teal);color:var(--white);border-radius:10px;padding:11px 22px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:filter .15s}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-ghost{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:11px 18px;font-size:13px;transition:background .15s}
+.btn-ghost:hover{background:rgba(255,255,255,.14)}
+.new-form{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:20px;margin-bottom:24px;display:none;animation:fadeUp .2s ease}
+.nf-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:14px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.fg-full{grid-column:1/-1}
+.fl label{display:block;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:3px}
+.fl input,.fl select{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--white);outline:none;transition:border-color .15s}
+.fl input:focus,.fl select:focus{border-color:var(--teal-bd)}
+.fl input::placeholder{color:rgba(255,255,255,.3)}
+.fl select option{background:var(--navy);color:var(--white)}
+.sessions-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px}
+.trd-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.trd-info{flex:1;min-width:0}
+.trd-name{font-size:15px;color:var(--white);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trd-meta{font-size:11px;color:rgba(255,255,255,.4)}
+.trd-badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;margin-top:4px}
+.badge-draft{background:rgba(239,159,39,.2);color:#EF9F27;border:1px solid rgba(239,159,39,.3)}
+.badge-review{background:rgba(108,78,191,.2);color:#A98EF5;border:1px solid rgba(108,78,191,.3)}
+.badge-approved{background:rgba(29,158,117,.2);color:var(--teal-bd);border:1px solid rgba(29,158,117,.3)}
+.trd-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.btn-teal{background:var(--teal);color:var(--white);border-radius:20px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.btn-sm{border-radius:8px;padding:7px 14px;font-size:12px}
+.btn-danger{color:rgba(255,80,80,.6);font-size:11px;padding:4px}
+.empty{text-align:center;padding:48px 0;color:rgba(255,255,255,.3);font-size:14px}
+
+#form-screen{background:var(--gray-bg)}
+.form-hdr{background:var(--teal-dk);padding:12px 18px 10px;position:sticky;top:52px;z-index:100;box-shadow:0 2px 14px rgba(0,0,0,.22)}
+.form-hdr-inner{max-width:900px;margin:0 auto}
+.form-top{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.form-back{font-size:18px;color:var(--teal-lt);background:rgba(255,255,255,.1);border-radius:8px;padding:4px 10px}
+.form-back:hover{background:rgba(255,255,255,.2)}
+.form-heading{flex:1;font-size:15px;color:var(--white);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.form-actions{display:flex;gap:7px;align-items:center;flex-shrink:0}
+.save-msg{font-size:11px;color:var(--teal-bd);min-width:55px}
+.btn-blue{background:var(--blue-btn);color:var(--white);border-radius:20px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.form-body{max-width:900px;margin:0 auto;padding:14px 14px 60px}
+
+.sec-card{background:var(--white);border-radius:14px;overflow:hidden;margin-bottom:10px;border:1px solid var(--gray-line);animation:fadeUp .2s ease}
+.sec-hdr{display:flex;align-items:center;gap:9px;padding:11px 14px;cursor:pointer;user-select:none;background:#FAFAF8}
+.sec-icon{font-size:15px}
+.sec-title{flex:1;font-size:14px;font-weight:500}
+.sec-opt{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-mid);background:#F0EFE9;padding:2px 6px;border-radius:4px}
+.sec-chev{font-size:11px;color:var(--gray-mid);transition:transform .2s}
+.sec-chev.open{transform:rotate(180deg)}
+.sec-body-wrap{display:none}.sec-body-wrap.open{display:block}
+.sec-body{padding:16px}
+.sec-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid);margin-bottom:6px;margin-top:14px}
+.sec-lbl:first-child{margin-top:0}
+.sec-ta{width:100%;min-height:72px;padding:9px 11px;font-size:13px;border:1px solid var(--gray-line);border-radius:8px;background:#FAFAF8;color:var(--black);line-height:1.6;font-family:'Barlow',sans-serif}
+.sec-ta:focus{outline:none;border-color:var(--teal)}
+.sec-in{width:100%;padding:7px 10px;font-size:13px;border:1px solid var(--gray-line);border-radius:8px;background:#FAFAF8;color:var(--black)}
+.sec-in:focus{outline:none;border-color:var(--teal)}
+.sec-sel{width:100%;padding:7px 10px;font-size:13px;border:1px solid var(--gray-line);border-radius:8px;background:#FAFAF8;color:var(--black)}
+.sec-sel:focus{outline:none;border-color:var(--teal)}
+.sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sec-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.sec-full{grid-column:1/-1}
+.fld{display:flex;flex-direction:column;gap:3px}
+.fld-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid)}
+
+/* PRIORITY PILLS */
+.pri-set{display:flex;gap:5px}
+.pri-pill{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--gray-line);color:var(--gray-mid);transition:all .12s;user-select:none}
+.pri-must{background:#FAECE7;border-color:var(--coral);color:var(--coral)}
+.pri-should{background:var(--amber-lt);border-color:var(--amber);color:#7A5200}
+.pri-could{background:var(--teal-lt);border-color:var(--teal);color:var(--teal-dk)}
+
+/* DYNAMIC TABLES */
+.dt-wrap{overflow-x:auto;margin-bottom:6px}
+.dtbl{width:100%;border-collapse:collapse;font-size:12px}
+.dtbl th{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid);padding:6px 7px;border-bottom:1px solid var(--gray-line);text-align:left;background:#FAFAF8;white-space:nowrap}
+.dtbl td{padding:3px 3px;border-bottom:1px solid var(--gray-line);vertical-align:middle}
+.dtbl tr:last-child td{border-bottom:none}
+.dt-in{width:100%;padding:5px 7px;font-size:12px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--black);font-family:'Barlow',sans-serif}
+.dt-in:focus{outline:none;border-color:var(--teal);background:var(--teal-lt)}
+.dt-sel{width:100%;padding:4px 5px;font-size:11px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--black);cursor:pointer}
+.dt-sel:focus{outline:none;border-color:var(--teal)}
+.dt-rm{color:rgba(216,90,48,.35);font-size:15px;padding:2px 5px;cursor:pointer;border-radius:4px;line-height:1;border:none;background:none}
+.dt-rm:hover{color:var(--coral);background:var(--coral-lt)}
+.btn-add-row{margin-top:6px;font-size:12px;color:var(--teal);padding:5px 11px;border:1px dashed var(--teal-bd);border-radius:7px;background:var(--teal-lt);cursor:pointer;transition:all .15s}
+.btn-add-row:hover{background:var(--teal);color:var(--white)}
+
+/* CONNECTIVITY CHIPS */
+.chip-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chip{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--gray-line);color:var(--gray-mid);transition:all .12s;user-select:none}
+.chip.on{background:var(--navy2);border-color:var(--teal-bd);color:var(--teal-bd)}
+
+/* OPEN ITEMS */
+.oi-status-open{color:var(--coral)}
+.oi-status-decided{color:var(--teal)}
+.oi-status-blocked{color:var(--amber)}
+
+/* STATUS */
+.status-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.status-pill{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--gray-line);color:var(--gray-mid);transition:all .15s}
+.sp-draft{} .sp-draft.act{background:var(--amber-lt);border-color:var(--amber);color:#7A5200}
+.sp-review.act{background:var(--purple-lt);border-color:var(--purple);color:var(--purple)}
+.sp-approved.act{background:var(--teal-lt);border-color:var(--teal);color:var(--teal-dk)}
+
+#preview-screen{background:#ddd}
+.prev-hdr{background:var(--navy);padding:10px 20px;display:flex;align-items:center;gap:10px;position:sticky;top:52px;z-index:100}
+.prev-title{flex:1;font-size:13px;color:rgba(255,255,255,.5)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.fg,.sec-grid,.sec-grid-3{grid-template-columns:1fr}.fg-full,.sec-full{grid-column:1}}
+</style>
+</head>
+<body>
+<div id="site-nav-root"></div>
+<script src="../nav.js"></script>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="home-wrap">
+    <div class="home-label">SCM Solution LTD</div>
+    <div class="home-title">TRD</div>
+    <div class="home-sub">Technical Requirements Document — the foundation every project needs before factory outreach begins</div>
+    <div class="home-service-note">
+      <strong>Billable Service</strong> — Most clients arrive without a TRD. SCM Solution prepares this document in collaboration with the client as a paid deliverable. A clear TRD reduces factory back-and-forth, produces better quotations, and protects scope. <a href="#" id="blog-link" style="color:#A98EF5;text-decoration:underline;display:none">Read more →</a>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="showNewForm()">+ New TRD</button>
+    </div>
+    <div class="new-form" id="new-form">
+      <div class="nf-title">New Technical Requirements Document</div>
+      <div class="fg">
+        <div class="fl fg-full"><label>Product Name *</label><input id="nf-product" placeholder="e.g. Children's Safety Vest"/></div>
+        <div class="fl"><label>Product Code / Ref *</label><input id="nf-code" placeholder="e.g. SCM-2025-001-TRD"/></div>
+        <div class="fl"><label>Product Type</label>
+          <select id="nf-type">
+            <option value="hardware">Hardware / Electronics</option>
+            <option value="mechanical">Mechanical / Industrial</option>
+            <option value="softgoods">Soft Goods / Apparel</option>
+            <option value="mixed">Mixed / Other</option>
+          </select>
+        </div>
+        <div class="fl"><label>Date</label><input id="nf-date" type="date"/></div>
+        <div class="fl"><label>Prepared By</label><input id="nf-author" placeholder="SCM Solution LTD"/></div>
+        <div class="fl"><label>Classification</label>
+          <select id="nf-class">
+            <option value="Confidential">Confidential</option>
+            <option value="Confidential — NDA Required">Confidential — NDA Required</option>
+            <option value="Internal">Internal Only</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="createTRD()">Create TRD</button>
+        <button class="btn-ghost" onclick="hideNewForm()">Cancel</button>
+      </div>
+    </div>
+    <div class="sessions-label">Saved Documents</div>
+    <div id="trd-list"><div class="empty">No TRDs yet — tap New TRD to begin</div></div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div id="form-screen" class="screen">
+  <div class="form-hdr">
+    <div class="form-hdr-inner">
+      <div class="form-top">
+        <button class="form-back" onclick="goHome()">←</button>
+        <div class="form-heading" id="form-heading">TRD</div>
+        <div class="form-actions">
+          <span class="save-msg" id="save-msg"></span>
+          <button class="btn-blue btn-sm" onclick="goPreview()">Preview / Export</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-body" id="form-body"></div>
+</div>
+
+<!-- PREVIEW -->
+<div id="preview-screen" class="screen">
+  <div class="prev-hdr">
+    <button class="form-back" onclick="goForm()" style="color:#fff;font-size:18px;background:rgba(255,255,255,.1);border-radius:8px;padding:4px 10px">←</button>
+    <span class="prev-title" id="prev-title">TRD Preview</span>
+    <button class="btn-teal btn-sm" onclick="printTRD()">Print / Export PDF</button>
+  </div>
+  <iframe id="prev-iframe" style="width:100%;height:calc(100vh - 104px);border:none;background:#fff"></iframe>
+</div>
+
+<script>
+var SAVE_KEY='scm_trd_v1', ALL=[], CUR=null, _st=null;
+var BLOG_URL=''; // Set your blog post URL here
+
+function loadAll(){ try{ ALL=JSON.parse(localStorage.getItem(SAVE_KEY)||'[]'); }catch(e){ ALL=[]; } }
+function saveAll(){
+  localStorage.setItem(SAVE_KEY,JSON.stringify(ALL));
+  var m=document.getElementById('save-msg');
+  if(m){m.textContent='Saved ✓';setTimeout(function(){m.textContent='';},1500);}
+}
+function debounceSave(){
+  clearTimeout(_st);
+  _st=setTimeout(function(){ if(!CUR)return; var i=ALL.findIndex(function(t){return t.id===CUR.id;}); if(i===-1)ALL.push(CUR);else ALL[i]=CUR; saveAll(); },600);
+}
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+
+var CONN_OPTS=['Bluetooth 5.x','Wi-Fi 2.4GHz','Wi-Fi 5GHz','NFC','Cellular (4G)','Cellular (5G)','USB-C','USB-A','Zigbee / Thread','LoRa','GPS','ANT+','Other'];
+var REGION_OPTS=['Australia (RCM)','United States (FCC / UL)','European Union (CE)','United Kingdom (UKCA)','China (CCC)','Japan (PSE)','Canada (IC)'];
+
+function blankTRD(meta){
+  return {
+    id:uid(), created:new Date().toISOString().slice(0,10), status:'draft', meta:meta,
+    overview:{ description:'', targetUsers:'', useCases:'', objective:'' },
+    functional:{ requirements:[{id:'FR-01',priority:'Must',description:'',notes:''}] },
+    mechanical:{ formFactor:'', dimensions:'', weight:'', materials:'', ipRating:'', color:'', assembly:'', notes:'' },
+    electrical:{ powerSource:'', batteryCapacity:'', batteryLife:'', charging:'', connectivity:[], sensors:'', display:'', audio:'', notes:'' },
+    software:{ platform:'', appOS:'', cloudRequired:false, ota:false, dataPrivacy:'', notes:'' },
+    environmental:{ operatingTemp:'', storageTemp:'', humidity:'', dropTest:'', vibration:'', uv:'', other:'' },
+    compliance:{ regions:[], standards:'', testing:'', labRequired:'', notes:'' },
+    openItems:[{id:'OI-01',item:'',owner:'',dueDate:'',status:'Open'}]
+  };
+}
+
+function show(id){ document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');}); document.getElementById(id).classList.add('active'); }
+function goHome(){ show('home'); renderList(); }
+function goForm(){ show('form-screen'); }
+function goPreview(){ show('preview-screen'); renderPreview(); }
+
+function showNewForm(){
+  document.getElementById('new-form').style.display='block';
+  document.getElementById('nf-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('nf-author').value='SCM Solution LTD';
+}
+function hideNewForm(){ document.getElementById('new-form').style.display='none'; }
+
+function createTRD(){
+  var p=document.getElementById('nf-product').value.trim();
+  var c=document.getElementById('nf-code').value.trim();
+  if(!p||!c){alert('Product name and code are required');return;}
+  var meta={
+    productName:p, productCode:c,
+    productType:document.getElementById('nf-type').value,
+    date:document.getElementById('nf-date').value,
+    preparedBy:document.getElementById('nf-author').value.trim()||'SCM Solution LTD',
+    classification:document.getElementById('nf-class').value,
+    version:'V1.0'
+  };
+  CUR=blankTRD(meta); ALL.push(CUR); saveAll(); hideNewForm(); openTRD(CUR);
+}
+function openTRD(t){ CUR=t; show('form-screen'); document.getElementById('form-heading').textContent=t.meta.productName+' — '+t.meta.productCode; renderForm(); }
+function openById(id){ var t=ALL.find(function(x){return x.id===id;}); if(t)openTRD(t); }
+function deleteTRD(id){ if(!confirm('Delete this TRD?'))return; ALL=ALL.filter(function(t){return t.id!==id;}); saveAll(); renderList(); }
+
+var TYPE_LABELS={hardware:'Hardware / Electronics',mechanical:'Mechanical / Industrial',softgoods:'Soft Goods / Apparel',mixed:'Mixed / Other'};
+var STATUS_LABEL={draft:'Draft',review:'Under Review',approved:'Approved'};
+
+function renderList(){
+  var el=document.getElementById('trd-list');
+  if(BLOG_URL){ var bl=document.getElementById('blog-link'); if(bl){bl.href=BLOG_URL;bl.style.display='inline';} }
+  if(!ALL.length){el.innerHTML='<div class="empty">No TRDs yet — tap New TRD to begin</div>';return;}
+  el.innerHTML=ALL.slice().reverse().map(function(t){
+    var badgeCls={draft:'badge-draft',review:'badge-review',approved:'badge-approved'}[t.status]||'badge-draft';
+    return '<div class="trd-card">'
+      +'<div class="trd-info"><div class="trd-name">'+esc(t.meta.productName)+'<span style="font-size:11px;opacity:.5;margin-left:8px">'+esc(t.meta.productCode)+'</span></div>'
+      +'<div class="trd-meta">'+esc(TYPE_LABELS[t.meta.productType]||t.meta.productType)+' · v'+esc(t.meta.version)+' · '+esc(t.created)+'</div>'
+      +'<span class="trd-badge '+badgeCls+'">'+esc(STATUS_LABEL[t.status]||t.status)+'</span></div>'
+      +'<div class="trd-actions"><button class="btn-teal btn-sm" onclick="openById(\''+t.id+'\')">Open</button>'
+      +'<button class="btn-danger" onclick="deleteTRD(\''+t.id+'\')">Delete</button></div></div>';
+  }).join('');
+}
+
+/* FORM */
+function getSections(){
+  var type=CUR.meta.productType;
+  var isHW=type==='hardware'||type==='mixed';
+  var isSW=type==='hardware'||type==='mixed';
+  var secs=[
+    {key:'meta',icon:'📋',title:'Document Info'},
+    {key:'overview',icon:'💡',title:'Product Overview'},
+    {key:'functional',icon:'⚡',title:'Functional Requirements'},
+    {key:'mechanical',icon:'⚙️',title:'Mechanical Requirements'},
+  ];
+  if(isHW) secs.push({key:'electrical',icon:'🔌',title:'Electrical / Electronic Requirements',opt:true});
+  if(isSW) secs.push({key:'software',icon:'📱',title:'Software & Firmware Requirements',opt:true});
+  secs.push({key:'environmental',icon:'🌡',title:'Environmental & Durability'});
+  secs.push({key:'compliance',icon:'✅',title:'Compliance & Regulatory'});
+  secs.push({key:'openItems',icon:'⚠️',title:'Open Items & Decisions Required'});
+  return secs;
+}
+
+var OPEN_SECS={meta:true};
+
+function toggleSec(k){
+  OPEN_SECS[k]=!OPEN_SECS[k];
+  document.getElementById('sbw-'+k).className='sec-body-wrap'+(OPEN_SECS[k]?' open':'');
+  document.getElementById('sch-'+k).className='sec-chev'+(OPEN_SECS[k]?' open':'');
+}
+function renderForm(){
+  var secs=getSections();
+  document.getElementById('form-body').innerHTML=secs.map(function(s){
+    if(!OPEN_SECS.hasOwnProperty(s.key)) OPEN_SECS[s.key]=false;
+    return '<div class="sec-card"><div class="sec-hdr" onclick="toggleSec(\''+s.key+'\')">'
+      +'<span class="sec-icon">'+s.icon+'</span>'
+      +'<span class="sec-title">'+s.title+'</span>'
+      +(s.opt?'<span class="sec-opt">Optional</span>':'')
+      +'<span class="sec-chev'+(OPEN_SECS[s.key]?' open':'')+'" id="sch-'+s.key+'">▾</span>'
+      +'</div><div class="sec-body-wrap'+(OPEN_SECS[s.key]?' open':'')+'" id="sbw-'+s.key+'">'
+      +build(s.key)+'</div></div>';
+  }).join('');
+}
+function rerender(k){ var el=document.getElementById('sbw-'+k); if(el)el.innerHTML=build(k); }
+function build(k){
+  if(k==='meta')        return bMeta();
+  if(k==='overview')    return bOverview();
+  if(k==='functional')  return bFunctional();
+  if(k==='mechanical')  return bMechanical();
+  if(k==='electrical')  return bElectrical();
+  if(k==='software')    return bSoftware();
+  if(k==='environmental') return bEnvironmental();
+  if(k==='compliance')  return bCompliance();
+  if(k==='openItems')   return bOpenItems();
+  return '';
+}
+
+function fld(lbl,type,val,onch,ph,full,note){
+  return '<div class="fld'+(full?' sec-full':'')+'"><label class="fld-lbl">'+lbl+'</label>'
+    +'<input type="'+type+'" class="sec-in" value="'+esc(val)+'" placeholder="'+esc(ph||'')+'" onchange="'+onch+'"/>'
+    +(note?'<span style="font-size:10px;color:var(--gray-mid)">'+note+'</span>':'')
+    +'</div>';
+}
+function fsel(lbl,opts,val,onch,full){
+  return '<div class="fld'+(full?' sec-full':'')+'"><label class="fld-lbl">'+lbl+'</label>'
+    +'<select class="sec-sel" onchange="'+onch+'">'
+    +opts.map(function(o){var v=o.v!==undefined?o.v:o,l=o.l||o;return '<option value="'+esc(v)+'"'+(val===v?' selected':'')+'>'+esc(l)+'</option>';}).join('')
+    +'</select></div>';
+}
+function fta(lbl,val,onch,ph,full,rows){
+  return '<div class="fld'+(full?' sec-full':'')+'"><label class="fld-lbl">'+lbl+'</label>'
+    +'<textarea class="sec-ta" style="min-height:'+(rows||72)+'px" placeholder="'+esc(ph||'')+'" onchange="'+onch+'">'+esc(val)+'</textarea></div>';
+}
+
+/* META */
+function bMeta(){
+  var m=CUR.meta;
+  return '<div class="sec-body"><div class="sec-grid">'
+    +fld('Product Name','text',m.productName,'CUR.meta.productName=this.value;document.getElementById("form-heading").textContent=CUR.meta.productName+" — "+CUR.meta.productCode;debounceSave()','',true)
+    +fld('Product Code / Ref','text',m.productCode,'CUR.meta.productCode=this.value;document.getElementById("form-heading").textContent=CUR.meta.productName+" — "+CUR.meta.productCode;debounceSave()','')
+    +fld('Document Version','text',m.version,'CUR.meta.version=this.value;debounceSave()','e.g. V1.0')
+    +fld('Date','date',m.date,'CUR.meta.date=this.value;debounceSave()','')
+    +fld('Prepared By','text',m.preparedBy,'CUR.meta.preparedBy=this.value;debounceSave()','SCM Solution LTD')
+    +fsel('Classification',[{v:'Confidential',l:'Confidential'},{v:'Confidential — NDA Required',l:'Confidential — NDA Required'},{v:'Internal',l:'Internal Only'}],m.classification,'CUR.meta.classification=this.value;debounceSave()')
+    +fsel('Product Type',[{v:'hardware',l:'Hardware / Electronics'},{v:'mechanical',l:'Mechanical / Industrial'},{v:'softgoods',l:'Soft Goods / Apparel'},{v:'mixed',l:'Mixed / Other'}],m.productType,'CUR.meta.productType=this.value;debounceSave();renderForm()')
+    +'</div>'
+    +'<div class="sec-lbl">Document Status</div>'
+    +'<div class="status-row">'
+    +'<div class="status-pill sp-draft'+(CUR.status==='draft'?' act':'')+'" onclick="setStatus(\'draft\')">Draft</div>'
+    +'<div class="status-pill sp-review'+(CUR.status==='review'?' act':'')+'" onclick="setStatus(\'review\')">Under Review</div>'
+    +'<div class="status-pill sp-approved'+(CUR.status==='approved'?' act':'')+'" onclick="setStatus(\'approved\')">Approved</div>'
+    +'</div></div>';
+}
+function setStatus(s){ CUR.status=s; debounceSave(); rerender('meta'); }
+
+/* OVERVIEW */
+function bOverview(){
+  var o=CUR.overview;
+  return '<div class="sec-body"><div class="sec-grid">'
+    +fta('Product Description',o.description,'CUR.overview.description=this.value;debounceSave()','What is this product? What problem does it solve?',true,80)
+    +fta('Target Users',o.targetUsers,'CUR.overview.targetUsers=this.value;debounceSave()','Who uses it? e.g. Children aged 2–6 wearing a monitoring device during outdoor activity',true,60)
+    +fta('Primary Use Cases',o.useCases,'CUR.overview.useCases=this.value;debounceSave()','Describe the 2–3 main scenarios the product is used in',true,60)
+    +fta('Business Objective',o.objective,'CUR.overview.objective=this.value;debounceSave()','Why does this product exist from the client\'s commercial perspective?',true,60)
+    +'</div></div>';
+}
+
+/* FUNCTIONAL REQUIREMENTS */
+function bFunctional(){
+  var reqs=CUR.functional.requirements;
+  var priOpts=[{v:'Must',l:'Must'},{v:'Should',l:'Should'},{v:'Could',l:'Could (nice-to-have)'}];
+  var priCls={Must:'pri-must',Should:'pri-should',Could:'pri-could'};
+  return '<div class="sec-body">'
+    +'<div style="font-size:12px;color:var(--gray-mid);margin-bottom:10px;padding:8px 12px;background:#FAFAF8;border-radius:8px;border:1px solid var(--gray-line)">'
+    +'<strong>Must</strong> = non-negotiable · <strong>Should</strong> = strongly expected · <strong>Could</strong> = nice-to-have if cost allows'
+    +'</div>'
+    +'<div class="dt-wrap"><table class="dtbl"><thead><tr><th style="width:55px">ID</th><th style="width:90px">Priority</th><th>Requirement</th><th>Notes / Rationale</th><th></th></tr></thead><tbody>'
+    +reqs.map(function(req,i){
+      return '<tr>'
+        +'<td><input class="dt-in" value="'+esc(req.id)+'" style="width:50px;font-weight:700;color:var(--teal-dk)" onchange="CUR.functional.requirements['+i+'].id=this.value;debounceSave()"/></td>'
+        +'<td><select class="dt-sel" onchange="CUR.functional.requirements['+i+'].priority=this.value;debounceSave();rerender(\'functional\')">'
+        +priOpts.map(function(p){return '<option value="'+p.v+'"'+(req.priority===p.v?' selected':'')+'>'+p.l+'</option>';}).join('')
+        +'</select></td>'
+        +'<td><input class="dt-in" value="'+esc(req.description)+'" placeholder="e.g. Product shall be washable at 30°C" onchange="CUR.functional.requirements['+i+'].description=this.value;debounceSave()"/></td>'
+        +'<td><input class="dt-in" value="'+esc(req.notes)+'" placeholder="Why this requirement exists" onchange="CUR.functional.requirements['+i+'].notes=this.value;debounceSave()"/></td>'
+        +'<td><button class="dt-rm" onclick="rmReq('+i+')">×</button></td></tr>';
+    }).join('')
+    +'</tbody></table></div>'
+    +'<button class="btn-add-row" onclick="addReq()">+ Add Requirement</button>'
+    +'</div>';
+}
+function addReq(){ var n=CUR.functional.requirements.length+1; CUR.functional.requirements.push({id:'FR-'+String(n).padStart(2,'0'),priority:'Must',description:'',notes:''}); debounceSave(); rerender('functional'); }
+function rmReq(i){ CUR.functional.requirements.splice(i,1); debounceSave(); rerender('functional'); }
+
+/* MECHANICAL */
+function bMechanical(){
+  var m=CUR.mechanical;
+  return '<div class="sec-body"><div class="sec-grid">'
+    +fld('Form Factor / Product Type','text',m.formFactor,'CUR.mechanical.formFactor=this.value;debounceSave()','e.g. Wearable vest, handheld device, wall-mount enclosure',true)
+    +fld('Target Dimensions (L × W × H)','text',m.dimensions,'CUR.mechanical.dimensions=this.value;debounceSave()','e.g. 300 × 250 × 5mm (or TBD)')
+    +fld('Target Weight','text',m.weight,'CUR.mechanical.weight=this.value;debounceSave()','e.g. < 150g')
+    +fld('Primary Materials','text',m.materials,'CUR.mechanical.materials=this.value;debounceSave()','e.g. Polyester + Spandex mesh body, ABS pocket housing')
+    +fld('IP / Ingress Protection Rating','text',m.ipRating,'CUR.mechanical.ipRating=this.value;debounceSave()','e.g. IP54, IPX7, or N/A')
+    +fld('Colour / Finish','text',m.color,'CUR.mechanical.color=this.value;debounceSave()','e.g. Heather grey, TBD')
+    +fta('Assembly Requirements',m.assembly,'CUR.mechanical.assembly=this.value;debounceSave()','e.g. Snap-fit assembly only (no tools), reversible for battery access',true,60)
+    +fta('Additional Mechanical Notes',m.notes,'CUR.mechanical.notes=this.value;debounceSave()','Any other mechanical constraints or requirements',true,55)
+    +'</div></div>';
+}
+
+/* ELECTRICAL */
+function bElectrical(){
+  var e=CUR.electrical;
+  var connChips=CONN_OPTS.map(function(c,i){
+    var on=e.connectivity.indexOf(c)!==-1;
+    return '<div class="chip'+(on?' on':'')+'" onclick="toggleConn(\''+c.replace(/'/g,'\\\'')+'\')" id="conn-'+i+'">'+c+'</div>';
+  }).join('');
+  return '<div class="sec-body"><div class="sec-grid">'
+    +fsel('Power Source',[{v:'',l:'— Select —'},'Rechargeable Li-Ion Battery','Rechargeable LiPo Battery','AA / AAA Alkaline','CR2032 Coin Cell','USB-powered (no battery)','AC Mains','Solar + Battery','Other'],e.powerSource,'CUR.electrical.powerSource=this.value;debounceSave()')
+    +fld('Battery Capacity (target)','text',e.batteryCapacity,'CUR.electrical.batteryCapacity=this.value;debounceSave()','e.g. 500mAh')
+    +fld('Target Battery Life','text',e.batteryLife,'CUR.electrical.batteryLife=this.value;debounceSave()','e.g. 8 hours continuous, 30 days standby')
+    +fld('Charging Method','text',e.charging,'CUR.electrical.charging=this.value;debounceSave()','e.g. USB-C 5V/1A, wireless Qi, magnetic POGO pins')
+    +'<div class="fld sec-full"><label class="fld-lbl">Wireless Connectivity Required</label><div class="chip-group">'+connChips+'</div></div>'
+    +fta('Sensors',e.sensors,'CUR.electrical.sensors=this.value;debounceSave()','e.g. Accelerometer (IMU), temperature sensor, UWB for positioning',true,55)
+    +fld('Display','text',e.display,'CUR.electrical.display=this.value;debounceSave()','e.g. None, LED indicator only, 1.4" TFT LCD')
+    +fld('Audio / Haptics','text',e.audio,'CUR.electrical.audio=this.value;debounceSave()','e.g. None, piezo buzzer, haptic motor')
+    +fta('Electrical Notes',e.notes,'CUR.electrical.notes=this.value;debounceSave()','Any other electrical requirements or constraints',true,55)
+    +'</div></div>';
+}
+function toggleConn(c){ var idx=CUR.electrical.connectivity.indexOf(c); if(idx===-1)CUR.electrical.connectivity.push(c);else CUR.electrical.connectivity.splice(idx,1); debounceSave(); rerender('electrical'); }
+
+/* SOFTWARE */
+function bSoftware(){
+  var s=CUR.software;
+  return '<div class="sec-body"><div class="sec-grid">'
+    +fld('Companion App Platform','text',s.platform,'CUR.software.platform=this.value;debounceSave()','e.g. iOS + Android, iOS only, None')
+    +fld('App OS Version Support','text',s.appOS,'CUR.software.appOS=this.value;debounceSave()','e.g. iOS 15+, Android 10+')
+    +'<div class="fld"><label class="fld-lbl">Cloud / Backend Required?</label>'
+    +'<div style="display:flex;gap:10px;padding-top:6px">'
+    +'<label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="radio" name="cloud" value="yes"'+(s.cloudRequired?' checked':'')+' onchange="CUR.software.cloudRequired=true;debounceSave()"/> Yes</label>'
+    +'<label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="radio" name="cloud" value="no"'+(!s.cloudRequired?' checked':'')+' onchange="CUR.software.cloudRequired=false;debounceSave()"/> No</label>'
+    +'</div></div>'
+    +'<div class="fld"><label class="fld-lbl">OTA Firmware Updates?</label>'
+    +'<div style="display:flex;gap:10px;padding-top:6px">'
+    +'<label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="radio" name="ota" value="yes"'+(s.ota?' checked':'')+' onchange="CUR.software.ota=true;debounceSave()"/> Yes</label>'
+    +'<label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="radio" name="ota" value="no"'+(!s.ota?' checked':'')+' onchange="CUR.software.ota=false;debounceSave()"/> No</label>'
+    +'</div></div>'
+    +fld('Data Privacy Requirements','text',s.dataPrivacy,'CUR.software.dataPrivacy=this.value;debounceSave()','e.g. GDPR compliant, no PII stored on device, HIPAA (if medical)',true)
+    +fta('Software / Firmware Notes',s.notes,'CUR.software.notes=this.value;debounceSave()','Any other software constraints, third-party SDKs, APIs to integrate',true,55)
+    +'</div></div>';
+}
+
+/* ENVIRONMENTAL */
+function bEnvironmental(){
+  var e=CUR.environmental;
+  return '<div class="sec-body"><div class="sec-grid-3">'
+    +fld('Operating Temp Range','text',e.operatingTemp,'CUR.environmental.operatingTemp=this.value;debounceSave()','e.g. -10°C to +50°C')
+    +fld('Storage Temp Range','text',e.storageTemp,'CUR.environmental.storageTemp=this.value;debounceSave()','e.g. -20°C to +60°C')
+    +fld('Humidity','text',e.humidity,'CUR.environmental.humidity=this.value;debounceSave()','e.g. 5–90% non-condensing')
+    +fld('Drop Test','text',e.dropTest,'CUR.environmental.dropTest=this.value;debounceSave()','e.g. 1.2m onto concrete, 6 faces')
+    +fld('Vibration / Shock','text',e.vibration,'CUR.environmental.vibration=this.value;debounceSave()','e.g. IEC 60068-2-6, or N/A')
+    +fld('UV / Outdoor Exposure','text',e.uv,'CUR.environmental.uv=this.value;debounceSave()','e.g. Colour-fast to 500hrs UV, or N/A')
+    +fta('Other Environmental Notes',e.other,'CUR.environmental.other=this.value;debounceSave()','Salt spray, altitude, chemical resistance, wash cycles, etc.',true,55)
+    +'</div></div>';
+}
+
+/* COMPLIANCE */
+function bCompliance(){
+  var c=CUR.compliance;
+  var regChips=REGION_OPTS.map(function(r,i){
+    var on=c.regions.indexOf(r)!==-1;
+    return '<div class="chip'+(on?' on':'')+'" onclick="toggleRegion(\''+r.replace(/'/g,'\\\'')+'\')" id="reg-'+i+'">'+r+'</div>';
+  }).join('');
+  return '<div class="sec-body">'
+    +'<div class="sec-lbl">Target Markets / Regulatory Regions</div>'
+    +'<div class="chip-group">'+regChips+'</div>'
+    +'<div class="sec-grid" style="margin-top:12px">'
+    +fta('Standards Required',c.standards,'CUR.compliance.standards=this.value;debounceSave()','e.g. EN 71 (toy safety), IEC 62368-1 (audio/video), ISO 13485 (medical), OEKO-TEX Standard 100',true,65)
+    +fta('Testing Required',c.testing,'CUR.compliance.testing=this.value;debounceSave()','e.g. EMC/EMI testing, SAR testing, safety lab testing by UL / TÜV / SGS',true,65)
+    +fld('Approved Test Lab (if known)','text',c.labRequired||'','CUR.compliance.labRequired=this.value;debounceSave()','e.g. SGS, TÜV Rheinland, Bureau Veritas, or TBD',true)
+    +fta('Compliance Notes',c.notes,'CUR.compliance.notes=this.value;debounceSave()','Any compliance constraints, restrictions, or outstanding questions',true,55)
+    +'</div></div>';
+}
+function toggleRegion(r){ var idx=CUR.compliance.regions.indexOf(r); if(idx===-1)CUR.compliance.regions.push(r);else CUR.compliance.regions.splice(idx,1); debounceSave(); rerender('compliance'); }
+
+/* OPEN ITEMS */
+function bOpenItems(){
+  var items=CUR.openItems;
+  var statusOpts=[{v:'Open',l:'Open'},{v:'In Progress',l:'In Progress'},{v:'Decided',l:'Decided'},{v:'Blocked',l:'Blocked'}];
+  var statusColor={Open:'var(--coral)',Decided:'var(--teal)','In Progress':'var(--amber)',Blocked:'#888'};
+  return '<div class="sec-body">'
+    +'<div style="font-size:12px;color:var(--gray-mid);margin-bottom:10px;padding:8px 12px;background:#FFFBF2;border:1px solid rgba(239,159,39,.3);border-radius:8px">'
+    +'Document what is NOT yet decided. This protects scope and creates clear action items for the client.'
+    +'</div>'
+    +'<div class="dt-wrap"><table class="dtbl"><thead><tr><th style="width:50px">ID</th><th>Open Question / Decision Needed</th><th>Owner</th><th>Due</th><th style="width:90px">Status</th><th></th></tr></thead><tbody>'
+    +items.map(function(item,i){
+      return '<tr>'
+        +'<td><input class="dt-in" value="'+esc(item.id)+'" style="width:45px;font-weight:700;color:var(--amber)" onchange="CUR.openItems['+i+'].id=this.value;debounceSave()"/></td>'
+        +'<td><input class="dt-in" value="'+esc(item.item)+'" placeholder="e.g. Final colour to be confirmed by client" onchange="CUR.openItems['+i+'].item=this.value;debounceSave()"/></td>'
+        +'<td><input class="dt-in" value="'+esc(item.owner)+'" placeholder="e.g. Client" style="width:80px" onchange="CUR.openItems['+i+'].owner=this.value;debounceSave()"/></td>'
+        +'<td><input class="dt-in" type="date" value="'+esc(item.dueDate)+'" onchange="CUR.openItems['+i+'].dueDate=this.value;debounceSave()"/></td>'
+        +'<td><select class="dt-sel" onchange="CUR.openItems['+i+'].status=this.value;debounceSave()">'
+        +statusOpts.map(function(s){return '<option value="'+s.v+'"'+(item.status===s.v?' selected':'')+'>'+s.l+'</option>';}).join('')
+        +'</select></td>'
+        +'<td><button class="dt-rm" onclick="rmOI('+i+')">×</button></td></tr>';
+    }).join('')
+    +'</tbody></table></div>'
+    +'<button class="btn-add-row" onclick="addOI()">+ Add Open Item</button>'
+    +'</div>';
+}
+function addOI(){ var n=CUR.openItems.length+1; CUR.openItems.push({id:'OI-'+String(n).padStart(2,'0'),item:'',owner:'',dueDate:'',status:'Open'}); debounceSave(); rerender('openItems'); }
+function rmOI(i){ CUR.openItems.splice(i,1); debounceSave(); rerender('openItems'); }
+
+/* PREVIEW */
+function renderPreview(){
+  var m=CUR.meta, o=CUR.overview, f=CUR.functional, me=CUR.mechanical, e=CUR.electrical, s=CUR.software, en=CUR.environmental, c=CUR.compliance, oi=CUR.openItems;
+  document.getElementById('prev-title').textContent=m.productName+' TRD '+m.version;
+
+  var STATCOL={Open:'#D85A30','In Progress':'#EF9F27',Decided:'#1D9E75',Blocked:'#888'};
+  var PRICOL={Must:'#D85A30',Should:'#EF9F27',Could:'#1D9E75'};
+
+  function sh(t){ return '<div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border-bottom:2px solid #1D9E75;padding-bottom:5px;margin:22px 0 12px;color:#1A2E3B;font-family:Arial,sans-serif">'+t+'</div>'; }
+  function field(l,v){ return v?'<div style="margin-bottom:7px"><span style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999">'+l+'</span><div style="font-size:12px;color:#1a1a1a;margin-top:1px">'+esc(v).replace(/\n/g,'<br/>')+'</div></div>':''; }
+  function grid2(a,b){ return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'+a+b+'</div>'; }
+
+  /* HEADER */
+  var hdr='<div style="background:#1A2E3B;padding:28px 36px;display:flex;justify-content:space-between;align-items:flex-start">'
+    +'<div><div style="font-family:monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#5DCAA5;margin-bottom:8px">SCM Solution LTD</div>'
+    +'<div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:.01em;font-family:Arial,sans-serif">'+esc(m.productName)+'</div>'
+    +'<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:4px">Technical Requirements Document</div>'
+    +'<div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:2px">'+esc(TYPE_LABELS[m.productType]||m.productType)+'</div>'
+    +'</div>'
+    +'<div style="text-align:right">'
+    +'<div style="font-family:monospace;font-size:16px;font-weight:700;color:#1D9E75">'+esc(m.productCode)+'</div>'
+    +'<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:4px">Version '+esc(m.version)+'</div>'
+    +'<div style="font-size:11px;color:rgba(255,255,255,.4)">'+esc(m.date)+'</div>'
+    +'<div style="font-size:11px;color:rgba(255,255,255,.4)">'+esc(m.preparedBy)+'</div>'
+    +'<div style="margin-top:8px;display:inline-block;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:4px;padding:3px 10px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5)">'+esc(m.classification)+'</div>'
+    +'<div style="margin-top:4px;display:inline-block;background:rgba('+(m.status==='approved'?'29,158,117,.25':m.status==='review'?'108,78,191,.25':'239,159,39,.25')+')'
+    +';border:1px solid rgba('+(m.status==='approved'?'29,158,117,.5':m.status==='review'?'108,78,191,.5':'239,159,39,.5')+')';
+    var statLabel={draft:'Draft',review:'Under Review',approved:'Approved'}[m.status]||m.status;
+    var statColor={draft:'#EF9F27',review:'#A98EF5',approved:'#5DCAA5'}[m.status]||'#EF9F27';
+    hdr+=';border-radius:4px;padding:3px 10px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:'+statColor+'">'+statLabel+'</div>'
+    +'</div></div>';
+
+  /* SECTIONS */
+  var body='<div style="padding:24px 36px">';
+
+  if(o.description||o.targetUsers||o.useCases||o.objective){
+    body+=sh('Product Overview')
+      +grid2(field('Product Description',o.description)+field('Business Objective',o.objective),
+             field('Target Users',o.targetUsers)+field('Primary Use Cases',o.useCases));
+  }
+
+  var fReqs=f.requirements.filter(function(r){return r.description;});
+  if(fReqs.length){
+    body+=sh('Functional Requirements')
+      +'<table style="width:100%;border-collapse:collapse;font-size:12px">'
+      +'<tr style="background:#1A2E3B;color:#fff"><th style="padding:6px 10px;text-align:left;width:55px">ID</th><th style="padding:6px 10px;text-align:left;width:80px">Priority</th><th style="padding:6px 10px;text-align:left">Requirement</th><th style="padding:6px 10px;text-align:left">Notes</th></tr>'
+      +fReqs.map(function(req,ri){
+        return '<tr style="background:'+(ri%2===0?'#f9f9f7':'#fff')+'"><td style="padding:5px 10px;border:1px solid #e0e0e0;font-weight:700;font-size:11px;color:var(--teal-dk)">'+esc(req.id)+'</td>'
+          +'<td style="padding:5px 10px;border:1px solid #e0e0e0"><span style="background:'+(req.priority==='Must'?'#FAECE7':req.priority==='Should'?'#FAEEDA':'#E1F5EE')+';color:'+(PRICOL[req.priority]||'#888')+';padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700">'+esc(req.priority)+'</span></td>'
+          +'<td style="padding:5px 10px;border:1px solid #e0e0e0">'+esc(req.description)+'</td>'
+          +'<td style="padding:5px 10px;border:1px solid #e0e0e0;color:#666;font-size:11px">'+esc(req.notes)+'</td></tr>';
+      }).join('')
+      +'</table>';
+  }
+
+  var hasME=me.formFactor||me.dimensions||me.weight||me.materials;
+  if(hasME){
+    body+=sh('Mechanical Requirements')
+      +grid2(field('Form Factor',me.formFactor)+field('Target Dimensions',me.dimensions)+field('Target Weight',me.weight),
+             field('Primary Materials',me.materials)+field('IP Rating',me.ipRating)+field('Colour / Finish',me.color))
+      +field('Assembly Requirements',me.assembly)+field('Notes',me.notes);
+  }
+
+  var hasEE=e.powerSource||e.connectivity.length||e.sensors;
+  if(hasEE&&(CUR.meta.productType==='hardware'||CUR.meta.productType==='mixed')){
+    body+=sh('Electrical / Electronic Requirements')
+      +grid2(field('Power Source',e.powerSource)+field('Battery Capacity',e.batteryCapacity)+field('Target Battery Life',e.batteryLife)+field('Charging',e.charging),
+             (e.connectivity.length?'<div style="margin-bottom:7px"><span style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999">Connectivity</span><div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px">'+e.connectivity.map(function(c){return '<span style="background:#E1F5EE;border:1px solid #5DCAA5;padding:2px 8px;border-radius:4px;font-size:11px;color:#085041">'+esc(c)+'</span>';}).join('')+'</div></div>':'')
+             +field('Sensors',e.sensors)+field('Display',e.display)+field('Audio / Haptics',e.audio))
+      +field('Notes',e.notes);
+  }
+
+  if(s.platform&&(CUR.meta.productType==='hardware'||CUR.meta.productType==='mixed')){
+    body+=sh('Software & Firmware Requirements')
+      +grid2(field('Companion App Platform',s.platform)+field('OS Version Support',s.appOS)+field('Data Privacy',s.dataPrivacy),
+             '<div style="margin-bottom:7px"><span style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999">Cloud / Backend</span><div style="font-size:12px;color:#1a1a1a;margin-top:1px">'+(s.cloudRequired?'Yes — required':'No')+'</div></div>'
+             +'<div style="margin-bottom:7px"><span style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999">OTA Firmware Updates</span><div style="font-size:12px;color:#1a1a1a;margin-top:1px">'+(s.ota?'Yes — required':'No')+'</div></div>'
+             +field('Notes',s.notes));
+  }
+
+  var hasEnv=en.operatingTemp||en.dropTest||en.humidity;
+  if(hasEnv){
+    body+=sh('Environmental & Durability')
+      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">'
+      +field('Operating Temp',en.operatingTemp)+field('Storage Temp',en.storageTemp)+field('Humidity',en.humidity)
+      +field('Drop Test',en.dropTest)+field('Vibration / Shock',en.vibration)+field('UV / Outdoor',en.uv)
+      +'</div>'+field('Other',en.other);
+  }
+
+  var hasComp=c.regions.length||c.standards;
+  if(hasComp){
+    body+=sh('Compliance & Regulatory')
+      +(c.regions.length?'<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:5px">Target Markets</div><div style="display:flex;flex-wrap:wrap;gap:5px">'+c.regions.map(function(r){return '<span style="background:#E1F5EE;border:1px solid #5DCAA5;padding:3px 10px;border-radius:4px;font-size:11px;color:#085041">'+esc(r)+'</span>';}).join('')+'</div></div>':'')
+      +grid2(field('Standards Required',c.standards)+field('Test Lab',c.labRequired),field('Testing Required',c.testing)+field('Notes',c.notes));
+  }
+
+  var openOI=oi.filter(function(x){return x.item;});
+  if(openOI.length){
+    body+=sh('Open Items & Decisions Required')
+      +'<table style="width:100%;border-collapse:collapse;font-size:12px">'
+      +'<tr style="background:#FFF3E0"><th style="padding:6px 10px;text-align:left;width:50px">ID</th><th style="padding:6px 10px;text-align:left">Open Question / Decision Needed</th><th style="padding:6px 10px;width:90px">Owner</th><th style="padding:6px 10px;width:90px">Due</th><th style="padding:6px 10px;width:85px;text-align:center">Status</th></tr>'
+      +openOI.map(function(item,ri){
+        return '<tr style="background:'+(ri%2===0?'#fffdf8':'#fff')+'"><td style="padding:5px 10px;border:1px solid #e0e0e0;font-weight:700;font-size:11px;color:#EF9F27">'+esc(item.id)+'</td>'
+          +'<td style="padding:5px 10px;border:1px solid #e0e0e0">'+esc(item.item)+'</td>'
+          +'<td style="padding:5px 10px;border:1px solid #e0e0e0;text-align:center;font-size:11px">'+esc(item.owner)+'</td>'
+          +'<td style="padding:5px 10px;border:1px solid #e0e0e0;text-align:center;font-size:11px">'+esc(item.dueDate)+'</td>'
+          +'<td style="padding:5px 10px;border:1px solid #e0e0e0;text-align:center"><span style="color:'+(STATCOL[item.status]||'#888')+';font-weight:700;font-size:11px">'+esc(item.status)+'</span></td></tr>';
+      }).join('')
+      +'</table>';
+  }
+
+  body+='<div style="margin-top:32px;padding-top:14px;border-top:1px solid #e0e0e0;font-size:10px;color:#aaa;text-align:center">'
+    +'SCM Solution LTD · Technical Requirements Document · '+esc(m.productCode)+' · Version '+esc(m.version)+' · '+esc(m.date)
+    +' · '+esc(m.classification)+'</div></div>';
+
+  var doc='<!DOCTYPE html><html><head><meta charset="UTF-8"/><style>@page{size:A4;margin:0}body{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#1a1a1a;margin:0;padding:0}@media print{body{padding:0}}</style></head><body>'+hdr+body+'</body></html>';
+  var iframe=document.getElementById('prev-iframe');
+  iframe.contentDocument.open(); iframe.contentDocument.write(doc); iframe.contentDocument.close();
+}
+
+function printTRD(){ document.getElementById('prev-iframe').contentWindow.print(); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+loadAll(); renderList();
+</script>
+</body>
+</html>

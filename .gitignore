@@ -1,1 +1,6 @@
 .claude/
+
+# Client project data files — never commit these
+*.scmb.json
+data/
+exports/

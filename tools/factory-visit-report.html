@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Factory Visit Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1A2E3B;--navy2:#2C4A5E;
+  --teal:#1D9E75;--teal-dk:#085041;--teal-lt:#E1F5EE;--teal-bd:#5DCAA5;
+  --amber:#EF9F27;--amber-lt:#FAEEDA;
+  --coral:#D85A30;--coral-lt:#FAECE7;
+  --gray-bg:#F5F4F1;--gray-line:#E0DED8;--gray-mid:#888780;--gray-dk:#444441;
+  --white:#fff;--black:#1A1A19;--blue-btn:#1B6FA8;
+}
+body{font-family:'Barlow',sans-serif;background:var(--gray-bg);color:var(--black);font-size:14px;line-height:1.5}
+input,textarea,select,button{font-family:inherit}
+button{cursor:pointer;border:none;background:none}
+textarea{resize:vertical}
+.screen{display:none;min-height:100vh}.screen.active{display:block}
+
+/* HOME */
+#home{background:var(--navy)}
+.home-wrap{max-width:720px;margin:0 auto;padding:36px 24px 60px}
+.home-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:6px}
+.home-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--white);line-height:1.1;margin-bottom:4px}
+.home-sub{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:32px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.btn-primary{background:var(--teal);color:var(--white);border-radius:10px;padding:11px 22px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:filter .15s}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-ghost{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:11px 18px;font-size:13px;transition:background .15s}
+.btn-ghost:hover{background:rgba(255,255,255,.14)}
+.new-form{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:20px;margin-bottom:24px;display:none;animation:fadeUp .2s ease}
+.nf-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:14px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.fg-full{grid-column:1/-1}
+.fl label{display:block;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:3px}
+.fl input,.fl select{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--white);outline:none;transition:border-color .15s}
+.fl input:focus,.fl select:focus{border-color:var(--teal-bd)}
+.fl input::placeholder{color:rgba(255,255,255,.3)}
+.fl select option{background:var(--navy);color:var(--white)}
+.sessions-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px}
+.rpt-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.rpt-info{flex:1;min-width:0}
+.rpt-name{font-size:15px;color:var(--white);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rpt-meta{font-size:11px;color:rgba(255,255,255,.4)}
+.rpt-fit{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;margin-top:4px}
+.fit-good{background:rgba(29,158,117,.2);color:var(--teal-bd);border:1px solid rgba(29,158,117,.3)}
+.fit-possible{background:rgba(239,159,39,.2);color:#EF9F27;border:1px solid rgba(239,159,39,.3)}
+.fit-limited{background:rgba(136,135,128,.2);color:var(--gray-mid);border:1px solid rgba(136,135,128,.3)}
+.fit-not{background:rgba(216,90,48,.2);color:var(--coral);border:1px solid rgba(216,90,48,.3)}
+.rpt-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.btn-teal{background:var(--teal);color:var(--white);border-radius:20px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.btn-blue{background:var(--blue-btn);color:var(--white);border-radius:20px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.btn-sm{border-radius:8px;padding:7px 14px;font-size:12px}
+.btn-danger{color:rgba(255,80,80,.6);font-size:11px;padding:4px}
+.empty{text-align:center;padding:48px 0;color:rgba(255,255,255,.3);font-size:14px}
+
+/* FORM SCREEN */
+#form-screen{background:var(--gray-bg)}
+.form-hdr{background:var(--teal-dk);padding:12px 18px 10px;position:sticky;top:52px;z-index:100;box-shadow:0 2px 14px rgba(0,0,0,.22)}
+.form-hdr-inner{max-width:760px;margin:0 auto}
+.form-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.form-back{font-size:18px;color:var(--teal-lt);background:rgba(255,255,255,.1);border-radius:8px;padding:4px 10px}
+.form-back:hover{background:rgba(255,255,255,.2)}
+.form-heading{flex:1;font-size:15px;color:var(--white);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.form-actions{display:flex;gap:7px;align-items:center;flex-shrink:0}
+.save-msg{font-size:11px;color:var(--teal-bd);min-width:55px}
+.form-bar{height:3px;background:rgba(255,255,255,.15);border-radius:2px;margin-top:6px}
+.form-bar-fill{height:100%;background:var(--teal);border-radius:2px;transition:width .4s}
+.form-body{max-width:760px;margin:0 auto;padding:14px 14px 60px}
+
+/* META PANEL */
+.meta-panel{background:var(--white);border-radius:14px;padding:0;margin-bottom:12px;border:1.5px solid var(--teal-bd);overflow:hidden}
+.meta-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;background:var(--teal-lt)}
+.meta-hdr-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-dk);flex:1}
+.meta-chev{font-size:11px;color:var(--teal);transition:transform .2s}
+.meta-chev.up{transform:rotate(-90deg)}
+.meta-body{padding:14px 16px;display:none}
+.meta-body.open{display:block}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.meta-full{grid-column:1/-1}
+.mf label{display:block;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:3px}
+.mf input,.mf select{width:100%;padding:7px 9px;font-size:13px;border:1px solid var(--gray-line);border-radius:7px;background:#FAFAF8;color:var(--black)}
+.mf input:focus,.mf select:focus{outline:none;border-color:var(--teal)}
+
+/* SECTION CARDS */
+.sec-card{background:var(--white);border-radius:14px;overflow:hidden;margin-bottom:10px;border:1px solid var(--gray-line);animation:fadeUp .2s ease}
+.sec-hdr{display:flex;align-items:center;gap:9px;padding:11px 14px;cursor:pointer;user-select:none;background:#FAFAF8}
+.sec-num{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--teal);min-width:20px}
+.sec-title{flex:1;font-size:14px;font-weight:500}
+.sec-done{font-size:10px;color:var(--teal);background:var(--teal-lt);padding:2px 7px;border-radius:10px}
+.sec-chev{font-size:11px;color:var(--gray-mid);transition:transform .2s}
+.sec-chev.up{transform:rotate(-90deg)}
+.sec-body{padding:16px}
+.sec-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid);margin-bottom:7px;margin-top:14px}
+.sec-lbl:first-child{margin-top:0}
+.sec-ta{width:100%;min-height:90px;padding:10px 12px;font-size:13px;border:1px solid var(--gray-line);border-radius:9px;background:#FAFAF8;color:var(--black);line-height:1.6;font-family:'Barlow',sans-serif}
+.sec-ta:focus{outline:none;border-color:var(--teal)}
+.sec-in{width:100%;padding:8px 10px;font-size:13px;border:1px solid var(--gray-line);border-radius:8px;background:#FAFAF8;color:var(--black)}
+.sec-in:focus{outline:none;border-color:var(--teal)}
+
+/* EDITABLE TABLES */
+.tbl-wrap{overflow-x:auto;margin-bottom:6px}
+.etbl{width:100%;border-collapse:collapse;font-size:13px}
+.etbl th{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid);padding:6px 7px;border-bottom:1px solid var(--gray-line);text-align:left;background:#FAFAF8;white-space:nowrap}
+.etbl td{padding:3px 3px;border-bottom:1px solid var(--gray-line);vertical-align:middle}
+.etbl tr:last-child td{border-bottom:none}
+.et-in{width:100%;padding:5px 7px;font-size:13px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--black);font-family:'Barlow',sans-serif;min-width:80px}
+.et-in:focus{outline:none;border-color:var(--teal);background:var(--teal-lt)}
+.et-sel{width:100%;padding:5px 3px;font-size:12px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--black);cursor:pointer;min-width:70px}
+.et-sel:focus{outline:none;border-color:var(--teal)}
+.et-rm{color:rgba(216,90,48,.35);font-size:16px;padding:2px 5px;cursor:pointer;border-radius:4px;line-height:1;flex-shrink:0}
+.et-rm:hover{color:var(--coral);background:var(--coral-lt)}
+.btn-add-row{margin-top:6px;font-size:12px;color:var(--teal);padding:5px 11px;border:1px dashed var(--teal-bd);border-radius:7px;background:var(--teal-lt);cursor:pointer;transition:all .15s}
+.btn-add-row:hover{background:var(--teal);color:var(--white)}
+
+/* OBSERVATIONS */
+.obs-row{padding:12px 0;border-bottom:1px solid var(--gray-line)}
+.obs-row:last-child{border-bottom:none}
+.obs-area{font-size:13px;font-weight:500;margin-bottom:7px;color:var(--black)}
+.rating-scale{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
+.r-pip{border:1.5px solid var(--gray-line);border-radius:7px;padding:5px 9px;font-size:12px;font-weight:600;color:var(--gray-mid);cursor:pointer;transition:all .15s;min-width:38px;text-align:center}
+.r-pip:hover{border-color:var(--teal);color:var(--teal)}
+.r-low{background:var(--coral-lt);border-color:var(--coral);color:var(--coral)}
+.r-mid{background:var(--amber-lt);border-color:var(--amber);color:#7A5200}
+.r-high{background:var(--teal-lt);border-color:var(--teal);color:var(--teal-dk)}
+.obs-note{width:100%;padding:6px 8px;font-size:12px;border:1px solid var(--gray-line);border-radius:7px;background:#FAFAF8;color:var(--black);resize:none;min-height:50px;font-family:'Barlow',sans-serif}
+.obs-note:focus{outline:none;border-color:var(--teal)}
+
+/* FIT PILLS */
+.fit-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.f-pill{border:1.5px solid var(--gray-line);border-radius:20px;padding:7px 16px;font-size:13px;color:var(--gray-mid);cursor:pointer;transition:all .15s}
+.f-pill:hover{border-color:var(--teal)}
+.fp-good{background:var(--teal-lt);border-color:var(--teal);color:var(--teal-dk)}
+.fp-possible{background:var(--amber-lt);border-color:var(--amber);color:#7A5200}
+.fp-limited{background:#F5F4F1;border-color:var(--gray-mid);color:var(--gray-dk)}
+.fp-not{background:var(--coral-lt);border-color:var(--coral);color:var(--coral)}
+
+/* PHOTOS */
+.photo-cats{display:flex;flex-direction:column;gap:10px}
+.photo-cat{background:#FAFAF8;border:1px solid var(--gray-line);border-radius:10px;padding:12px}
+.photo-cat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid);margin-bottom:8px}
+.photo-row{display:flex;gap:7px;flex-wrap:wrap;align-items:flex-start}
+.photo-add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:72px;height:72px;border-radius:10px;cursor:pointer;font-size:20px;border:1.5px dashed var(--teal-bd);background:var(--teal-lt);color:var(--teal-dk)}
+.photo-add span{font-size:9px}
+.photo-add input{display:none}
+.photo-thumb{position:relative;width:72px;height:72px;border-radius:10px;overflow:hidden;border:1px solid var(--teal-bd);flex-shrink:0}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-rm{position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.6);color:var(--white);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;cursor:pointer;border:none;line-height:1}
+
+/* RECOMMENDATION */
+.rec-pills{display:flex;gap:8px;flex-wrap:wrap}
+.rec-pill{border:1.5px solid var(--gray-line);border-radius:10px;padding:9px 16px;font-size:13px;color:var(--gray-mid);cursor:pointer;transition:all .15s}
+.rec-pill:hover{border-color:var(--teal)}
+.rp-proceed{background:var(--teal-lt);border-color:var(--teal);color:var(--teal-dk)}
+.rp-caution{background:var(--amber-lt);border-color:var(--amber);color:#7A5200}
+.rp-backup{background:#F5F4F1;border-color:var(--gray-mid);color:var(--gray-dk)}
+.rp-not{background:var(--coral-lt);border-color:var(--coral);color:var(--coral)}
+
+/* PREVIEW */
+#preview-screen{background:var(--gray-bg)}
+.prev-hdr{background:var(--navy);padding:10px 20px;display:flex;align-items:center;gap:10px;position:sticky;top:52px;z-index:100}
+.prev-title{flex:1;font-size:13px;color:rgba(255,255,255,.5)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.fg,.meta-grid{grid-template-columns:1fr}.fg-full,.meta-full{grid-column:1}}
+</style>
+</head>
+<body>
+<div id="site-nav-root"></div>
+<script src="../nav.js"></script>
+
+<!-- ══ HOME ══════════════════════════════════════════════════════════════════ -->
+<div id="home" class="screen active">
+  <div class="home-wrap">
+    <div class="home-label">SCM Solution LTD</div>
+    <div class="home-title">Factory Visit Report</div>
+    <div class="home-sub">Document and export structured supplier visit reports</div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="showNewForm()">+ New Report</button>
+    </div>
+    <div class="new-form" id="new-form">
+      <div class="nf-title">New Factory Visit Report</div>
+      <div class="fg">
+        <div class="fl fg-full"><label>Factory Name *</label><input id="nf-factory" placeholder="e.g. Shin-Fu Aluminum Co., Ltd."/></div>
+        <div class="fl"><label>Visit Date *</label><input id="nf-date" type="date"/></div>
+        <div class="fl"><label>Location</label><input id="nf-location" placeholder="City, Country"/></div>
+        <div class="fl"><label>Main Contact (Name / Title)</label><input id="nf-contact" placeholder="e.g. Frank Chen / Sales Manager"/></div>
+        <div class="fl"><label>Contact Phone</label><input id="nf-phone" placeholder=""/></div>
+        <div class="fl"><label>Contact Email</label><input id="nf-email" type="email" placeholder=""/></div>
+        <div class="fl"><label>Visited By</label><input id="nf-visited" placeholder="e.g. Patrick / Jerry / Kianna"/></div>
+        <div class="fl"><label>Project / Product</label><input id="nf-project" placeholder="e.g. Motis Project"/></div>
+        <div class="fl"><label>Main Capability</label><input id="nf-capability" placeholder="e.g. Aluminium extrusion"/></div>
+        <div class="fl"><label>Initial Fit</label>
+          <select id="nf-fit">
+            <option value="">— TBD —</option>
+            <option>Good fit</option><option>Possible fit</option><option>Limited fit</option><option>Not recommended</option>
+          </select>
+        </div>
+        <div class="fl fg-full"><label>Company Website</label><input id="nf-website" placeholder="https://"/></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="createReport()">Create Report</button>
+        <button class="btn-ghost" onclick="hideNewForm()">Cancel</button>
+      </div>
+    </div>
+    <div id="sessions-container"><div class="empty">No reports yet — tap New Report to begin</div></div>
+  </div>
+</div>
+
+<!-- ══ FORM SCREEN ══════════════════════════════════════════════════════════ -->
+<div id="form-screen" class="screen">
+  <div class="form-hdr">
+    <div class="form-hdr-inner">
+      <div class="form-top">
+        <button class="form-back" onclick="goHome()">←</button>
+        <div class="form-heading" id="form-heading">Visit Report</div>
+        <div class="form-actions">
+          <span class="save-msg" id="save-msg"></span>
+          <button class="btn-blue btn-sm" onclick="goPreview()">Preview / Export</button>
+        </div>
+      </div>
+      <div class="form-bar"><div class="form-bar-fill" id="form-bar" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="form-body" id="form-body"></div>
+</div>
+
+<!-- ══ PREVIEW SCREEN ══════════════════════════════════════════════════════ -->
+<div id="preview-screen" class="screen">
+  <div class="prev-hdr">
+    <div class="prev-title" id="prev-title">Report Preview</div>
+    <button class="btn-teal btn-sm" onclick="printRpt()">Print / Save PDF</button>
+    <button class="btn-ghost btn-sm" onclick="goForm()">← Back</button>
+  </div>
+  <div id="prev-body"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+// DEFAULTS
+// ════════════════════════════════════════════════════════════════════════════
+const DEF_BG = [
+  {item:"Company overview",        details:"",confirmed:"",notes:""},
+  {item:"Main products / services",details:"",confirmed:"",notes:""},
+  {item:"Industries served",       details:"",confirmed:"",notes:""},
+  {item:"Years in business",       details:"",confirmed:"",notes:""},
+  {item:"Factory size",            details:"",confirmed:"",notes:""},
+  {item:"Certifications",          details:"",confirmed:"",notes:""},
+];
+const DEF_CAP = [
+  {category:"Main processes",    details:"",inHouse:"",notes:""},
+  {category:"Materials",         details:"",inHouse:"",notes:""},
+  {category:"Surface treatment", details:"",inHouse:"",notes:""},
+  {category:"Printing / marking",details:"",inHouse:"",notes:""},
+  {category:"Assembly",          details:"",inHouse:"",notes:""},
+  {category:"Tooling / fixtures",details:"",inHouse:"",notes:""},
+];
+const DEF_EQ = [{machine:"",qty:"",purpose:"",observation:""},{machine:"",qty:"",purpose:"",observation:""},{machine:"",qty:"",purpose:"",observation:""}];
+const DEF_QC = [
+  {area:"Incoming inspection",      details:"",available:"",notes:""},
+  {area:"In-process inspection",    details:"",available:"",notes:""},
+  {area:"Final inspection",         details:"",available:"",notes:""},
+  {area:"Inspection equipment",     details:"",available:"",notes:""},
+  {area:"Testing capability",       details:"",available:"",notes:""},
+  {area:"Documentation",            details:"",available:"",notes:""},
+];
+const DEF_CAPACITY = [
+  {item:"Prototype capability",      response:"",confirmed:"",notes:""},
+  {item:"Mass production capability",response:"",confirmed:"",notes:""},
+  {item:"MOQ",                       response:"",confirmed:"",notes:""},
+  {item:"Prototype lead time",       response:"",confirmed:"",notes:""},
+  {item:"Mass production lead time", response:"",confirmed:"",notes:""},
+  {item:"Scalability",               response:"",confirmed:"",notes:""},
+];
+const DEF_PKG = [
+  {area:"Packaging",          capability:"",confirmed:"",notes:""},
+  {area:"Warehouse / storage",capability:"",confirmed:"",notes:""},
+  {area:"Export experience",  capability:"",confirmed:"",notes:""},
+  {area:"Shipping documents", capability:"",confirmed:"",notes:""},
+];
+const DEF_OBS = [
+  {area:"Cleanliness / organization",   rating:null,notes:""},
+  {area:"Production flow",              rating:null,notes:""},
+  {area:"Equipment condition",          rating:null,notes:""},
+  {area:"Worker skill / training",      rating:null,notes:""},
+  {area:"Quality control maturity",     rating:null,notes:""},
+  {area:"Communication / responsiveness",rating:null,notes:""},
+  {area:"Overall professionalism",      rating:null,notes:""},
+];
+const PHOTO_CATS = [
+  {key:"exterior",  label:"Factory Exterior"},
+  {key:"production",label:"Production Area / Line"},
+  {key:"equipment", label:"Equipment & Machines"},
+  {key:"samples",   label:"Sample Products"},
+  {key:"qc",        label:"Quality Control Area"},
+  {key:"other",     label:"Other"},
+];
+const CONF_OPTS  = [["","—"],["yes","Yes"],["partial","Partial"],["no","No"]];
+const IH_OPTS    = [["","—"],["in-house","In-house"],["outsourced","Outsourced"],["partial","Partial"],["tbc","TBC"]];
+const STATUS_OPTS = ["Pending","In Progress","Done","On Hold"];
+const R_STEPS    = [1,1.5,2,2.5,3,3.5,4,4.5,5];
+
+// ════════════════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════════════════
+const SK = "scm_visit_reports_v1";
+let reports=[], activeId=null, collapsed={};
+
+function dc(o){return JSON.parse(JSON.stringify(o));}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function getRpt(){return reports.find(r=>r.id===activeId)||null;}
+function newAction(){return {action:"",owner:"",deadline:"",status:"Pending",notes:""};}
+
+function blankReport(meta){
+  return {
+    id:Date.now().toString(), meta:{...meta},
+    purpose:"",
+    background:dc(DEF_BG), capabilities:dc(DEF_CAP), equipment:dc(DEF_EQ), productionFlow:"",
+    qc:dc(DEF_QC), capacity:dc(DEF_CAPACITY), packaging:dc(DEF_PKG),
+    observations:dc(DEF_OBS),
+    fit:{projectFit:"",mainReason:"",bestUseCase:"",keyMissingInfo:"",nextStep:""},
+    photos:{exterior:[],production:[],equipment:[],samples:[],qc:[],other:[]},
+    actions:[newAction(),newAction(),newAction()],
+    summary:"", recommendation:"",
+    createdAt:new Date().toISOString(),
+  };
+}
+
+function load(){try{reports=JSON.parse(localStorage.getItem(SK)||"[]");}catch{reports=[];}}
+function save(){
+  try{localStorage.setItem(SK,JSON.stringify(reports));}
+  catch{
+    try{
+      const s=reports.map(r=>({...r,photos:{exterior:[],production:[],equipment:[],samples:[],qc:[],other:[]}}));
+      localStorage.setItem(SK,JSON.stringify(s));
+    }catch(e){console.error("save failed",e);}
+  }
+}
+let saveTimer=null;
+function ds(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{save();showSave();},600);}
+function showSave(){const el=document.getElementById("save-msg");if(el){el.textContent="Saved ✓";setTimeout(()=>{if(el.textContent==="Saved ✓")el.textContent="";},2000);}}
+
+// ════════════════════════════════════════════════════════════════════════════
+// NAV
+// ════════════════════════════════════════════════════════════════════════════
+function showScreen(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");window.scrollTo(0,0);}
+function goHome(){showScreen("home");renderHome();}
+function goForm(){showScreen("form-screen");renderForm();}
+function goPreview(){showScreen("preview-screen");renderPreview();}
+
+// ════════════════════════════════════════════════════════════════════════════
+// HOME
+// ════════════════════════════════════════════════════════════════════════════
+function showNewForm(){document.getElementById("new-form").style.display="block";document.getElementById("nf-factory").focus();}
+function hideNewForm(){document.getElementById("new-form").style.display="none";}
+
+function createReport(){
+  const factory=document.getElementById("nf-factory").value.trim();
+  if(!factory){alert("Factory name is required.");return;}
+  const meta={
+    factory,
+    date:document.getElementById("nf-date").value||new Date().toISOString().slice(0,10),
+    location:document.getElementById("nf-location").value.trim(),
+    contact:document.getElementById("nf-contact").value.trim(),
+    phone:document.getElementById("nf-phone").value.trim(),
+    email:document.getElementById("nf-email").value.trim(),
+    visitedBy:document.getElementById("nf-visited").value.trim(),
+    project:document.getElementById("nf-project").value.trim(),
+    capability:document.getElementById("nf-capability").value.trim(),
+    initialFit:document.getElementById("nf-fit").value,
+    website:document.getElementById("nf-website").value.trim(),
+  };
+  const rpt=blankReport(meta);
+  reports.push(rpt); save(); hideNewForm();
+  ["nf-factory","nf-date","nf-location","nf-contact","nf-phone","nf-email","nf-visited","nf-project","nf-capability","nf-fit","nf-website"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  openReport(rpt.id);
+}
+
+function openReport(id){activeId=id;collapsed={};showScreen("form-screen");renderForm();}
+function delReport(id){if(!confirm("Delete this report? This cannot be undone."))return;reports=reports.filter(r=>r.id!==id);save();renderHome();}
+
+function fitCls(f){
+  if(f==="Good fit")return "fit-good";
+  if(f==="Possible fit")return "fit-possible";
+  if(f==="Limited fit")return "fit-limited";
+  if(f==="Not recommended")return "fit-not";
+  return "";
+}
+
+function renderHome(){
+  const c=document.getElementById("sessions-container");
+  if(!reports.length){c.innerHTML='<div class="empty">No reports yet — tap New Report to begin</div>';return;}
+  let html=`<div class="sessions-label">Saved Reports (${reports.length})</div>`;
+  reports.slice().reverse().forEach(r=>{
+    const fit=r.meta.initialFit||r.fit?.projectFit||"";
+    const fc=fitCls(fit);
+    html+=`<div class="rpt-card">
+      <div class="rpt-info">
+        <div class="rpt-name">${esc(r.meta.factory)}</div>
+        <div class="rpt-meta">${[r.meta.project,r.meta.date,r.meta.location].filter(Boolean).map(esc).join(" · ")}</div>
+        ${fit?`<div class="rpt-fit ${fc}">${esc(fit)}</div>`:""}
+      </div>
+      <div class="rpt-actions">
+        <button class="btn-teal btn-sm" onclick="openReport('${r.id}')">Open</button>
+        <button class="btn-danger" onclick="delReport('${r.id}')">Delete</button>
+      </div>
+    </div>`;
+  });
+  c.innerHTML=html;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FORM — META PANEL
+// ════════════════════════════════════════════════════════════════════════════
+let metaOpen=false;
+function toggleMeta(){
+  metaOpen=!metaOpen;
+  const body=document.getElementById("meta-body");
+  const chev=document.getElementById("meta-chev");
+  if(body)body.classList.toggle("open",metaOpen);
+  if(chev)chev.classList.toggle("up",!metaOpen);
+}
+function updMeta(field,value){const r=getRpt();if(!r)return;r.meta[field]=value;document.getElementById("form-heading").textContent=r.meta.factory+(r.meta.date?" — "+r.meta.date:"");ds();}
+
+function buildMeta(r){
+  const m=r.meta;
+  const opts=(v)=>["","Good fit","Possible fit","Limited fit","Not recommended"].map(f=>`<option value="${esc(f)}"${m.initialFit===f?" selected":""}>${f||"— TBD —"}</option>`).join("");
+  return `<div class="meta-panel">
+    <div class="meta-hdr" onclick="toggleMeta()">
+      <span class="meta-hdr-label">Factory Snapshot — ${esc(m.factory)}${m.visitedBy?" · Visited by: "+esc(m.visitedBy):""}</span>
+      <span class="meta-chev" id="meta-chev">▼</span>
+    </div>
+    <div class="meta-body" id="meta-body">
+      <div class="meta-grid">
+        <div class="mf"><label>Factory Name</label><input value="${esc(m.factory||"")}" oninput="updMeta('factory',this.value)"/></div>
+        <div class="mf"><label>Visit Date</label><input type="date" value="${esc(m.date||"")}" oninput="updMeta('date',this.value)"/></div>
+        <div class="mf"><label>Location</label><input value="${esc(m.location||"")}" placeholder="City, Country" oninput="updMeta('location',this.value)"/></div>
+        <div class="mf"><label>Main Contact</label><input value="${esc(m.contact||"")}" placeholder="Name / Title" oninput="updMeta('contact',this.value)"/></div>
+        <div class="mf"><label>Phone</label><input value="${esc(m.phone||"")}" oninput="updMeta('phone',this.value)"/></div>
+        <div class="mf"><label>Email</label><input type="email" value="${esc(m.email||"")}" oninput="updMeta('email',this.value)"/></div>
+        <div class="mf"><label>Visited By</label><input value="${esc(m.visitedBy||"")}" placeholder="Names" oninput="updMeta('visitedBy',this.value)"/></div>
+        <div class="mf"><label>Project / Product</label><input value="${esc(m.project||"")}" oninput="updMeta('project',this.value)"/></div>
+        <div class="mf"><label>Main Capability</label><input value="${esc(m.capability||"")}" oninput="updMeta('capability',this.value)"/></div>
+        <div class="mf"><label>Website</label><input value="${esc(m.website||"")}" placeholder="https://" oninput="updMeta('website',this.value)"/></div>
+        <div class="mf meta-full"><label>Initial Fit</label><select onchange="updMeta('initialFit',this.value)">${opts()}</select></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FORM — SECTION HELPERS
+// ════════════════════════════════════════════════════════════════════════════
+function secCard(num,id,title,done,content){
+  const coll=!!collapsed[id];
+  return `<div class="sec-card">
+    <div class="sec-hdr" onclick="toggleSec('${id}')">
+      <span class="sec-num">${num}</span>
+      <span class="sec-title">${title}</span>
+      ${done?'<span class="sec-done">✓</span>':""}
+      <span class="sec-chev${coll?" up":""}" id="schev-${id}">▼</span>
+    </div>
+    <div class="sec-body" id="sbody-${id}"${coll?' style="display:none"':""}>
+      ${content}
+    </div>
+  </div>`;
+}
+function toggleSec(id){
+  collapsed[id]=!collapsed[id];
+  const b=document.getElementById("sbody-"+id);
+  const c=document.getElementById("schev-"+id);
+  if(b)b.style.display=collapsed[id]?"none":"block";
+  if(c)c.classList.toggle("up",!!collapsed[id]);
+}
+
+// Generic confirm/available/in-house selects
+function confSel(val,fn){return `<select class="et-sel" onchange="${fn}">${CONF_OPTS.map(([v,l])=>`<option value="${v}"${val===v?" selected":""}>${l}</option>`).join("")}</select>`;}
+function ihSel(val,fn){return `<select class="et-sel" onchange="${fn}">${IH_OPTS.map(([v,l])=>`<option value="${v}"${val===v?" selected":""}>${l}</option>`).join("")}</select>`;}
+function statusSel(val,fn){return `<select class="et-sel" onchange="${fn}">${STATUS_OPTS.map(s=>`<option${val===s?" selected":""}>${s}</option>`).join("")}</select>`;}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FORM — SECTION CONTENT BUILDERS
+// ════════════════════════════════════════════════════════════════════════════
+function bPurpose(r){
+  return `<div class="sec-lbl">Why was this factory visited and what needed to be confirmed?</div>
+  <textarea class="sec-ta" placeholder="Describe the visit purpose..." oninput="updF('purpose',this.value)">${esc(r.purpose)}</textarea>`;
+}
+
+function bBg(r){
+  const rows=r.background.map((row,i)=>`<tr>
+    <td><input class="et-in" value="${esc(row.item)}" oninput="updT('background',${i},'item',this.value)" placeholder="Item"/></td>
+    <td><input class="et-in" value="${esc(row.details)}" oninput="updT('background',${i},'details',this.value)" placeholder="Details"/></td>
+    <td>${confSel(row.confirmed,`updT('background',${i},'confirmed',this.value)`)}</td>
+    <td><input class="et-in" value="${esc(row.notes)}" oninput="updT('background',${i},'notes',this.value)" placeholder="Notes"/></td>
+    <td><button class="et-rm" onclick="rmRow('background',${i})">×</button></td>
+  </tr>`).join("");
+  return `<div class="tbl-wrap"><table class="etbl"><thead><tr><th>Item</th><th>Details</th><th>Confirmed?</th><th>Notes</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+  <button class="btn-add-row" onclick="addBg()">+ Add row</button>`;
+}
+
+function bCap(r){
+  const rows=r.capabilities.map((row,i)=>`<tr>
+    <td><input class="et-in" value="${esc(row.category)}" oninput="updT('capabilities',${i},'category',this.value)" placeholder="Category"/></td>
+    <td><input class="et-in" value="${esc(row.details)}" oninput="updT('capabilities',${i},'details',this.value)" placeholder="Details"/></td>
+    <td>${ihSel(row.inHouse,`updT('capabilities',${i},'inHouse',this.value)`)}</td>
+    <td><input class="et-in" value="${esc(row.notes)}" oninput="updT('capabilities',${i},'notes',this.value)" placeholder="Notes"/></td>
+    <td><button class="et-rm" onclick="rmRow('capabilities',${i})">×</button></td>
+  </tr>`).join("");
+  return `<div class="tbl-wrap"><table class="etbl"><thead><tr><th>Category</th><th>Capability / Details</th><th>In-House?</th><th>Notes</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+  <button class="btn-add-row" onclick="addCap()">+ Add row</button>`;
+}
+
+function bEquip(r){
+  const rows=r.equipment.map((row,i)=>`<tr>
+    <td><input class="et-in" value="${esc(row.machine)}" oninput="updT('equipment',${i},'machine',this.value)" placeholder="Machine / area"/></td>
+    <td><input class="et-in" style="min-width:50px" value="${esc(row.qty)}" oninput="updT('equipment',${i},'qty',this.value)" placeholder="Qty"/></td>
+    <td><input class="et-in" value="${esc(row.purpose)}" oninput="updT('equipment',${i},'purpose',this.value)" placeholder="What it's used for"/></td>
+    <td><input class="et-in" value="${esc(row.observation)}" oninput="updT('equipment',${i},'observation',this.value)" placeholder="Condition, age, notes"/></td>
+    <td><button class="et-rm" onclick="rmRow('equipment',${i})">×</button></td>
+  </tr>`).join("");
+  return `<div class="tbl-wrap"><table class="etbl"><thead><tr><th>Equipment / Area</th><th>Qty</th><th>Purpose</th><th>Observation</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+  <button class="btn-add-row" onclick="addEq()">+ Add row</button>
+  <div class="sec-lbl" style="margin-top:16px">Production flow summary</div>
+  <textarea class="sec-ta" placeholder="Describe the process from raw material to shipment..." oninput="updF('productionFlow',this.value)">${esc(r.productionFlow)}</textarea>`;
+}
+
+function bQc(r){
+  const rows=r.qc.map((row,i)=>`<tr>
+    <td><input class="et-in" value="${esc(row.area)}" oninput="updT('qc',${i},'area',this.value)" placeholder="Area"/></td>
+    <td><input class="et-in" value="${esc(row.details)}" oninput="updT('qc',${i},'details',this.value)" placeholder="Details"/></td>
+    <td>${confSel(row.available,`updT('qc',${i},'available',this.value)`)}</td>
+    <td><input class="et-in" value="${esc(row.notes)}" oninput="updT('qc',${i},'notes',this.value)" placeholder="Notes"/></td>
+    <td><button class="et-rm" onclick="rmRow('qc',${i})">×</button></td>
+  </tr>`).join("");
+  return `<div class="tbl-wrap"><table class="etbl"><thead><tr><th>QC Area</th><th>Details</th><th>Available?</th><th>Notes</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+  <button class="btn-add-row" onclick="addQc()">+ Add row</button>`;
+}
+
+function bCpcty(r){
+  const rows=r.capacity.map((row,i)=>`<tr>
+    <td><input class="et-in" value="${esc(row.item)}" oninput="updT('capacity',${i},'item',this.value)" placeholder="Item"/></td>
+    <td><input class="et-in" value="${esc(row.response)}" oninput="updT('capacity',${i},'response',this.value)" placeholder="Supplier response"/></td>
+    <td>${confSel(row.confirmed,`updT('capacity',${i},'confirmed',this.value)`)}</td>
+    <td><input class="et-in" value="${esc(row.notes)}" oninput="updT('capacity',${i},'notes',this.value)" placeholder="Notes"/></td>
+    <td><button class="et-rm" onclick="rmRow('capacity',${i})">×</button></td>
+  </tr>`).join("");
+  return `<div class="tbl-wrap"><table class="etbl"><thead><tr><th>Item</th><th>Supplier Response</th><th>Confirmed?</th><th>Notes</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+  <button class="btn-add-row" onclick="addCpcty()">+ Add row</button>`;
+}
+
+function bPkg(r){
+  const rows=r.packaging.map((row,i)=>`<tr>
+    <td><input class="et-in" value="${esc(row.area)}" oninput="updT('packaging',${i},'area',this.value)" placeholder="Area"/></td>
+    <td><input class="et-in" value="${esc(row.capability)}" oninput="updT('packaging',${i},'capability',this.value)" placeholder="Capability"/></td>
+    <td>${confSel(row.confirmed,`updT('packaging',${i},'confirmed',this.value)`)}</td>
+    <td><input class="et-in" value="${esc(row.notes)}" oninput="updT('packaging',${i},'notes',this.value)" placeholder="Notes"/></td>
+    <td><button class="et-rm" onclick="rmRow('packaging',${i})">×</button></td>
+  </tr>`).join("");
+  return `<div class="tbl-wrap"><table class="etbl"><thead><tr><th>Area</th><th>Capability</th><th>Confirmed?</th><th>Notes</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+  <button class="btn-add-row" onclick="addPkg()">+ Add row</button>`;
+}
+
+function bObs(r){
+  return r.observations.map((obs,i)=>{
+    const pips=R_STEPS.map(v=>{
+      const sel=obs.rating===v;
+      const cls=sel?(v<=2?"r-low":v<=3.5?"r-mid":"r-high"):"";
+      return `<button class="r-pip${cls?" "+cls:""}" onclick="setRating(${i},${v})">${v}</button>`;
+    }).join("");
+    return `<div class="obs-row">
+      <div class="obs-area">${esc(obs.area)}</div>
+      <div class="rating-scale">${pips}</div>
+      <textarea class="obs-note" placeholder="Notes..." oninput="updObs(${i},'notes',this.value)">${esc(obs.notes)}</textarea>
+    </div>`;
+  }).join("");
+}
+
+function bFit(r){
+  const fits=[["Good fit","fp-good"],["Possible fit","fp-possible"],["Limited fit","fp-limited"],["Not recommended","fp-not"]];
+  const fpills=fits.map(([f,cls])=>{
+    const sel=r.fit.projectFit===f;
+    return `<button class="f-pill${sel?" "+cls:""}" onclick="setFit('${f}')">${esc(f)}</button>`;
+  }).join("");
+  return `<div class="sec-lbl">Project Fit</div>
+  <div class="fit-pills">${fpills}</div>
+  <div class="sec-lbl">Main Reason</div>
+  <textarea class="sec-ta" style="min-height:60px" placeholder="Why does or doesn't this factory fit the project?" oninput="updFit('mainReason',this.value)">${esc(r.fit.mainReason)}</textarea>
+  <div class="sec-lbl">Best Use Case (if any)</div>
+  <textarea class="sec-ta" style="min-height:60px" placeholder="What could this supplier be used for even if not the primary fit?" oninput="updFit('bestUseCase',this.value)">${esc(r.fit.bestUseCase)}</textarea>
+  <div class="sec-lbl">Key Missing Information</div>
+  <textarea class="sec-ta" style="min-height:60px" placeholder="What still needs to be confirmed before a final decision?" oninput="updFit('keyMissingInfo',this.value)">${esc(r.fit.keyMissingInfo)}</textarea>
+  <div class="sec-lbl">Recommended Next Step</div>
+  <textarea class="sec-ta" style="min-height:60px" placeholder="What should happen next with this supplier?" oninput="updFit('nextStep',this.value)">${esc(r.fit.nextStep)}</textarea>`;
+}
+
+function bPhotos(r){
+  return `<div class="photo-cats">${PHOTO_CATS.map(cat=>{
+    const thumbs=(r.photos[cat.key]||[]).map((ph,i)=>`<div class="photo-thumb"><img src="${ph.url}" alt="${esc(ph.name||"")}"/><button class="photo-rm" onclick="rmPhoto('${cat.key}',${i})">×</button></div>`).join("");
+    return `<div class="photo-cat">
+      <div class="photo-cat-lbl">${esc(cat.label)}</div>
+      <div class="photo-row" id="pr-${cat.key}">
+        ${thumbs}
+        <label class="photo-add">📷<span>Add</span><input type="file" accept="image/*" multiple onchange="addPhotos('${cat.key}',this.files)"/></label>
+      </div>
+    </div>`;
+  }).join("")}</div>`;
+}
+
+function bActions(r){
+  const rows=r.actions.map((a,i)=>`<tr>
+    <td><input class="et-in" value="${esc(a.action)}" oninput="updT('actions',${i},'action',this.value)" placeholder="Action item"/></td>
+    <td><input class="et-in" style="min-width:70px" value="${esc(a.owner)}" oninput="updT('actions',${i},'owner',this.value)" placeholder="Owner"/></td>
+    <td><input class="et-in" type="date" style="min-width:100px" value="${esc(a.deadline)}" oninput="updT('actions',${i},'deadline',this.value)"/></td>
+    <td>${statusSel(a.status,`updT('actions',${i},'status',this.value)`)}</td>
+    <td><input class="et-in" value="${esc(a.notes)}" oninput="updT('actions',${i},'notes',this.value)" placeholder="Notes"/></td>
+    <td><button class="et-rm" onclick="rmRow('actions',${i})">×</button></td>
+  </tr>`).join("");
+  return `<div class="tbl-wrap"><table class="etbl"><thead><tr><th>Action Item</th><th>Owner</th><th>Deadline</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+  <button class="btn-add-row" onclick="addAction()">+ Add action</button>`;
+}
+
+function bSummary(r){
+  const recs=[["Proceed","rp-proceed"],["Proceed with caution","rp-caution"],["Keep as backup supplier","rp-backup"],["Not recommended","rp-not"]];
+  const rpills=recs.map(([label,cls])=>{
+    const sel=r.recommendation===label;
+    return `<button class="rec-pill${sel?" "+cls:""}" onclick="setRec('${label}')">${esc(label)}</button>`;
+  }).join("");
+  return `<div class="sec-lbl">Summary</div>
+  <textarea class="sec-ta" placeholder="Summarize the visit — what the factory is strongest at, overall suitability, and what needs to be confirmed." oninput="updF('summary',this.value)">${esc(r.summary)}</textarea>
+  <div class="sec-lbl" style="margin-top:14px">Overall Recommendation</div>
+  <div class="rec-pills">${rpills}</div>`;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FORM — HANDLERS
+// ════════════════════════════════════════════════════════════════════════════
+function updF(field,value){const r=getRpt();if(!r)return;r[field]=value;ds();updProgress();}
+function updT(section,idx,field,value){const r=getRpt();if(!r)return;r[section][idx][field]=value;ds();updProgress();}
+function updObs(i,field,value){const r=getRpt();if(!r)return;r.observations[i][field]=value;ds();updProgress();}
+function updFit(field,value){const r=getRpt();if(!r)return;r.fit[field]=value;ds();updProgress();}
+
+function setRating(i,v){
+  const r=getRpt();if(!r)return;
+  r.observations[i].rating=r.observations[i].rating===v?null:v;
+  ds();rerender("obs");updProgress();
+}
+function setFit(f){
+  const r=getRpt();if(!r)return;
+  r.fit.projectFit=r.fit.projectFit===f?"":f;
+  ds();rerender("fit");updProgress();
+}
+function setRec(label){
+  const r=getRpt();if(!r)return;
+  r.recommendation=r.recommendation===label?"":label;
+  ds();rerender("summary");updProgress();
+}
+
+function rmRow(section,idx){const r=getRpt();if(!r)return;r[section].splice(idx,1);save();rerender(secKey(section));}
+function addBg(){const r=getRpt();if(!r)return;r.background.push({item:"",details:"",confirmed:"",notes:""});save();rerender("bg");}
+function addCap(){const r=getRpt();if(!r)return;r.capabilities.push({category:"",details:"",inHouse:"",notes:""});save();rerender("cap");}
+function addEq(){const r=getRpt();if(!r)return;r.equipment.push({machine:"",qty:"",purpose:"",observation:""});save();rerender("equip");}
+function addQc(){const r=getRpt();if(!r)return;r.qc.push({area:"",details:"",available:"",notes:""});save();rerender("qc");}
+function addCpcty(){const r=getRpt();if(!r)return;r.capacity.push({item:"",response:"",confirmed:"",notes:""});save();rerender("capacity");}
+function addPkg(){const r=getRpt();if(!r)return;r.packaging.push({area:"",capability:"",confirmed:"",notes:""});save();rerender("pkg");}
+function addAction(){const r=getRpt();if(!r)return;r.actions.push(newAction());save();rerender("actions");}
+
+function addPhotos(key,files){
+  const r=getRpt();if(!r)return;
+  Array.from(files).forEach(f=>{
+    const reader=new FileReader();
+    reader.onload=e=>{r.photos[key].push({url:e.target.result,name:f.name});ds();rerender("photos");};
+    reader.readAsDataURL(f);
+  });
+}
+function rmPhoto(key,idx){const r=getRpt();if(!r)return;r.photos[key].splice(idx,1);save();rerender("photos");}
+
+// section key lookup for sections with different array names
+function secKey(section){
+  const map={background:"bg",capabilities:"cap",equipment:"equip",qc:"qc",capacity:"capacity",packaging:"pkg",actions:"actions"};
+  return map[section]||section;
+}
+
+// Builders map for re-render
+const BUILDERS={
+  purpose:bPurpose, bg:bBg, cap:bCap, equip:bEquip,
+  qc:bQc, capacity:bCpcty, pkg:bPkg, obs:bObs,
+  fit:bFit, photos:bPhotos, actions:bActions, summary:bSummary,
+};
+function rerender(key){
+  const el=document.getElementById("sbody-"+key);
+  const r=getRpt();
+  if(!el||!r)return;
+  el.innerHTML=BUILDERS[key](r);
+}
+
+function updProgress(){
+  const r=getRpt();if(!r)return;
+  let done=0;
+  if(r.purpose)done++;
+  if(r.background.some(x=>x.details))done++;
+  if(r.capabilities.some(x=>x.details))done++;
+  if(r.equipment.some(x=>x.machine)||r.productionFlow)done++;
+  if(r.qc.some(x=>x.notes||x.available))done++;
+  if(r.capacity.some(x=>x.response))done++;
+  if(r.packaging.some(x=>x.capability))done++;
+  if(r.observations.some(x=>x.rating))done++;
+  if(r.fit.projectFit||r.fit.mainReason)done++;
+  if(Object.values(r.photos).some(a=>a.length))done++;
+  if(r.actions.some(a=>a.action))done++;
+  if(r.summary||r.recommendation)done++;
+  const bar=document.getElementById("form-bar");
+  if(bar)bar.style.width=Math.round((done/12)*100)+"%";
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FORM — RENDER
+// ════════════════════════════════════════════════════════════════════════════
+function hasDone(r){
+  return {
+    purpose:!!r.purpose,
+    bg:r.background.some(x=>x.details),
+    cap:r.capabilities.some(x=>x.details),
+    equip:r.equipment.some(x=>x.machine)||!!r.productionFlow,
+    qc:r.qc.some(x=>x.notes||x.available),
+    capacity:r.capacity.some(x=>x.response),
+    pkg:r.packaging.some(x=>x.capability),
+    obs:r.observations.some(x=>x.rating),
+    fit:!!(r.fit.projectFit||r.fit.mainReason),
+    photos:Object.values(r.photos).some(a=>a.length),
+    actions:r.actions.some(a=>a.action),
+    summary:!!(r.summary||r.recommendation),
+  };
+}
+
+function renderForm(){
+  const r=getRpt();if(!r)return;
+  metaOpen=false;
+  document.getElementById("form-heading").textContent=r.meta.factory+(r.meta.date?" — "+r.meta.date:"");
+  const d=hasDone(r);
+  document.getElementById("form-body").innerHTML=
+    buildMeta(r)+
+    secCard("1","purpose","Visit Purpose",d.purpose,bPurpose(r))+
+    secCard("2","bg","Factory Background",d.bg,bBg(r))+
+    secCard("3","cap","Manufacturing Capabilities",d.cap,bCap(r))+
+    secCard("4","equip","Equipment & Production Line",d.equip,bEquip(r))+
+    secCard("5","qc","Quality Control",d.qc,bQc(r))+
+    secCard("6","capacity","Production Capacity & Lead Time",d.capacity,bCpcty(r))+
+    secCard("7","pkg","Packaging & Export",d.pkg,bPkg(r))+
+    secCard("8","obs","Visit Observations",d.obs,bObs(r))+
+    secCard("9","fit","Project Fit Assessment",d.fit,bFit(r))+
+    secCard("10","photos","Photos & Attachments",d.photos,bPhotos(r))+
+    secCard("11","actions","Follow-Up Action Items",d.actions,bActions(r))+
+    secCard("12","summary","Final Summary & Recommendation",d.summary,bSummary(r));
+  updProgress();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// PREVIEW / EXPORT
+// ════════════════════════════════════════════════════════════════════════════
+function ratingColor(v){
+  if(!v)return["#888","#F5F4F1","#E0DED8"];
+  if(v<=2)return["#D85A30","#FAECE7","#D85A30"];
+  if(v<=3.5)return["#EF9F27","#FAEEDA","#EF9F27"];
+  return["#1D9E75","#E1F5EE","#5DCAA5"];
+}
+function fitColor(f){
+  if(f==="Good fit")return["#1D9E75","#E1F5EE","#5DCAA5"];
+  if(f==="Possible fit")return["#EF9F27","#FAEEDA","#EF9F27"];
+  if(f==="Limited fit")return["#888780","#F5F4F1","#E0DED8"];
+  if(f==="Not recommended")return["#D85A30","#FAECE7","#D85A30"];
+  return["#888","#F5F4F1","#E0DED8"];
+}
+function recColor(rec){
+  if(rec==="Proceed")return["#1D9E75","#E1F5EE"];
+  if(rec==="Proceed with caution")return["#EF9F27","#FAEEDA"];
+  if(rec==="Keep as backup supplier")return["#888780","#F5F4F1"];
+  if(rec==="Not recommended")return["#D85A30","#FAECE7"];
+  return["#888","#F5F4F1"];
+}
+function confBadge(v){
+  if(v==="yes")return`<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:#E1F5EE;color:#085041;border:0.5px solid #5DCAA5">Yes</span>`;
+  if(v==="partial")return`<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:#FAEEDA;color:#7A5200;border:0.5px solid #EF9F27">Partial</span>`;
+  if(v==="no")return`<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:#FAECE7;color:#D85A30;border:0.5px solid #D85A30">No</span>`;
+  return`<span style="font-size:10px;color:#888">—</span>`;
+}
+
+function genTableHTML(rows,cols,headers){
+  const thCells=headers.map(h=>`<th style="${thStyle}">${esc(h)}</th>`).join("");
+  const trRows=rows.map(row=>{
+    const cells=cols.map(col=>{
+      const v=row[col];
+      if(col==="confirmed"||col==="available")return`<td style="${tdStyle}">${confBadge(v)}</td>`;
+      if(col==="inHouse"){
+        const c=v==="in-house"?"#085041":v==="outsourced"?"#D85A30":"#888";
+        const bg=v==="in-house"?"#E1F5EE":v==="outsourced"?"#FAECE7":"#F5F4F1";
+        return`<td style="${tdStyle}"><span style="font-size:10px;padding:2px 7px;border-radius:10px;background:${bg};color:${c}">${esc(v||"—")}</span></td>`;
+      }
+      return`<td style="${tdStyle};font-size:13px;color:#333">${esc(v||"—")}</td>`;
+    }).join("");
+    return`<tr>${cells}</tr>`;
+  }).join("");
+  return`<table style="width:100%;border-collapse:collapse"><thead><tr>${thCells}</tr></thead><tbody>${trRows}</tbody></table>`;
+}
+const thStyle="font-family:Helvetica,sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#888;padding:7px 10px;border-bottom:1px solid #E0DED8;text-align:left;background:#FAFAF8";
+const tdStyle="padding:8px 10px;border-bottom:1px solid #E0DED8;vertical-align:middle";
+
+function generateHTML(){
+  const r=getRpt();if(!r)return"";
+  const m=r.meta;
+  const [fc,fb,fbd]=fitColor(m.initialFit||r.fit.projectFit||"");
+  const [rc,rb]=recColor(r.recommendation);
+  const hasPhotos=Object.values(r.photos).some(a=>a.length);
+
+  const photoCatHTML=PHOTO_CATS.map(cat=>{
+    const imgs=(r.photos[cat.key]||[]);
+    if(!imgs.length)return"";
+    return`<div style="margin-bottom:16px">
+      <div style="font-family:Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#888;margin-bottom:8px">${esc(cat.label)}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">${imgs.map(ph=>`<div><img src="${ph.url}" style="width:180px;height:130px;object-fit:cover;border-radius:8px;border:0.5px solid #E0DED8;display:block"/><div style="font-size:9px;color:#888;margin-top:3px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(ph.name||"")}</div></div>`).join("")}</div>
+    </div>`;
+  }).join("");
+
+  const obsHTML=r.observations.filter(o=>o.rating||o.notes).map(o=>{
+    const [c,bg,bd]=ratingColor(o.rating);
+    return`<div style="display:flex;align-items:flex-start;gap:14px;padding:9px 0;border-bottom:0.5px solid #E0DED8">
+      <div style="flex:1;font-size:13px;color:#333">${esc(o.area)}</div>
+      ${o.rating?`<div style="font-size:13px;font-weight:700;padding:3px 12px;border-radius:20px;background:${bg};color:${c};border:0.5px solid ${bd};white-space:nowrap">${o.rating} / 5</div>`:''}
+      ${o.notes?`<div style="flex:2;font-size:12px;color:#555;font-style:italic">${esc(o.notes)}</div>`:''}
+    </div>`;
+  }).join("");
+
+  const actionsFiltered=r.actions.filter(a=>a.action);
+  const actHTML=actionsFiltered.length?genTableHTML(actionsFiltered,["action","owner","deadline","status","notes"],["Action Item","Owner","Deadline","Status","Notes"]):"<p style='font-size:13px;color:#888'>No action items recorded.</p>";
+
+  const css=`*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;background:#F5F4F1;color:#1A1A19;padding-bottom:40px}.cover{background:#1A2E3B;padding:40px;color:white;margin-bottom:20px}.ct{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#5DCAA5;font-family:Helvetica,sans-serif;margin-bottom:10px}.cs{font-size:30px;font-weight:bold;margin-bottom:4px}.cp{font-size:15px;color:rgba(255,255,255,.55);margin-bottom:26px}.meta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.ml{font-size:9px;color:#5DCAA5;letter-spacing:.1em;text-transform:uppercase;font-family:Helvetica,sans-serif;margin-bottom:3px}.mv{font-size:13px}.card{background:white;margin:0 20px 16px;border-radius:12px;padding:22px 24px}.ch{font-family:Helvetica,sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#888;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #E0DED8}.notes{font-size:13px;color:#333;line-height:1.7}@media print{body{background:white}.cover{-webkit-print-color-adjust:exact;print-color-adjust:exact}.card{margin:0 0 12px;border-radius:0}}`;
+
+  return`<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Factory Visit Report — ${esc(m.factory)}</title><style>${css}</style></head><body>
+  <div class="cover">
+    <div class="ct">SCM Solution LTD — Factory Visit Report</div>
+    <div class="cs">${esc(m.factory)}</div>
+    <div class="cp">${esc(m.project||"")}${m.capability?" · "+esc(m.capability):""}</div>
+    ${(m.initialFit||r.fit.projectFit)?`<div style="display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border-radius:20px;background:${fb};color:${fc};border:1px solid ${fbd};margin-bottom:20px">${esc(m.initialFit||r.fit.projectFit)}</div>`:""}
+    <div class="meta-grid">
+      <div><div class="ml">Visit Date</div><div class="mv">${esc(m.date||"—")}</div></div>
+      <div><div class="ml">Location</div><div class="mv">${esc(m.location||"—")}</div></div>
+      <div><div class="ml">Visited By</div><div class="mv">${esc(m.visitedBy||"—")}</div></div>
+      <div><div class="ml">Main Contact</div><div class="mv">${esc(m.contact||"—")}${m.phone?" · "+esc(m.phone):""}</div></div>
+      <div><div class="ml">Email</div><div class="mv">${esc(m.email||"—")}</div></div>
+      <div><div class="ml">Website</div><div class="mv">${esc(m.website||"—")}</div></div>
+    </div>
+  </div>
+
+  ${r.purpose?`<div class="card"><div class="ch">Visit Purpose</div><div class="notes">${esc(r.purpose)}</div></div>`:""}
+
+  ${r.background.some(x=>x.details)?`<div class="card"><div class="ch">Factory Background</div>${genTableHTML(r.background,["item","details","confirmed","notes"],["Item","Details","Confirmed?","Notes"])}</div>`:""}
+
+  ${r.capabilities.some(x=>x.details)?`<div class="card"><div class="ch">Manufacturing Capabilities</div>${genTableHTML(r.capabilities,["category","details","inHouse","notes"],["Category","Capability / Details","In-House?","Notes"])}</div>`:""}
+
+  ${(r.equipment.some(x=>x.machine)||r.productionFlow)?`<div class="card"><div class="ch">Equipment & Production Line</div>
+    ${r.equipment.some(x=>x.machine)?genTableHTML(r.equipment.filter(x=>x.machine),["machine","qty","purpose","observation"],["Equipment / Area","Qty","Purpose","Observation"]):""}
+    ${r.productionFlow?`<div style="margin-top:14px"><div style="font-family:Helvetica,sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#888;margin-bottom:6px">Production Flow</div><div class="notes">${esc(r.productionFlow)}</div></div>`:""}
+  </div>`:""}
+
+  ${r.qc.some(x=>x.notes||x.available)?`<div class="card"><div class="ch">Quality Control</div>${genTableHTML(r.qc,["area","details","available","notes"],["QC Area","Details","Available?","Notes"])}</div>`:""}
+
+  ${r.capacity.some(x=>x.response)?`<div class="card"><div class="ch">Production Capacity & Lead Time</div>${genTableHTML(r.capacity,["item","response","confirmed","notes"],["Item","Supplier Response","Confirmed?","Notes"])}</div>`:""}
+
+  ${r.packaging.some(x=>x.capability)?`<div class="card"><div class="ch">Packaging & Export</div>${genTableHTML(r.packaging,["area","capability","confirmed","notes"],["Area","Capability","Confirmed?","Notes"])}</div>`:""}
+
+  ${r.observations.some(x=>x.rating||x.notes)?`<div class="card"><div class="ch">Visit Observations</div>${obsHTML}</div>`:""}
+
+  ${(r.fit.projectFit||r.fit.mainReason||r.fit.bestUseCase||r.fit.keyMissingInfo||r.fit.nextStep)?`<div class="card"><div class="ch">Project Fit Assessment</div>
+    ${r.fit.projectFit?`<div style="display:inline-block;font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;background:${fb};color:${fc};border:1px solid ${fbd};margin-bottom:14px">${esc(r.fit.projectFit)}</div>`:""}
+    ${[["Main Reason",r.fit.mainReason],["Best Use Case",r.fit.bestUseCase],["Key Missing Information",r.fit.keyMissingInfo],["Recommended Next Step",r.fit.nextStep]].filter(([,v])=>v).map(([label,value])=>`<div style="margin-bottom:12px"><div style="font-family:Helvetica,sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#888;margin-bottom:4px">${esc(label)}</div><div class="notes">${esc(value)}</div></div>`).join("")}
+  </div>`:""}
+
+  ${hasPhotos?`<div class="card"><div class="ch">Photos & Attachments</div>${photoCatHTML}</div>`:""}
+
+  ${actionsFiltered.length?`<div class="card"><div class="ch">Follow-Up Action Items</div>${actHTML}</div>`:""}
+
+  ${(r.summary||r.recommendation)?`<div class="card"><div class="ch">Final Summary & Recommendation</div>
+    ${r.recommendation?`<div style="display:inline-block;font-size:11px;font-weight:700;padding:6px 16px;border-radius:10px;background:${rb};color:${rc};margin-bottom:14px">${esc(r.recommendation)}</div>`:""}
+    ${r.summary?`<div class="notes">${esc(r.summary)}</div>`:""}
+  </div>`:""}
+
+  <div style="padding:16px 20px;display:flex;justify-content:space-between;font-size:11px;color:#888;font-family:Helvetica,sans-serif">
+    <span>SCM Solution LTD — Confidential</span>
+    <span>${esc(m.date||"")} — ${esc(m.factory)}</span>
+  </div>
+  </body></html>`;
+}
+
+function renderPreview(){
+  const r=getRpt();if(!r)return;
+  document.getElementById("prev-title").textContent=r.meta.factory+" — Visit Report";
+  const body=document.getElementById("prev-body");
+  body.innerHTML="";
+  const iframe=document.createElement("iframe");
+  iframe.style.cssText="width:100%;height:calc(100vh - 50px);border:none;background:#fff;display:block";
+  body.appendChild(iframe);
+  iframe.contentDocument.open();
+  iframe.contentDocument.write(generateHTML());
+  iframe.contentDocument.close();
+}
+function printRpt(){const f=document.querySelector("#prev-body iframe");if(f)f.contentWindow.print();}
+
+// ════════════════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════════════════
+load();
+renderHome();
+</script>
+</body>
+</html>
