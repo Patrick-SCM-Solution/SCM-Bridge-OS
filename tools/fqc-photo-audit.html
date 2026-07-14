@@ -266,6 +266,7 @@ var BUILTINS = [
 ];
 
 var CUSTOM_KEY='scm_fqc_configs_v1';
+var SESSION_KEY='scm_fqc_session_v1';
 var customConfigs=[];
 var ACTIVE_CFG=null;
 var appData={meta:{},units:[],currentUnitIndex:1};
@@ -278,6 +279,58 @@ function loadCustom(){ try{customConfigs=JSON.parse(localStorage.getItem(CUSTOM_
 function saveCustom(){ localStorage.setItem(CUSTOM_KEY,JSON.stringify(customConfigs)); }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
 
+/* ── CRASH RECOVERY ─────────────────────────────────────── */
+function saveSession(){
+  try{
+    localStorage.setItem(SESSION_KEY,JSON.stringify({
+      cfgId:ACTIVE_CFG.id, cfgBuiltin:!!ACTIVE_CFG.builtin,
+      appData:appData, globalLabelPass:globalLabelPass,
+      savedAt:new Date().toISOString()
+    }));
+  }catch(e){ /* localStorage full — photos may be too large, skip silently */ }
+}
+function clearSession(){ localStorage.removeItem(SESSION_KEY); }
+function loadSession(){ try{ return JSON.parse(localStorage.getItem(SESSION_KEY)||'null'); }catch(e){ return null; } }
+
+function resumeSession(){
+  var s=loadSession(); if(!s)return;
+  var cfg=s.cfgBuiltin
+    ? BUILTINS.find(function(c){return c.id===s.cfgId;})
+    : customConfigs.find(function(c){return c.id===s.cfgId;});
+  if(!cfg){ clearSession(); return; }
+  ACTIVE_CFG=cfg;
+  appData=s.appData;
+  globalLabelPass=s.globalLabelPass;
+  unitAnswers=new Array(ACTIVE_CFG.tests.length).fill(null);
+  unitPhotos={};
+  document.getElementById('s1-iso-badge').textContent='ISO 2859-1 Level '+ACTIVE_CFG.isoLevel+' · '+ACTIVE_CFG.name;
+  document.getElementById('s2-sample-label').textContent=ACTIVE_CFG.sampleSize;
+  document.getElementById('total-units').textContent=ACTIVE_CFG.sampleSize;
+  document.getElementById('s3-iso-badge').textContent='Level '+ACTIVE_CFG.isoLevel;
+  document.getElementById('current-unit-num').textContent=appData.currentUnitIndex;
+  renderUnitLoop();
+  show('screen-3');
+}
+
+/* ── PHOTO RESIZE ───────────────────────────────────────── */
+function resizePhoto(file, cb){
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var img=new Image();
+    img.onload=function(){
+      var maxW=1000,maxH=750,w=img.width,h=img.height;
+      if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+      if(h>maxH){w=Math.round(w*maxH/h);h=maxH;}
+      var cvs=document.createElement('canvas');
+      cvs.width=w;cvs.height=h;
+      cvs.getContext('2d').drawImage(img,0,0,w,h);
+      cb(cvs.toDataURL('image/jpeg',0.78));
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 function show(id){
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
   document.getElementById(id).classList.add('active');
@@ -286,6 +339,25 @@ function show(id){
 
 // ── HOME ──────────────────────────────────────────────────────
 function renderHome(){
+  /* Resume banner */
+  var existing=document.getElementById('resume-banner');
+  if(existing)existing.remove();
+  var s=loadSession();
+  if(s){
+    var banner=document.createElement('div');
+    banner.id='resume-banner';
+    banner.style.cssText='background:rgba(239,159,39,.15);border:1px solid rgba(239,159,39,.4);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px';
+    var saved=new Date(s.savedAt);
+    var timeStr=saved.toLocaleDateString()+' '+saved.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    banner.innerHTML='<div style="flex:1">'
+      +'<div style="font-size:13px;font-weight:700;color:#EF9F27">⚠️ In-Progress Audit Found</div>'
+      +'<div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px">Template: '+esc(s.cfgId)+' · Unit '+(s.appData.currentUnitIndex)+' of '+(s.appData.units?s.appData.units.length+1:1)+' · Saved '+timeStr+'</div>'
+      +'</div>'
+      +'<button type="button" onclick="resumeSession()" style="background:#EF9F27;color:#1A2E3B;border:none;border-radius:20px;padding:8px 16px;font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">Resume →</button>'
+      +'<button type="button" onclick="clearSession();renderHome()" style="background:none;border:none;color:rgba(255,255,255,.35);font-size:18px;cursor:pointer;padding:4px">✕</button>';
+    document.querySelector('.home-wrap').insertBefore(banner, document.querySelector('.home-wrap').firstChild.nextSibling.nextSibling);
+  }
+
   var bi=document.getElementById('builtin-list');
   bi.innerHTML=BUILTINS.map(function(c){return tmplCard(c,true);}).join('');
   var cl=document.getElementById('custom-list');
@@ -478,23 +550,19 @@ function setAnswer(i,val){
 function processPhoto(slotId,inp){
   var file=inp.files[0];
   if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    unitPhotos[slotId]=e.target.result;
-    /* Update slot src for re-render reference */
+  resizePhoto(file,function(dataUrl){
+    unitPhotos[slotId]=dataUrl;
     if(ACTIVE_CFG.photoSlots){
       var s=ACTIVE_CFG.photoSlots.find(function(p){return p.id===slotId;});
-      if(s)s._src=e.target.result;
+      if(s)s._src=dataUrl;
     }
     var tile=document.getElementById('tile-'+slotId);
     if(tile)tile.classList.add('filled');
     var prev=document.getElementById('prev-'+slotId);
-    if(prev){prev.src=e.target.result;prev.style.display='block';}
+    if(prev){prev.src=dataUrl;prev.style.display='block';}
     var hint=tile?tile.querySelector('.photo-slot-hint'):null;
-    if(hint)hint.textContent='✓ Photo taken — tap to replace';
-    if(hint)hint.style.color='var(--teal-dk)';
-  };
-  reader.readAsDataURL(file);
+    if(hint){hint.textContent='✓ Photo taken — tap to replace';hint.style.color='var(--teal-dk)';}
+  });
 }
 
 function submitUnit(){
@@ -519,9 +587,11 @@ function submitUnit(){
     unitAnswers=new Array(ACTIVE_CFG.tests.length).fill(null);
     unitPhotos={};
     if(ACTIVE_CFG.photoSlots)ACTIVE_CFG.photoSlots.forEach(function(s){s._src=null;});
+    saveSession();
     renderUnitLoop();
     window.scrollTo(0,0);
   } else {
+    clearSession();
     showSummary();
   }
 }
@@ -600,6 +670,7 @@ function setupSigs(){
 
 // ── EXPORT ────────────────────────────────────────────────────
 function exportReport(){
+  clearSession();
   var cfg=ACTIVE_CFG;
   var passed=appData.units.filter(function(u){return u.status==='PASSED';}).length;
   var failed=appData.units.filter(function(u){return u.status==='FAILED';}).length;
