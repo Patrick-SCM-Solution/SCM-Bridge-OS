@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RFQ Template — SCM Bridge OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1A2E3B;--navy2:#2C4A5E;
+  --teal:#1D9E75;--teal-dk:#085041;--teal-lt:#E1F5EE;--teal-bd:#5DCAA5;
+  --amber:#EF9F27;--amber-lt:#FAEEDA;
+  --coral:#D85A30;--coral-lt:#FAECE7;
+  --purple:#7C5CBF;--purple-lt:#EDE8F8;
+  --gray-bg:#F5F4F1;--gray-line:#E0DED8;--gray-mid:#888780;--gray-dk:#444441;
+  --white:#fff;--black:#1A1A19;--blue-btn:#1B6FA8;
+}
+body{font-family:'Barlow',sans-serif;background:var(--gray-bg);color:var(--black);font-size:14px;line-height:1.5}
+input,textarea,select,button{font-family:inherit}
+button{cursor:pointer;border:none;background:none}
+textarea{resize:vertical}
+.screen{display:none;min-height:100vh}.screen.active{display:block}
+
+/* HOME */
+#home{background:var(--navy)}
+.home-wrap{max-width:720px;margin:0 auto;padding:36px 24px 60px}
+.home-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:6px}
+.home-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--white);line-height:1.1;margin-bottom:4px}
+.home-sub{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:28px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.btn-primary{background:var(--teal);color:var(--white);border-radius:10px;padding:11px 22px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:filter .15s}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-ghost{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:11px 18px;font-size:13px;transition:background .15s}
+.btn-ghost:hover{background:rgba(255,255,255,.14)}
+.new-form{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:20px;margin-bottom:24px;display:none;animation:fadeUp .2s ease}
+.nf-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:14px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.fg-full{grid-column:1/-1}
+.fl label{display:block;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:3px}
+.fl input,.fl select{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--white);outline:none;transition:border-color .15s}
+.fl input:focus,.fl select:focus{border-color:var(--teal-bd)}
+.fl input::placeholder{color:rgba(255,255,255,.3)}
+.fl select option{background:var(--navy);color:var(--white)}
+.sessions-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px}
+.rfq-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.rfq-info{flex:1;min-width:0}
+.rfq-name{font-size:15px;color:var(--white);margin-bottom:2px}
+.rfq-meta{font-size:11px;color:rgba(255,255,255,.4)}
+.rfq-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.btn-teal{background:var(--teal);color:var(--white);border-radius:20px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.btn-sm{border-radius:8px;padding:7px 14px;font-size:12px}
+.btn-danger{color:rgba(255,80,80,.6);font-size:11px;padding:4px}
+.empty{text-align:center;padding:48px 0;color:rgba(255,255,255,.3);font-size:14px}
+
+/* FORM SCREEN */
+#form-screen{background:var(--gray-bg)}
+.form-hdr{background:var(--teal-dk);padding:12px 18px 10px;position:sticky;top:52px;z-index:100;box-shadow:0 2px 14px rgba(0,0,0,.22)}
+.form-hdr-inner{max-width:760px;margin:0 auto}
+.form-top{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.form-back{font-size:18px;color:var(--teal-lt);background:rgba(255,255,255,.1);border-radius:8px;padding:4px 10px}
+.form-back:hover{background:rgba(255,255,255,.2)}
+.form-heading{flex:1;font-size:15px;color:var(--white);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.form-actions{display:flex;gap:7px;align-items:center;flex-shrink:0}
+.save-msg{font-size:11px;color:var(--teal-bd);min-width:55px}
+.btn-blue{background:var(--blue-btn);color:var(--white);border-radius:20px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.form-body{max-width:760px;margin:0 auto;padding:14px 14px 60px}
+
+/* SECTION CARDS */
+.sec-card{background:var(--white);border-radius:14px;overflow:hidden;margin-bottom:10px;border:1px solid var(--gray-line);animation:fadeUp .2s ease}
+.sec-hdr{display:flex;align-items:center;gap:9px;padding:11px 14px;cursor:pointer;user-select:none;background:#FAFAF8}
+.sec-num{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--teal);min-width:20px}
+.sec-title{flex:1;font-size:14px;font-weight:500}
+.sec-done{font-size:10px;color:var(--teal);background:var(--teal-lt);padding:2px 7px;border-radius:10px}
+.sec-chev{font-size:11px;color:var(--gray-mid);transition:transform .2s}
+.sec-chev.up{transform:rotate(-90deg)}
+.sec-body{padding:16px}
+.sec-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid);margin-bottom:6px;margin-top:14px}
+.sec-lbl:first-child{margin-top:0}
+.sec-ta{width:100%;min-height:80px;padding:9px 11px;font-size:13px;border:1px solid var(--gray-line);border-radius:8px;background:#FAFAF8;color:var(--black);line-height:1.6;font-family:'Barlow',sans-serif}
+.sec-ta:focus{outline:none;border-color:var(--teal)}
+.sec-in{width:100%;padding:7px 10px;font-size:13px;border:1px solid var(--gray-line);border-radius:8px;background:#FAFAF8;color:var(--black)}
+.sec-in:focus{outline:none;border-color:var(--teal)}
+.sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sec-full{grid-column:1/-1}
+
+/* PRICE TABLE */
+.price-tbl{width:100%;border-collapse:collapse;margin-bottom:6px}
+.price-tbl th{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid);padding:7px 8px;border-bottom:1px solid var(--gray-line);text-align:left;background:#FAFAF8}
+.price-tbl td{padding:4px 3px;border-bottom:1px solid var(--gray-line);vertical-align:middle}
+.price-tbl tr:last-child td{border-bottom:none}
+.pt-in{width:100%;padding:5px 7px;font-size:13px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--black);font-family:'Barlow',sans-serif}
+.pt-in:focus{outline:none;border-color:var(--teal);background:var(--teal-lt)}
+.pt-in.currency::before{content:"$"}
+.pt-rm{color:rgba(216,90,48,.35);font-size:16px;padding:2px 5px;cursor:pointer;border-radius:4px}
+.pt-rm:hover{color:var(--coral);background:var(--coral-lt)}
+.btn-add-row{margin-top:6px;font-size:12px;color:var(--teal);padding:5px 11px;border:1px dashed var(--teal-bd);border-radius:7px;background:var(--teal-lt);cursor:pointer;transition:all .15s}
+.btn-add-row:hover{background:var(--teal);color:var(--white)}
+
+/* TOOLING TABLE */
+.tool-tbl{width:100%;border-collapse:collapse;margin-bottom:6px}
+.tool-tbl th{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid);padding:7px 8px;border-bottom:1px solid var(--gray-line);text-align:left;background:#FAFAF8}
+.tool-tbl td{padding:4px 3px;border-bottom:1px solid var(--gray-line);vertical-align:middle}
+.tool-tbl tr:last-child td{border-bottom:none}
+
+/* PREVIEW */
+#preview-screen{background:var(--gray-bg)}
+.prev-hdr{background:var(--navy);padding:10px 20px;display:flex;align-items:center;gap:10px;position:sticky;top:52px;z-index:100}
+.prev-title{flex:1;font-size:13px;color:rgba(255,255,255,.5)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.fg,.sec-grid{grid-template-columns:1fr}.fg-full,.sec-full{grid-column:1}}
+</style>
+</head>
+<body>
+<div id="site-nav-root"></div>
+<script src="../nav.js"></script>
+
+<!-- ══ HOME ══════════════════════════════════════════════════════════════════ -->
+<div id="home" class="screen active">
+  <div class="home-wrap">
+    <div class="home-label">SCM Solution LTD</div>
+    <div class="home-title">RFQ Template</div>
+    <div class="home-sub">Request for Quotation — tiered unit pricing, tooling/NRE, sample costs, and production terms</div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="showNewForm()">+ New RFQ</button>
+    </div>
+    <div class="new-form" id="new-form">
+      <div class="nf-title">New Request for Quotation</div>
+      <div class="fg">
+        <div class="fl fg-full"><label>Factory Name *</label><input id="nf-factory" placeholder="e.g. Shin-Fu Aluminum Co., Ltd."/></div>
+        <div class="fl fg-full"><label>Part / Product Name *</label><input id="nf-part" placeholder="e.g. Aluminium Housing — Model A"/></div>
+        <div class="fl"><label>Part Number / Ref</label><input id="nf-partno" placeholder="e.g. MTX-001-A"/></div>
+        <div class="fl"><label>Date Issued</label><input id="nf-date" type="date"/></div>
+        <div class="fl"><label>Response Deadline</label><input id="nf-deadline" type="date"/></div>
+        <div class="fl"><label>Project</label><input id="nf-project" placeholder="e.g. Motis Project"/></div>
+        <div class="fl"><label>Issued By (Company)</label><input id="nf-from-company" placeholder="SCM Solution LTD"/></div>
+        <div class="fl"><label>Issued By (Name)</label><input id="nf-from-name" placeholder=""/></div>
+        <div class="fl"><label>Currency</label>
+          <select id="nf-currency">
+            <option value="USD">USD ($)</option><option value="AUD">AUD (A$)</option>
+            <option value="TWD">TWD (NT$)</option><option value="EUR">EUR (€)</option>
+            <option value="CNY">CNY (¥)</option>
+          </select>
+        </div>
+        <div class="fl"><label>Incoterms</label>
+          <select id="nf-incoterms">
+            <option value="EXW">EXW</option><option value="FOB">FOB</option>
+            <option value="CIF">CIF</option><option value="DDP">DDP</option><option value="DAP">DAP</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="createRfq()">Create RFQ</button>
+        <button class="btn-ghost" onclick="hideNewForm()">Cancel</button>
+      </div>
+    </div>
+    <div id="rfq-list"><div class="empty">No RFQs yet — tap New RFQ to begin</div></div>
+  </div>
+</div>
+
+<!-- ══ FORM SCREEN ═══════════════════════════════════════════════════════════ -->
+<div id="form-screen" class="screen">
+  <div class="form-hdr">
+    <div class="form-hdr-inner">
+      <div class="form-top">
+        <button class="form-back" onclick="goHome()">←</button>
+        <div class="form-heading" id="form-heading">RFQ</div>
+        <div class="form-actions">
+          <span class="save-msg" id="save-msg"></span>
+          <button class="btn-blue btn-sm" onclick="goPreview()">Preview / Export</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-body" id="form-body"></div>
+</div>
+
+<!-- ══ PREVIEW SCREEN ════════════════════════════════════════════════════════ -->
+<div id="preview-screen" class="screen">
+  <div class="prev-hdr">
+    <div class="prev-title" id="prev-title">RFQ Preview</div>
+    <button class="btn-teal btn-sm" onclick="printRfq()">Print / Save PDF</button>
+    <button class="btn-ghost btn-sm" onclick="goForm()">← Back</button>
+  </div>
+  <div id="prev-body"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+// STATE & STORAGE
+// ════════════════════════════════════════════════════════════════════════════
+const SK="scm_rfq_v1";
+let rfqs=[], activeId=null, collapsed={};
+
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function getRfq(){return rfqs.find(r=>r.id===activeId)||null;}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function currSym(c){return{USD:"$",AUD:"A$",TWD:"NT$",EUR:"€",CNY:"¥"}[c]||"$";}
+
+function blankRfq(meta){
+  return {
+    id:uid(), meta:{...meta},
+    overview:"",
+    specNotes:"",
+    priceTiers:[
+      {volume:"500",  unitPrice:"",moqNote:""},
+      {volume:"1,000",unitPrice:"",moqNote:""},
+      {volume:"5,000",unitPrice:"",moqNote:""},
+      {volume:"10,000",unitPrice:"",moqNote:""},
+    ],
+    priceIncludes:"",
+    toolingItems:[
+      {item:"Injection mould / extrusion die",qty:"",cost:"",leadTime:"",amortised:""},
+      {item:"Fixture / jig",qty:"",cost:"",leadTime:"",amortised:""},
+    ],
+    toolingNotes:"",
+    sampleCost:"", sampleQty:"", sampleLeadTime:"", sampleNotes:"",
+    prodLeadTime:"", prodMOQ:"", packaging:"", paymentTerms:"", portOfLoad:"",
+    prodNotes:"",
+    responseContact:"", responseFormat:"",
+    responseNotes:"",
+    createdAt:new Date().toISOString(),
+  };
+}
+
+function load(){try{rfqs=JSON.parse(localStorage.getItem(SK)||"[]");}catch{rfqs=[];}}
+function save(){try{localStorage.setItem(SK,JSON.stringify(rfqs));}catch(e){console.error(e);}}
+let saveTimer=null;
+function ds(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{save();showSave();},600);}
+function showSave(){const el=document.getElementById("save-msg");if(el){el.textContent="Saved ✓";setTimeout(()=>{if(el.textContent==="Saved ✓")el.textContent="";},2000);}}
+
+function showScreen(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");window.scrollTo(0,0);}
+function goHome(){showScreen("home");renderHome();}
+function goForm(){showScreen("form-screen");renderForm();}
+function goPreview(){showScreen("preview-screen");renderPreview();}
+
+// ════════════════════════════════════════════════════════════════════════════
+// HOME
+// ════════════════════════════════════════════════════════════════════════════
+function showNewForm(){document.getElementById("new-form").style.display="block";document.getElementById("nf-factory").focus();}
+function hideNewForm(){document.getElementById("new-form").style.display="none";}
+
+function createRfq(){
+  const factory=document.getElementById("nf-factory").value.trim();
+  const part=document.getElementById("nf-part").value.trim();
+  if(!factory||!part){alert("Factory name and part name are required.");return;}
+  const meta={
+    factory, part,
+    partNo:document.getElementById("nf-partno").value.trim(),
+    date:document.getElementById("nf-date").value||new Date().toISOString().slice(0,10),
+    deadline:document.getElementById("nf-deadline").value||"",
+    project:document.getElementById("nf-project").value.trim(),
+    fromCompany:document.getElementById("nf-from-company").value.trim()||"SCM Solution LTD",
+    fromName:document.getElementById("nf-from-name").value.trim(),
+    currency:document.getElementById("nf-currency").value,
+    incoterms:document.getElementById("nf-incoterms").value,
+  };
+  const rfq=blankRfq(meta);
+  rfqs.push(rfq); save(); hideNewForm();
+  ["nf-factory","nf-part","nf-partno","nf-date","nf-deadline","nf-project","nf-from-company","nf-from-name"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  openRfq(rfq.id);
+}
+
+function openRfq(id){activeId=id;collapsed={};showScreen("form-screen");renderForm();}
+function delRfq(id){if(!confirm("Delete this RFQ?"))return;rfqs=rfqs.filter(r=>r.id!==id);save();renderHome();}
+
+function renderHome(){
+  const c=document.getElementById("rfq-list");
+  if(!rfqs.length){c.innerHTML='<div class="empty">No RFQs yet — tap New RFQ to begin</div>';return;}
+  let html=`<div class="sessions-label">Saved RFQs (${rfqs.length})</div>`;
+  rfqs.slice().reverse().forEach(r=>{
+    html+=`<div class="rfq-card">
+      <div class="rfq-info">
+        <div class="rfq-name">${esc(r.meta.factory)}</div>
+        <div class="rfq-meta">${[r.meta.part,r.meta.partNo,r.meta.project,r.meta.date].filter(Boolean).map(esc).join(" · ")}</div>
+      </div>
+      <div class="rfq-actions">
+        <button class="btn-teal btn-sm" onclick="openRfq('${r.id}')">Open</button>
+        <button class="btn-danger" onclick="delRfq('${r.id}')">Delete</button>
+      </div>
+    </div>`;
+  });
+  c.innerHTML=html;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FORM
+// ════════════════════════════════════════════════════════════════════════════
+function toggleSec(id){
+  collapsed[id]=!collapsed[id];
+  const b=document.getElementById("sbody-"+id);
+  const c=document.getElementById("schev-"+id);
+  if(b)b.style.display=collapsed[id]?"none":"block";
+  if(c)c.classList.toggle("up",!!collapsed[id]);
+}
+
+function updMeta(f,v){const r=getRfq();if(!r)return;r.meta[f]=v;document.getElementById("form-heading").textContent="RFQ — "+r.meta.factory;ds();}
+function updF(f,v){const r=getRfq();if(!r)return;r[f]=v;ds();}
+function updTier(i,f,v){const r=getRfq();if(!r)return;r.priceTiers[i][f]=v;ds();}
+function updTool(i,f,v){const r=getRfq();if(!r)return;r.toolingItems[i][f]=v;ds();}
+
+function addTier(){
+  const r=getRfq();if(!r)return;
+  r.priceTiers.push({volume:"",unitPrice:"",moqNote:""});
+  save();rerender("price");
+}
+function rmTier(i){
+  const r=getRfq();if(!r)return;
+  r.priceTiers.splice(i,1);save();rerender("price");
+}
+function addTooling(){
+  const r=getRfq();if(!r)return;
+  r.toolingItems.push({item:"",qty:"",cost:"",leadTime:"",amortised:""});
+  save();rerender("tooling");
+}
+function rmTool(i){
+  const r=getRfq();if(!r)return;
+  r.toolingItems.splice(i,1);save();rerender("tooling");
+}
+
+const SECTION_BODIES={
+  meta:    buildMetaBody,
+  overview:buildOverviewBody,
+  price:   buildPriceBody,
+  tooling: buildToolingBody,
+  samples: buildSamplesBody,
+  prod:    buildProdBody,
+  response:buildResponseBody,
+};
+
+function rerender(key){
+  const el=document.getElementById("sbody-"+key);
+  const r=getRfq();if(!el||!r)return;
+  el.innerHTML=SECTION_BODIES[key](r);
+}
+
+function buildMetaBody(r){
+  const m=r.meta;
+  const curOpts=["USD","AUD","TWD","EUR","CNY"].map(c=>`<option${m.currency===c?" selected":""}>${c}</option>`).join("");
+  const incOpts=["EXW","FOB","CIF","DDP","DAP"].map(t=>`<option${m.incoterms===t?" selected":""}>${t}</option>`).join("");
+  return `<div class="sec-grid">
+    <div class="sec-full"><div class="sec-lbl" style="margin-top:0">To (Factory)</div><input class="sec-in" value="${esc(m.factory||"")}" oninput="updMeta('factory',this.value)"/></div>
+    <div class="sec-full"><div class="sec-lbl">Part / Product Name</div><input class="sec-in" value="${esc(m.part||"")}" oninput="updMeta('part',this.value)"/></div>
+    <div><div class="sec-lbl">Part Number / Ref</div><input class="sec-in" value="${esc(m.partNo||"")}" oninput="updMeta('partNo',this.value)"/></div>
+    <div><div class="sec-lbl">Project</div><input class="sec-in" value="${esc(m.project||"")}" oninput="updMeta('project',this.value)"/></div>
+    <div><div class="sec-lbl">From (Company)</div><input class="sec-in" value="${esc(m.fromCompany||"")}" oninput="updMeta('fromCompany',this.value)"/></div>
+    <div><div class="sec-lbl">From (Name)</div><input class="sec-in" value="${esc(m.fromName||"")}" oninput="updMeta('fromName',this.value)"/></div>
+    <div><div class="sec-lbl">Date Issued</div><input class="sec-in" type="date" value="${esc(m.date||"")}" oninput="updMeta('date',this.value)"/></div>
+    <div><div class="sec-lbl">Response Deadline</div><input class="sec-in" type="date" value="${esc(m.deadline||"")}" oninput="updMeta('deadline',this.value)"/></div>
+    <div><div class="sec-lbl">Currency</div><select class="sec-in" onchange="updMeta('currency',this.value)">${curOpts}</select></div>
+    <div><div class="sec-lbl">Incoterms</div><select class="sec-in" onchange="updMeta('incoterms',this.value)">${incOpts}</select></div>
+  </div>`;
+}
+
+function buildOverviewBody(r){
+  return `<div class="sec-lbl" style="margin-top:0">Project & Product Overview</div>
+  <textarea class="sec-ta" placeholder="Brief product description, application, and context. Include any key technical requirements that inform the quote." oninput="updF('overview',this.value)">${esc(r.overview)}</textarea>
+  <div class="sec-lbl">Specification Notes</div>
+  <textarea class="sec-ta" style="min-height:60px" placeholder="Key dimensions, tolerances, material grade, finish requirements, certifications required. Reference drawing numbers if applicable." oninput="updF('specNotes',this.value)">${esc(r.specNotes)}</textarea>`;
+}
+
+function buildPriceBody(r){
+  const sym=currSym(r.meta.currency);
+  const rows=r.priceTiers.map((t,i)=>`<tr>
+    <td><input class="pt-in" value="${esc(t.volume)}" oninput="updTier(${i},'volume',this.value)" placeholder="e.g. 1,000"/></td>
+    <td><input class="pt-in" value="${esc(t.unitPrice)}" oninput="updTier(${i},'unitPrice',this.value)" placeholder="${sym}0.00"/></td>
+    <td><input class="pt-in" value="${esc(t.moqNote)}" oninput="updTier(${i},'moqNote',this.value)" placeholder="Any notes"/></td>
+    <td><button class="pt-rm" onclick="rmTier(${i})">×</button></td>
+  </tr>`).join("");
+  return `<p style="font-size:12px;color:var(--gray-mid);margin-bottom:10px;font-style:italic">Please quote unit price (${r.meta.currency}, ${r.meta.incoterms}) at each of the following order volumes.</p>
+  <div style="overflow-x:auto;margin-bottom:6px"><table class="price-tbl">
+    <thead><tr><th>Order Volume (units)</th><th>Unit Price (${r.meta.currency})</th><th>Notes / MOQ Conditions</th><th></th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>
+  <button class="btn-add-row" onclick="addTier()">+ Add volume tier</button>
+  <div class="sec-lbl" style="margin-top:16px">What Is Included in the Unit Price?</div>
+  <textarea class="sec-ta" style="min-height:55px" placeholder="e.g. Parts + standard bulk packaging. Exclude: surface treatment, custom packaging, freight." oninput="updF('priceIncludes',this.value)">${esc(r.priceIncludes)}</textarea>`;
+}
+
+function buildToolingBody(r){
+  const sym=currSym(r.meta.currency);
+  const rows=r.toolingItems.map((t,i)=>`<tr>
+    <td><input class="pt-in" value="${esc(t.item)}" oninput="updTool(${i},'item',this.value)" placeholder="e.g. Extrusion die"/></td>
+    <td><input class="pt-in" value="${esc(t.qty)}" oninput="updTool(${i},'qty',this.value)" placeholder="1"/></td>
+    <td><input class="pt-in" value="${esc(t.cost)}" oninput="updTool(${i},'cost',this.value)" placeholder="${sym}0.00"/></td>
+    <td><input class="pt-in" value="${esc(t.leadTime)}" oninput="updTool(${i},'leadTime',this.value)" placeholder="e.g. 4 weeks"/></td>
+    <td><input class="pt-in" value="${esc(t.amortised)}" oninput="updTool(${i},'amortised',this.value)" placeholder="Yes / No / Partial"/></td>
+    <td><button class="pt-rm" onclick="rmTool(${i})">×</button></td>
+  </tr>`).join("");
+  return `<p style="font-size:12px;color:var(--gray-mid);margin-bottom:10px;font-style:italic">Please list all one-time tooling, fixture, and NRE costs required to manufacture this part.</p>
+  <div style="overflow-x:auto;margin-bottom:6px"><table class="tool-tbl">
+    <thead><tr><th>Item</th><th>Qty</th><th>Cost (${r.meta.currency})</th><th>Lead Time</th><th>Amortised into Unit Price?</th><th></th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>
+  <button class="btn-add-row" onclick="addTooling()">+ Add tooling item</button>
+  <div class="sec-lbl" style="margin-top:16px">Additional Tooling Notes</div>
+  <textarea class="sec-ta" style="min-height:55px" placeholder="Tooling ownership, storage, revision costs, expected tool life, etc." oninput="updF('toolingNotes',this.value)">${esc(r.toolingNotes)}</textarea>`;
+}
+
+function buildSamplesBody(r){
+  const sym=currSym(r.meta.currency);
+  return `<div class="sec-grid">
+    <div><div class="sec-lbl" style="margin-top:0">Sample / Prototype Unit Cost (${r.meta.currency})</div><input class="sec-in" value="${esc(r.sampleCost)}" placeholder="${sym}0.00" oninput="updF('sampleCost',this.value)"/></div>
+    <div><div class="sec-lbl" style="margin-top:0">Sample Quantity Available</div><input class="sec-in" value="${esc(r.sampleQty)}" placeholder="e.g. Up to 3 units" oninput="updF('sampleQty',this.value)"/></div>
+    <div class="sec-full"><div class="sec-lbl">Sample Lead Time</div><input class="sec-in" value="${esc(r.sampleLeadTime)}" placeholder="e.g. 4–6 weeks from confirmed order" oninput="updF('sampleLeadTime',this.value)"/></div>
+  </div>
+  <div class="sec-lbl">Sample Notes</div>
+  <textarea class="sec-ta" style="min-height:55px" placeholder="What is included in the sample cost? Finish level, documentation, inspection reports." oninput="updF('sampleNotes',this.value)">${esc(r.sampleNotes)}</textarea>`;
+}
+
+function buildProdBody(r){
+  return `<div class="sec-grid">
+    <div><div class="sec-lbl" style="margin-top:0">Mass Production Lead Time</div><input class="sec-in" value="${esc(r.prodLeadTime)}" placeholder="e.g. 6–8 weeks from PO" oninput="updF('prodLeadTime',this.value)"/></div>
+    <div><div class="sec-lbl" style="margin-top:0">Minimum Order Quantity (MOQ)</div><input class="sec-in" value="${esc(r.prodMOQ)}" placeholder="e.g. 500 units" oninput="updF('prodMOQ',this.value)"/></div>
+    <div><div class="sec-lbl">Standard Packaging</div><input class="sec-in" value="${esc(r.packaging)}" placeholder="e.g. Bulk carton, 20 units/box" oninput="updF('packaging',this.value)"/></div>
+    <div><div class="sec-lbl">Payment Terms</div><input class="sec-in" value="${esc(r.paymentTerms)}" placeholder="e.g. 30% deposit, 70% on shipment" oninput="updF('paymentTerms',this.value)"/></div>
+    <div class="sec-full"><div class="sec-lbl">Port of Loading / Shipping Point</div><input class="sec-in" value="${esc(r.portOfLoad)}" placeholder="e.g. Kaohsiung, Taiwan" oninput="updF('portOfLoad',this.value)"/></div>
+  </div>
+  <div class="sec-lbl">Additional Production Notes</div>
+  <textarea class="sec-ta" style="min-height:55px" placeholder="Capacity, priority scheduling, flexibility on run size, any constraints." oninput="updF('prodNotes',this.value)">${esc(r.prodNotes)}</textarea>`;
+}
+
+function buildResponseBody(r){
+  return `<div class="sec-grid">
+    <div><div class="sec-lbl" style="margin-top:0">Quote Contact (Name / Email)</div><input class="sec-in" value="${esc(r.responseContact)}" placeholder="e.g. sales@shin-fu.tw" oninput="updF('responseContact',this.value)"/></div>
+    <div><div class="sec-lbl" style="margin-top:0">Preferred Response Format</div><input class="sec-in" value="${esc(r.responseFormat)}" placeholder="e.g. Excel / PDF / Email" oninput="updF('responseFormat',this.value)"/></div>
+  </div>
+  <div class="sec-lbl">Additional Instructions</div>
+  <textarea class="sec-ta" style="min-height:70px" placeholder="Any other instructions for the supplier — questions you want answered, attachments to include in their response, NDA requirement, etc." oninput="updF('responseNotes',this.value)">${esc(r.responseNotes)}</textarea>`;
+}
+
+function secCard(num,key,title,done,bodyFn,r){
+  const coll=!!collapsed[key];
+  return `<div class="sec-card">
+    <div class="sec-hdr" onclick="toggleSec('${key}')">
+      <span class="sec-num">${num}</span>
+      <span class="sec-title">${title}</span>
+      ${done?'<span class="sec-done">✓</span>':""}
+      <span class="sec-chev${coll?" up":""}" id="schev-${key}">▼</span>
+    </div>
+    <div class="sec-body" id="sbody-${key}"${coll?' style="display:none"':""}>
+      ${bodyFn(r)}
+    </div>
+  </div>`;
+}
+
+function hasDone(r){
+  return {
+    overview:!!(r.overview||r.specNotes),
+    price:r.priceTiers.some(t=>t.unitPrice),
+    tooling:r.toolingItems.some(t=>t.cost),
+    samples:!!(r.sampleCost||r.sampleLeadTime),
+    prod:!!(r.prodLeadTime||r.prodMOQ),
+    response:!!(r.responseContact||r.responseNotes),
+  };
+}
+
+function renderForm(){
+  const r=getRfq();if(!r)return;
+  document.getElementById("form-heading").textContent="RFQ — "+r.meta.factory;
+  const d=hasDone(r);
+  document.getElementById("form-body").innerHTML=
+    secCard("↩","meta","Document Header",!!(r.meta.factory&&r.meta.part),buildMetaBody,r)+
+    secCard("1","overview","Project Overview & Specifications",d.overview,buildOverviewBody,r)+
+    secCard("2","price","Unit Price Request — Tiered Volumes",d.price,buildPriceBody,r)+
+    secCard("3","tooling","Tooling & NRE Costs",d.tooling,buildToolingBody,r)+
+    secCard("4","samples","Sample / Prototype Costs",d.samples,buildSamplesBody,r)+
+    secCard("5","prod","Production Terms",d.prod,buildProdBody,r)+
+    secCard("6","response","Response Instructions",d.response,buildResponseBody,r);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// PREVIEW / EXPORT
+// ════════════════════════════════════════════════════════════════════════════
+function generateHTML(){
+  const r=getRfq();if(!r)return"";
+  const m=r.meta;
+  const sym=currSym(m.currency);
+  const css=`*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;background:#F5F4F1;color:#1A1A19;padding-bottom:40px}.cover{background:#1A2E3B;padding:36px 40px;color:white;margin-bottom:20px}.ct{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#5DCAA5;font-family:Helvetica,sans-serif;margin-bottom:8px}.cs{font-size:26px;font-weight:bold;margin-bottom:3px}.cp{font-size:14px;color:rgba(255,255,255,.55);margin-bottom:22px}.meta-row{display:flex;gap:24px;flex-wrap:wrap}.ml{font-size:9px;color:#5DCAA5;letter-spacing:.1em;text-transform:uppercase;font-family:Helvetica,sans-serif;margin-bottom:2px}.mv{font-size:13px}.note{background:rgba(255,255,255,.07);border-left:3px solid #5DCAA5;padding:12px 16px;font-size:12px;color:rgba(255,255,255,.6);line-height:1.6;margin-top:18px}.card{background:white;margin:0 20px 16px;border-radius:10px;padding:20px 24px}.ch{font-family:Helvetica,sans-serif;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#888;margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid #E0DED8;font-weight:700}.field{margin-bottom:12px}.fl{font-family:Helvetica,sans-serif;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#2C4A5E;margin-bottom:3px}.fv{font-size:13px;color:#333;line-height:1.6}.fv-box{background:#FAFAF8;border:1px solid #E0DED8;border-radius:6px;padding:9px 11px;font-size:13px;color:#333;line-height:1.6;white-space:pre-wrap;min-height:36px}.tbl{width:100%;border-collapse:collapse}.tbl th{font-family:Helvetica,sans-serif;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#888;padding:7px 10px;border-bottom:1px solid #E0DED8;text-align:left;background:#FAFAF8}.tbl td{padding:9px 10px;border-bottom:0.5px solid #E0DED8;font-size:13px;color:#333}.tbl tr:last-child td{border-bottom:none}.price-col{font-weight:700;color:#085041}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.footer{padding:14px 20px;display:flex;justify-content:space-between;font-size:11px;color:#888;font-family:Helvetica,sans-serif}@media print{body{background:white}.cover{-webkit-print-color-adjust:exact;print-color-adjust:exact}}`;
+
+  const priceRows=r.priceTiers.map(t=>`<tr><td>${esc(t.volume)}</td><td class="price-col">${t.unitPrice?sym+esc(t.unitPrice):"—"}</td><td>${esc(t.moqNote||"—")}</td></tr>`).join("");
+  const toolRows=r.toolingItems.filter(t=>t.item||t.cost).map(t=>`<tr><td>${esc(t.item||"—")}</td><td>${esc(t.qty||"—")}</td><td class="price-col">${t.cost?sym+esc(t.cost):"—"}</td><td>${esc(t.leadTime||"—")}</td><td>${esc(t.amortised||"—")}</td></tr>`).join("");
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>RFQ — ${esc(m.factory)}</title><style>${css}</style></head><body>
+  <div class="cover">
+    <div class="ct">Request for Quotation</div>
+    <div class="cs">To: ${esc(m.factory)}</div>
+    <div class="cp">${esc(m.part||"")}${m.partNo?" · "+esc(m.partNo):""}${m.project?" · "+esc(m.project):""}</div>
+    <div class="meta-row">
+      <div><div class="ml">From</div><div class="mv">${esc(m.fromName||"")}${m.fromCompany?" · "+esc(m.fromCompany):""}</div></div>
+      <div><div class="ml">Date Issued</div><div class="mv">${esc(m.date||"—")}</div></div>
+      ${m.deadline?`<div><div class="ml">Response By</div><div class="mv">${esc(m.deadline)}</div></div>`:""}
+      <div><div class="ml">Currency / Incoterms</div><div class="mv">${esc(m.currency||"")} / ${esc(m.incoterms||"")}</div></div>
+    </div>
+    ${m.deadline?`<div class="note">Please return your completed quotation by <strong>${esc(m.deadline)}</strong>. Quote in ${esc(m.currency)} ${esc(m.incoterms)} unless otherwise specified.</div>`:""}
+  </div>
+
+  ${(r.overview||r.specNotes)?`<div class="card"><div class="ch">1. Project Overview & Specifications</div>
+    ${r.overview?`<div class="field"><div class="fl">Product Overview</div><div class="fv-box">${esc(r.overview)}</div></div>`:""}
+    ${r.specNotes?`<div class="field"><div class="fl">Specification Notes</div><div class="fv-box">${esc(r.specNotes)}</div></div>`:""}
+  </div>`:""}
+
+  ${r.priceTiers.length?`<div class="card"><div class="ch">2. Unit Price Request — ${esc(m.currency)} ${esc(m.incoterms)}</div>
+    <table class="tbl"><thead><tr><th>Order Volume (units)</th><th>Unit Price (${esc(m.currency)})</th><th>Notes / MOQ Conditions</th></tr></thead><tbody>${priceRows}</tbody></table>
+    ${r.priceIncludes?`<div class="field" style="margin-top:14px"><div class="fl">What should the unit price include?</div><div class="fv-box">${esc(r.priceIncludes)}</div></div>`:""}
+  </div>`:""}
+
+  ${(toolRows||r.toolingNotes)?`<div class="card"><div class="ch">3. Tooling & NRE Costs</div>
+    ${toolRows?`<table class="tbl"><thead><tr><th>Item</th><th>Qty</th><th>Cost (${esc(m.currency)})</th><th>Lead Time</th><th>Amortised?</th></tr></thead><tbody>${toolRows}</tbody></table>`:""}
+    ${r.toolingNotes?`<div class="field" style="margin-top:14px"><div class="fl">Additional Tooling Notes</div><div class="fv-box">${esc(r.toolingNotes)}</div></div>`:""}
+  </div>`:""}
+
+  ${(r.sampleCost||r.sampleLeadTime||r.sampleNotes)?`<div class="card"><div class="ch">4. Sample / Prototype Costs</div>
+    <div class="grid2">
+      ${r.sampleCost?`<div class="field"><div class="fl">Sample Unit Cost</div><div class="fv">${sym}${esc(r.sampleCost)}</div></div>`:""}
+      ${r.sampleQty?`<div class="field"><div class="fl">Sample Quantity Available</div><div class="fv">${esc(r.sampleQty)}</div></div>`:""}
+      ${r.sampleLeadTime?`<div class="field sec-full"><div class="fl">Sample Lead Time</div><div class="fv">${esc(r.sampleLeadTime)}</div></div>`:""}
+    </div>
+    ${r.sampleNotes?`<div class="field"><div class="fl">Sample Notes</div><div class="fv-box">${esc(r.sampleNotes)}</div></div>`:""}
+  </div>`:""}
+
+  ${(r.prodLeadTime||r.prodMOQ||r.packaging||r.paymentTerms||r.portOfLoad||r.prodNotes)?`<div class="card"><div class="ch">5. Production Terms</div>
+    <div class="grid2">
+      ${r.prodLeadTime?`<div class="field"><div class="fl">Mass Production Lead Time</div><div class="fv">${esc(r.prodLeadTime)}</div></div>`:""}
+      ${r.prodMOQ?`<div class="field"><div class="fl">Minimum Order Quantity</div><div class="fv">${esc(r.prodMOQ)}</div></div>`:""}
+      ${r.packaging?`<div class="field"><div class="fl">Standard Packaging</div><div class="fv">${esc(r.packaging)}</div></div>`:""}
+      ${r.paymentTerms?`<div class="field"><div class="fl">Payment Terms</div><div class="fv">${esc(r.paymentTerms)}</div></div>`:""}
+      ${r.portOfLoad?`<div class="field"><div class="fl">Port of Loading</div><div class="fv">${esc(r.portOfLoad)}</div></div>`:""}
+    </div>
+    ${r.prodNotes?`<div class="field"><div class="fl">Additional Notes</div><div class="fv-box">${esc(r.prodNotes)}</div></div>`:""}
+  </div>`:""}
+
+  ${(r.responseContact||r.responseFormat||r.responseNotes)?`<div class="card"><div class="ch">6. Response Instructions</div>
+    <div class="grid2">
+      ${r.responseContact?`<div class="field"><div class="fl">Return Quote To</div><div class="fv">${esc(r.responseContact)}</div></div>`:""}
+      ${r.responseFormat?`<div class="field"><div class="fl">Preferred Format</div><div class="fv">${esc(r.responseFormat)}</div></div>`:""}
+    </div>
+    ${r.responseNotes?`<div class="field"><div class="fl">Additional Instructions</div><div class="fv-box">${esc(r.responseNotes)}</div></div>`:""}
+  </div>`:""}
+
+  <div class="footer">
+    <span>${esc(m.fromCompany||"SCM Solution LTD")} — Confidential</span>
+    <span>RFQ — ${esc(m.factory)} — ${esc(m.date||"")}</span>
+  </div>
+  </body></html>`;
+}
+
+function renderPreview(){
+  const r=getRfq();if(!r)return;
+  document.getElementById("prev-title").textContent="RFQ — "+r.meta.factory+" — "+r.meta.part;
+  const body=document.getElementById("prev-body");
+  body.innerHTML="";
+  const iframe=document.createElement("iframe");
+  iframe.style.cssText="width:100%;height:calc(100vh - 50px);border:none;background:#fff;display:block";
+  body.appendChild(iframe);
+  iframe.contentDocument.open();
+  iframe.contentDocument.write(generateHTML());
+  iframe.contentDocument.close();
+}
+function printRfq(){const f=document.querySelector("#prev-body iframe");if(f)f.contentWindow.print();}
+
+// ════════════════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════════════════
+load();
+renderHome();
+</script>
+</body>
+</html>

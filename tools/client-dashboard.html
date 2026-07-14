@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Client Dashboard — SCM Bridge OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1A2E3B;--navy2:#2C4A5E;
+  --teal:#1D9E75;--teal-dk:#085041;--teal-lt:#E1F5EE;--teal-bd:#5DCAA5;
+  --amber:#EF9F27;--amber-lt:#FAEEDA;
+  --coral:#D85A30;--coral-lt:#FAECE7;
+  --purple:#6C4EBF;--purple-lt:#EDE8F8;
+  --gray-bg:#F5F4F1;--gray-line:#E0DED8;--gray-mid:#888780;--gray-dk:#444441;
+  --white:#fff;--black:#1A1A19;--blue-btn:#1B6FA8;
+}
+body{font-family:'Barlow',sans-serif;background:var(--gray-bg);color:var(--black);font-size:14px;line-height:1.5}
+input,textarea,select,button{font-family:inherit}
+button{cursor:pointer;border:none;background:none}
+textarea{resize:vertical}
+.screen{display:none;min-height:100vh}.screen.active{display:block}
+
+/* HOME */
+#home{background:var(--navy)}
+.home-wrap{max-width:760px;margin:0 auto;padding:36px 24px 60px}
+.home-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:6px}
+.home-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--white);line-height:1.1;margin-bottom:4px}
+.home-sub{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:28px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.btn-primary{background:var(--teal);color:var(--white);border-radius:10px;padding:11px 22px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:filter .15s}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-ghost{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:11px 18px;font-size:13px;transition:background .15s}
+.btn-ghost:hover{background:rgba(255,255,255,.14)}
+.new-form{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:20px;margin-bottom:24px;display:none;animation:fadeUp .2s ease}
+.nf-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:14px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.fg-full{grid-column:1/-1}
+.fl label{display:block;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:3px}
+.fl input,.fl select{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--white);outline:none}
+.fl input::placeholder{color:rgba(255,255,255,.3)}
+.fl select option{background:var(--navy)}
+.sessions-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px}
+.proj-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;cursor:pointer;transition:background .15s}
+.proj-card:hover{background:rgba(255,255,255,.1)}
+.proj-info{flex:1;min-width:0}
+.proj-client{font-size:11px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;font-family:'Barlow Condensed',sans-serif;font-weight:700;margin-bottom:1px}
+.proj-name{font-size:16px;color:var(--white);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proj-meta{font-size:11px;color:rgba(255,255,255,.4)}
+.proj-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dot-on-track{background:#1D9E75}
+.dot-at-risk{background:#EF9F27}
+.dot-blocked{background:#D85A30}
+.dot-completed{background:#6C4EBF}
+.btn-sm{border-radius:8px;padding:7px 14px;font-size:12px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.btn-teal{background:var(--teal);color:var(--white)}
+.btn-danger{color:rgba(255,80,80,.5);font-size:11px;padding:4px}
+.empty{text-align:center;padding:48px 0;color:rgba(255,255,255,.3);font-size:14px}
+
+/* FORM */
+#form-screen{background:var(--gray-bg)}
+.form-hdr{background:var(--teal-dk);padding:12px 18px 10px;position:sticky;top:52px;z-index:100;box-shadow:0 2px 14px rgba(0,0,0,.22)}
+.form-hdr-inner{max-width:900px;margin:0 auto}
+.form-top{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.form-back{font-size:18px;color:var(--teal-lt);background:rgba(255,255,255,.1);border-radius:8px;padding:4px 10px}
+.form-back:hover{background:rgba(255,255,255,.2)}
+.form-heading{flex:1;font-size:15px;color:var(--white);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.form-actions{display:flex;gap:7px;align-items:center;flex-shrink:0}
+.save-msg{font-size:11px;color:var(--teal-bd);min-width:55px}
+.btn-blue{background:var(--blue-btn);color:var(--white);border-radius:20px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.form-body{max-width:900px;margin:0 auto;padding:14px 14px 60px}
+.sec-card{background:var(--white);border-radius:14px;overflow:hidden;margin-bottom:10px;border:1px solid var(--gray-line);animation:fadeUp .2s ease}
+.sec-hdr{display:flex;align-items:center;gap:9px;padding:11px 14px;cursor:pointer;user-select:none;background:#FAFAF8}
+.sec-icon{font-size:15px}
+.sec-title{flex:1;font-size:14px;font-weight:500}
+.sec-chev{font-size:11px;color:var(--gray-mid);transition:transform .2s}
+.sec-chev.open{transform:rotate(180deg)}
+.sec-body-wrap{display:none}.sec-body-wrap.open{display:block}
+.sec-body{padding:16px}
+.sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sec-full{grid-column:1/-1}
+.fld{display:flex;flex-direction:column;gap:3px}
+.fld-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid)}
+.sec-in{width:100%;padding:7px 10px;font-size:13px;border:1px solid var(--gray-line);border-radius:8px;background:#FAFAF8;color:var(--black)}
+.sec-in:focus{outline:none;border-color:var(--teal)}
+.sec-sel{width:100%;padding:7px 10px;font-size:13px;border:1px solid var(--gray-line);border-radius:8px;background:#FAFAF8;color:var(--black)}
+.sec-sel:focus{outline:none;border-color:var(--teal)}
+.sec-ta{width:100%;min-height:72px;padding:9px 11px;font-size:13px;border:1px solid var(--gray-line);border-radius:8px;background:#FAFAF8;color:var(--black);line-height:1.6;font-family:'Barlow',sans-serif}
+.sec-ta:focus{outline:none;border-color:var(--teal)}
+.sec-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid);margin-bottom:6px;margin-top:14px}
+.sec-lbl:first-child{margin-top:0}
+
+/* DYNAMIC TABLES */
+.dt-wrap{overflow-x:auto;margin-bottom:6px}
+.dtbl{width:100%;border-collapse:collapse;font-size:12px}
+.dtbl th{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid);padding:6px 7px;border-bottom:1px solid var(--gray-line);text-align:left;background:#FAFAF8}
+.dtbl td{padding:3px 3px;border-bottom:1px solid var(--gray-line);vertical-align:middle}
+.dtbl tr:last-child td{border-bottom:none}
+.dt-in{width:100%;padding:5px 7px;font-size:12px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--black);font-family:'Barlow',sans-serif}
+.dt-in:focus{outline:none;border-color:var(--teal);background:var(--teal-lt)}
+.dt-sel{width:100%;padding:4px 5px;font-size:11px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--black);cursor:pointer}
+.dt-sel:focus{outline:none;border-color:var(--teal)}
+.dt-rm{color:rgba(216,90,48,.35);font-size:15px;padding:2px 5px;cursor:pointer;border-radius:4px;line-height:1;border:none;background:none}
+.dt-rm:hover{color:var(--coral);background:var(--coral-lt)}
+.btn-add-row{margin-top:6px;font-size:12px;color:var(--teal);padding:5px 11px;border:1px dashed var(--teal-bd);border-radius:7px;background:var(--teal-lt);cursor:pointer;transition:all .15s}
+.btn-add-row:hover{background:var(--teal);color:var(--white)}
+
+/* PHASE PILLS */
+.phase-pills{display:flex;flex-wrap:wrap;gap:6px}
+.phase-pill{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--gray-line);color:var(--gray-mid);transition:all .12s;user-select:none}
+.phase-pill.act{background:var(--navy);border-color:var(--teal-bd);color:var(--teal-bd)}
+
+/* STATUS PILLS */
+.status-pills{display:flex;gap:8px;flex-wrap:wrap}
+.sp{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--gray-line);color:var(--gray-mid);transition:all .15s}
+.sp-on-track.act{background:#E1F5EE;border-color:var(--teal);color:var(--teal-dk)}
+.sp-at-risk.act{background:var(--amber-lt);border-color:var(--amber);color:#7A5200}
+.sp-blocked.act{background:var(--coral-lt);border-color:var(--coral);color:var(--coral)}
+.sp-completed.act{background:var(--purple-lt);border-color:var(--purple);color:var(--purple)}
+
+/* EXPORT BUTTON */
+.btn-export{background:#6C4EBF;color:var(--white);border-radius:20px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+
+/* PREVIEW */
+#preview-screen{background:#e8e8e8}
+.prev-hdr{background:var(--navy);padding:10px 20px;display:flex;align-items:center;gap:10px;position:sticky;top:52px;z-index:100}
+.prev-title{flex:1;font-size:13px;color:rgba(255,255,255,.5)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.fg,.sec-grid{grid-template-columns:1fr}.fg-full,.sec-full{grid-column:1}}
+</style>
+</head>
+<body>
+<div id="site-nav-root"></div>
+<script src="../nav.js"></script>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="home-wrap">
+    <div class="home-label">SCM Solution LTD</div>
+    <div class="home-title">Client Dashboard</div>
+    <div class="home-sub">Project status portal — updates, blockers, documents, and milestones for each client engagement</div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="showNewForm()">+ New Client Project</button>
+    </div>
+    <div class="new-form" id="new-form">
+      <div class="nf-title">New Client Dashboard</div>
+      <div class="fg">
+        <div class="fl"><label>Client Name *</label><input id="nf-client" placeholder="e.g. Acme Wearables"/></div>
+        <div class="fl"><label>Project Name *</label><input id="nf-proj" placeholder="e.g. SmartVest Gen 2"/></div>
+        <div class="fl"><label>Project Code</label><input id="nf-code" placeholder="e.g. SCM-2025-004"/></div>
+        <div class="fl"><label>Current Phase</label>
+          <select id="nf-phase">
+            <option value="idea">Idea / Concepting</option>
+            <option value="poc">Proof of Concept</option>
+            <option value="design" selected>Detail Design</option>
+            <option value="test">Validation / Testing</option>
+            <option value="factory">Factory Qualification</option>
+            <option value="mp">Mass Production</option>
+          </select>
+        </div>
+        <div class="fl"><label>PM / Lead</label><input id="nf-pm" placeholder="SCM Solution LTD"/></div>
+        <div class="fl"><label>PM Email</label><input id="nf-email" type="email" placeholder=""/></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="createDash()">Create Dashboard</button>
+        <button class="btn-ghost" onclick="hideNewForm()">Cancel</button>
+      </div>
+    </div>
+    <div class="sessions-label">Active Projects</div>
+    <div id="proj-list"><div class="empty">No projects yet — tap New Client Project to begin</div></div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div id="form-screen" class="screen">
+  <div class="form-hdr">
+    <div class="form-hdr-inner">
+      <div class="form-top">
+        <button class="form-back" onclick="goHome()">←</button>
+        <div class="form-heading" id="form-heading">Client Dashboard</div>
+        <div class="form-actions">
+          <span class="save-msg" id="save-msg"></span>
+          <button class="btn-blue" onclick="goPreview()">Preview</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-body" id="form-body"></div>
+</div>
+
+<!-- PREVIEW -->
+<div id="preview-screen" class="screen">
+  <div class="prev-hdr">
+    <button class="form-back" onclick="goForm()" style="color:#fff;font-size:18px;background:rgba(255,255,255,.1);border-radius:8px;padding:4px 10px">←</button>
+    <span class="prev-title" id="prev-title">Client View</span>
+    <button class="btn-export" onclick="exportHTML()" style="margin-right:8px">Export HTML</button>
+    <button class="btn-teal btn-sm" onclick="printDash()">Print / PDF</button>
+  </div>
+  <iframe id="prev-iframe" style="width:100%;height:calc(100vh - 104px);border:none;background:#fff"></iframe>
+</div>
+
+<script>
+var SAVE_KEY='scm_client_dash_v1', ALL=[], CUR=null, _st=null;
+var PHASES=[
+  {k:'idea',l:'Idea',sub:'Concepting'},
+  {k:'poc',l:'PoC',sub:'Proof of Concept'},
+  {k:'design',l:'Design',sub:'Detail Design'},
+  {k:'test',l:'Test',sub:'Validation'},
+  {k:'factory',l:'Factory',sub:'Qualification'},
+  {k:'mp',l:'MP',sub:'Mass Production'}
+];
+var STATUS=[
+  {k:'on-track',l:'On Track'},
+  {k:'at-risk',l:'At Risk'},
+  {k:'blocked',l:'Blocked'},
+  {k:'completed',l:'Completed'}
+];
+var STATUS_COLOR={'on-track':'#1D9E75','at-risk':'#EF9F27','blocked':'#D85A30','completed':'#6C4EBF'};
+var STATUS_BG={'on-track':'#E1F5EE','at-risk':'#FAEEDA','blocked':'#FAECE7','completed':'#EDE8F8'};
+var DOC_TYPES=['TRD','Project Brief','RFI Response','RFQ / Quotation','Tech Pack','NDA','SOW','Sample Photos','Test Report','Factory Audit','Other'];
+var UPDATE_CATS=['Update','Milestone','Decision','Alert','Document Shared'];
+var MS_STATUS=['Upcoming','In Progress','Complete','At Risk','Delayed'];
+var BLK_STATUS=['Open','Client Action Required','In Progress','Resolved'];
+
+function loadAll(){ try{ ALL=JSON.parse(localStorage.getItem(SAVE_KEY)||'[]'); }catch(e){ ALL=[]; } }
+function saveAll(){
+  localStorage.setItem(SAVE_KEY,JSON.stringify(ALL));
+  var m=document.getElementById('save-msg');
+  if(m){m.textContent='Saved ✓';setTimeout(function(){m.textContent='';},1500);}
+}
+function debounceSave(){
+  clearTimeout(_st);
+  _st=setTimeout(function(){ if(!CUR)return; var i=ALL.findIndex(function(t){return t.id===CUR.id;}); if(i===-1)ALL.push(CUR);else ALL[i]=CUR; saveAll(); },600);
+}
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+function today(){ return new Date().toISOString().slice(0,10); }
+
+function blankDash(meta){
+  return {
+    id:uid(), created:today(), meta:meta,
+    updates:[],
+    blockers:[],
+    documents:[],
+    milestones:[]
+  };
+}
+
+function show(id){ document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');}); document.getElementById(id).classList.add('active'); }
+function goHome(){ show('home'); renderList(); }
+function goForm(){ show('form-screen'); }
+function goPreview(){ show('preview-screen'); renderPreview(); }
+
+function showNewForm(){
+  document.getElementById('new-form').style.display='block';
+  document.getElementById('nf-pm').value='SCM Solution LTD';
+}
+function hideNewForm(){ document.getElementById('new-form').style.display='none'; }
+
+function createDash(){
+  var c=document.getElementById('nf-client').value.trim();
+  var p=document.getElementById('nf-proj').value.trim();
+  if(!c||!p){alert('Client name and project name are required');return;}
+  var meta={
+    clientName:c, projectName:p, projectCode:document.getElementById('nf-code').value.trim(),
+    phase:document.getElementById('nf-phase').value, status:'on-track',
+    targetDate:'', overview:'',
+    pmName:document.getElementById('nf-pm').value.trim()||'SCM Solution LTD',
+    pmEmail:document.getElementById('nf-email').value.trim(),
+    pmPhone:'', lastUpdated:today()
+  };
+  CUR=blankDash(meta); ALL.push(CUR); saveAll(); hideNewForm(); openDash(CUR);
+}
+function openDash(d){ CUR=d; show('form-screen'); updateHeading(); renderForm(); }
+function openById(id){ var d=ALL.find(function(x){return x.id===id;}); if(d)openDash(d); }
+function deleteDash(id){ if(!confirm('Delete this client dashboard?'))return; ALL=ALL.filter(function(d){return d.id!==id;}); saveAll(); renderList(); }
+function updateHeading(){ document.getElementById('form-heading').textContent=CUR.meta.clientName+' — '+CUR.meta.projectName; }
+
+var PHASE_LABEL={idea:'Idea',poc:'PoC',design:'Design',test:'Test',factory:'Factory',mp:'Mass Production'};
+
+function renderList(){
+  var el=document.getElementById('proj-list');
+  if(!ALL.length){el.innerHTML='<div class="empty">No projects yet — tap New Client Project to begin</div>';return;}
+  el.innerHTML=ALL.slice().reverse().map(function(d){
+    var dotCls='dot-'+d.meta.status;
+    var ph=PHASE_LABEL[d.meta.phase]||d.meta.phase;
+    var sl=STATUS.find(function(s){return s.k===d.meta.status;}); var sl2=sl?sl.l:'On Track';
+    return '<div class="proj-card">'
+      +'<div class="status-dot '+dotCls+'"></div>'
+      +'<div class="proj-info"><div class="proj-client">'+esc(d.meta.clientName)+'</div>'
+      +'<div class="proj-name">'+esc(d.meta.projectName)+(d.meta.projectCode?'<span style="font-size:11px;opacity:.4;margin-left:8px">'+esc(d.meta.projectCode)+'</span>':'')+'</div>'
+      +'<div class="proj-meta">Phase: '+esc(ph)+' · Status: '+esc(sl2)+' · Updated: '+esc(d.meta.lastUpdated)+'</div></div>'
+      +'<div class="proj-actions">'
+      +'<button class="btn-teal btn-sm" onclick="event.stopPropagation();openById(\''+d.id+'\')">Open</button>'
+      +'<button class="btn-danger" onclick="event.stopPropagation();deleteDash(\''+d.id+'\')">Delete</button>'
+      +'</div></div>';
+  }).join('');
+}
+
+var OPEN_SECS={meta:true,updates:true};
+function toggleSec(k){
+  OPEN_SECS[k]=!OPEN_SECS[k];
+  document.getElementById('sbw-'+k).className='sec-body-wrap'+(OPEN_SECS[k]?' open':'');
+  document.getElementById('sch-'+k).className='sec-chev'+(OPEN_SECS[k]?' open':'');
+}
+function renderForm(){
+  var secs=[
+    {key:'meta',icon:'🏢',title:'Project Info'},
+    {key:'updates',icon:'📢',title:'Updates & Activity'},
+    {key:'blockers',icon:'🚧',title:'Blockers & Actions Required'},
+    {key:'documents',icon:'📁',title:'Documents Shared'},
+    {key:'milestones',icon:'🎯',title:'Milestones & Schedule'},
+    {key:'contact',icon:'📞',title:'Contact & Support'}
+  ];
+  document.getElementById('form-body').innerHTML=secs.map(function(s){
+    if(!OPEN_SECS.hasOwnProperty(s.key)) OPEN_SECS[s.key]=false;
+    return '<div class="sec-card"><div class="sec-hdr" onclick="toggleSec(\''+s.key+'\')">'
+      +'<span class="sec-icon">'+s.icon+'</span><span class="sec-title">'+s.title+'</span>'
+      +'<span class="sec-chev'+(OPEN_SECS[s.key]?' open':'')+'" id="sch-'+s.key+'">▾</span>'
+      +'</div><div class="sec-body-wrap'+(OPEN_SECS[s.key]?' open':'')+'" id="sbw-'+s.key+'">'
+      +build(s.key)+'</div></div>';
+  }).join('');
+}
+function rerender(k){ var el=document.getElementById('sbw-'+k); if(el)el.innerHTML=build(k); }
+function build(k){
+  if(k==='meta')       return bMeta();
+  if(k==='updates')    return bUpdates();
+  if(k==='blockers')   return bBlockers();
+  if(k==='documents')  return bDocuments();
+  if(k==='milestones') return bMilestones();
+  if(k==='contact')    return bContact();
+  return '';
+}
+
+/* META */
+function bMeta(){
+  var m=CUR.meta;
+  var phPills=PHASES.map(function(p){
+    return '<div class="phase-pill'+(m.phase===p.k?' act':'')+'" onclick="CUR.meta.phase=\''+p.k+'\';debounceSave();rerender(\'meta\')">'+p.l+'</div>';
+  }).join('');
+  var spPills=STATUS.map(function(s){
+    return '<div class="sp sp-'+s.k+(m.status===s.k?' act':'')+'" onclick="CUR.meta.status=\''+s.k+'\';debounceSave();rerender(\'meta\')">'+s.l+'</div>';
+  }).join('');
+  return '<div class="sec-body"><div class="sec-grid">'
+    +'<div class="fld"><label class="fld-lbl">Client Name</label><input class="sec-in" value="'+esc(m.clientName)+'" onchange="CUR.meta.clientName=this.value;updateHeading();debounceSave()"/></div>'
+    +'<div class="fld"><label class="fld-lbl">Project Name</label><input class="sec-in" value="'+esc(m.projectName)+'" onchange="CUR.meta.projectName=this.value;updateHeading();debounceSave()"/></div>'
+    +'<div class="fld"><label class="fld-lbl">Project Code</label><input class="sec-in" value="'+esc(m.projectCode||'')+'" onchange="CUR.meta.projectCode=this.value;debounceSave()"/></div>'
+    +'<div class="fld"><label class="fld-lbl">Target Completion</label><input type="date" class="sec-in" value="'+esc(m.targetDate||'')+'" onchange="CUR.meta.targetDate=this.value;debounceSave()"/></div>'
+    +'<div class="fld sec-full"><label class="fld-lbl">Project Overview (shown to client)</label><textarea class="sec-ta" onchange="CUR.meta.overview=this.value;debounceSave()" placeholder="Brief description of what this project is and what SCM Solution is doing on this engagement">'+esc(m.overview||'')+'</textarea></div>'
+    +'</div>'
+    +'<div class="sec-lbl">Current Phase</div><div class="phase-pills">'+phPills+'</div>'
+    +'<div class="sec-lbl" style="margin-top:14px">Project Status</div><div class="status-pills">'+spPills+'</div>'
+    +'</div>';
+}
+
+/* UPDATES */
+function bUpdates(){
+  var upds=CUR.updates;
+  var catOpts=UPDATE_CATS.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('');
+  var catColor={'Update':'#1B6FA8','Milestone':'#1D9E75','Decision':'#6C4EBF','Alert':'#D85A30','Document Shared':'#EF9F27'};
+  return '<div class="sec-body">'
+    +'<p style="font-size:12px;color:var(--gray-mid);margin-bottom:12px">Newest entries appear first in the client view. Use <strong>Alert</strong> for anything urgent.</p>'
+    +'<div class="dt-wrap"><table class="dtbl"><thead><tr><th style="width:95px">Date</th><th style="width:110px">Category</th><th>Title</th><th>Detail</th><th></th></tr></thead><tbody>'
+    +upds.map(function(u,i){
+      return '<tr><td><input class="dt-in" type="date" value="'+esc(u.date)+'" onchange="CUR.updates['+i+'].date=this.value;debounceSave()"/></td>'
+        +'<td><select class="dt-sel" onchange="CUR.updates['+i+'].category=this.value;debounceSave()"><option value="">— Type —</option>'+UPDATE_CATS.map(function(c){return '<option value="'+esc(c)+'"'+(u.category===c?' selected':'')+'>'+esc(c)+'</option>';}).join('')+'</select></td>'
+        +'<td><input class="dt-in" value="'+esc(u.title)+'" placeholder="Short headline" onchange="CUR.updates['+i+'].title=this.value;debounceSave()"/></td>'
+        +'<td><input class="dt-in" value="'+esc(u.body||'')+'" placeholder="More detail (optional)" onchange="CUR.updates['+i+'].body=this.value;debounceSave()"/></td>'
+        +'<td><button class="dt-rm" onclick="rmUpdate('+i+')">×</button></td></tr>';
+    }).join('')
+    +'</tbody></table></div>'
+    +'<button class="btn-add-row" onclick="addUpdate()">+ Add Update</button>'
+    +'</div>';
+}
+function addUpdate(){ CUR.updates.unshift({id:uid(),date:today(),category:'Update',title:'',body:''}); debounceSave(); rerender('updates'); }
+function rmUpdate(i){ CUR.updates.splice(i,1); debounceSave(); rerender('updates'); }
+
+/* BLOCKERS */
+function bBlockers(){
+  var blks=CUR.blockers;
+  return '<div class="sec-body">'
+    +'<p style="font-size:12px;color:var(--gray-mid);margin-bottom:12px">Blockers are shown prominently in the client view. Mark "Client Action Required" for things the client needs to respond to.</p>'
+    +'<div class="dt-wrap"><table class="dtbl"><thead><tr><th>Blocker / Issue</th><th>Detail</th><th style="width:100px">Owner</th><th style="width:90px">Due</th><th style="width:120px">Status</th><th></th></tr></thead><tbody>'
+    +blks.map(function(b,i){
+      return '<tr><td><input class="dt-in" value="'+esc(b.title)+'" placeholder="What is blocked?" onchange="CUR.blockers['+i+'].title=this.value;debounceSave()"/></td>'
+        +'<td><input class="dt-in" value="'+esc(b.detail||'')+'" placeholder="More context" onchange="CUR.blockers['+i+'].detail=this.value;debounceSave()"/></td>'
+        +'<td><input class="dt-in" value="'+esc(b.owner||'')+'" placeholder="Client / SCM" onchange="CUR.blockers['+i+'].owner=this.value;debounceSave()"/></td>'
+        +'<td><input class="dt-in" type="date" value="'+esc(b.dueDate||'')+'" onchange="CUR.blockers['+i+'].dueDate=this.value;debounceSave()"/></td>'
+        +'<td><select class="dt-sel" onchange="CUR.blockers['+i+'].status=this.value;debounceSave()">'+BLK_STATUS.map(function(s){return '<option value="'+esc(s)+'"'+(b.status===s?' selected':'')+'>'+esc(s)+'</option>';}).join('')+'</select></td>'
+        +'<td><button class="dt-rm" onclick="rmBlocker('+i+')">×</button></td></tr>';
+    }).join('')
+    +'</tbody></table></div>'
+    +'<button class="btn-add-row" onclick="addBlocker()">+ Add Blocker</button>'
+    +'</div>';
+}
+function addBlocker(){ CUR.blockers.push({id:uid(),title:'',detail:'',owner:'Client',dueDate:'',status:'Open'}); debounceSave(); rerender('blockers'); }
+function rmBlocker(i){ CUR.blockers.splice(i,1); debounceSave(); rerender('blockers'); }
+
+/* DOCUMENTS */
+function bDocuments(){
+  var docs=CUR.documents;
+  var docStatusOpts=['Shared','Awaiting Client Review','Approved','Superseded'];
+  return '<div class="sec-body">'
+    +'<div class="dt-wrap"><table class="dtbl"><thead><tr><th>Document</th><th style="width:120px">Type</th><th style="width:90px">Date Shared</th><th style="width:100px">Version</th><th style="width:110px">Status</th><th></th></tr></thead><tbody>'
+    +docs.map(function(d,i){
+      return '<tr><td><input class="dt-in" value="'+esc(d.name)+'" placeholder="e.g. SmartVest TRD V1" onchange="CUR.documents['+i+'].name=this.value;debounceSave()"/></td>'
+        +'<td><select class="dt-sel" onchange="CUR.documents['+i+'].type=this.value;debounceSave()"><option value="">— Select —</option>'+DOC_TYPES.map(function(t){return '<option value="'+esc(t)+'"'+(d.type===t?' selected':'')+'>'+esc(t)+'</option>';}).join('')+'</select></td>'
+        +'<td><input class="dt-in" type="date" value="'+esc(d.date||'')+'" onchange="CUR.documents['+i+'].date=this.value;debounceSave()"/></td>'
+        +'<td><input class="dt-in" value="'+esc(d.version||'')+'" placeholder="V1.0" onchange="CUR.documents['+i+'].version=this.value;debounceSave()"/></td>'
+        +'<td><select class="dt-sel" onchange="CUR.documents['+i+'].status=this.value;debounceSave()">'+docStatusOpts.map(function(s){return '<option value="'+esc(s)+'"'+(d.status===s?' selected':'')+'>'+esc(s)+'</option>';}).join('')+'</select></td>'
+        +'<td><button class="dt-rm" onclick="rmDoc('+i+')">×</button></td></tr>';
+    }).join('')
+    +'</tbody></table></div>'
+    +'<button class="btn-add-row" onclick="addDoc()">+ Add Document</button>'
+    +'</div>';
+}
+function addDoc(){ CUR.documents.push({id:uid(),name:'',type:'',date:today(),version:'',status:'Shared'}); debounceSave(); rerender('documents'); }
+function rmDoc(i){ CUR.documents.splice(i,1); debounceSave(); rerender('documents'); }
+
+/* MILESTONES */
+function bMilestones(){
+  var ms=CUR.milestones;
+  return '<div class="sec-body">'
+    +'<div class="dt-wrap"><table class="dtbl"><thead><tr><th>Milestone</th><th style="width:100px">Target Date</th><th style="width:110px">Status</th><th></th></tr></thead><tbody>'
+    +ms.map(function(m,i){
+      return '<tr><td><input class="dt-in" value="'+esc(m.title)+'" placeholder="e.g. TRD Sign-off by Client" onchange="CUR.milestones['+i+'].title=this.value;debounceSave()"/></td>'
+        +'<td><input class="dt-in" type="date" value="'+esc(m.date||'')+'" onchange="CUR.milestones['+i+'].date=this.value;debounceSave()"/></td>'
+        +'<td><select class="dt-sel" onchange="CUR.milestones['+i+'].status=this.value;debounceSave()">'+MS_STATUS.map(function(s){return '<option value="'+esc(s)+'"'+(m.status===s?' selected':'')+'>'+esc(s)+'</option>';}).join('')+'</select></td>'
+        +'<td><button class="dt-rm" onclick="rmMS('+i+')">×</button></td></tr>';
+    }).join('')
+    +'</tbody></table></div>'
+    +'<button class="btn-add-row" onclick="addMS()">+ Add Milestone</button>'
+    +'</div>';
+}
+function addMS(){ CUR.milestones.push({id:uid(),title:'',date:'',status:'Upcoming'}); debounceSave(); rerender('milestones'); }
+function rmMS(i){ CUR.milestones.splice(i,1); debounceSave(); rerender('milestones'); }
+
+/* CONTACT */
+function bContact(){
+  var m=CUR.meta;
+  return '<div class="sec-body"><div class="sec-grid">'
+    +'<div class="fld"><label class="fld-lbl">PM / Lead Name</label><input class="sec-in" value="'+esc(m.pmName||'')+'" onchange="CUR.meta.pmName=this.value;debounceSave()"/></div>'
+    +'<div class="fld"><label class="fld-lbl">PM Email</label><input class="sec-in" type="email" value="'+esc(m.pmEmail||'')+'" onchange="CUR.meta.pmEmail=this.value;debounceSave()"/></div>'
+    +'<div class="fld"><label class="fld-lbl">PM Phone / WeChat</label><input class="sec-in" value="'+esc(m.pmPhone||'')+'" onchange="CUR.meta.pmPhone=this.value;debounceSave()"/></div>'
+    +'</div></div>';
+}
+
+/* PREVIEW HTML */
+function generateHTML(){
+  var m=CUR.meta;
+  var phIdx=PHASES.findIndex(function(p){return p.k===m.phase;});
+  var statColor=STATUS_COLOR[m.status]||'#1D9E75';
+  var statBg=STATUS_BG[m.status]||'#E1F5EE';
+  var statLabel=(STATUS.find(function(s){return s.k===m.status;})||{l:'On Track'}).l;
+
+  var CAT_COLOR={'Update':'#1B6FA8','Milestone':'#1D9E75','Decision':'#6C4EBF','Alert':'#D85A30','Document Shared':'#EF9F27'};
+  var MS_COLOR={'Complete':'#1D9E75','Upcoming':'#888','In Progress':'#1B6FA8','At Risk':'#EF9F27','Delayed':'#D85A30'};
+  var BLK_COLOR={'Open':'#D85A30','Client Action Required':'#EF9F27','In Progress':'#1B6FA8','Resolved':'#1D9E75'};
+  var DOC_STATUS_COLOR={'Shared':'#1B6FA8','Awaiting Client Review':'#EF9F27','Approved':'#1D9E75','Superseded':'#888'};
+
+  /* PHASE PROGRESS */
+  var phaseBar=PHASES.map(function(p,i){
+    var done=i<phIdx, curr=i===phIdx;
+    var bg=done?'#1D9E75':curr?'#1A2E3B':'#E8E6E0';
+    var col=done||curr?'#fff':'#aaa';
+    var bord=curr?'2px solid #5DCAA5':'2px solid transparent';
+    return '<div style="flex:1;min-width:0;text-align:center">'
+      +'<div style="width:36px;height:36px;border-radius:50%;background:'+bg+';border:'+bord+';margin:0 auto 5px;display:flex;align-items:center;justify-content:center;font-size:14px;color:'+col+';font-weight:700">'+(done?'✓':(i+1))+'</div>'
+      +'<div style="font-size:10px;font-weight:700;color:'+(curr?'#1A2E3B':'#aaa')+'">'+esc(p.l)+'</div>'
+      +'<div style="font-size:9px;color:#bbb">'+esc(p.sub)+'</div></div>';
+  }).join('<div style="flex:0 0 12px;height:2px;background:#e0e0e0;align-self:center;margin-top:-14px"></div>');
+
+  /* STAT CARDS */
+  var openBlockers=CUR.blockers.filter(function(b){return b.status!=='Resolved';}).length;
+  var sharedDocs=CUR.documents.length;
+  var nextMS=CUR.milestones.filter(function(m){return m.status!=='Complete'&&m.date;}).sort(function(a,b){return a.date<b.date?-1:1;})[0];
+  var statCards=[
+    {icon:'📍',label:'Current Phase',val:(PHASES.find(function(p){return p.k===m.phase;})||{l:m.phase}).l},
+    {icon:'📅',label:'Target Completion',val:m.targetDate||'TBD'},
+    {icon:'🚧',label:'Open Blockers',val:openBlockers>0?openBlockers+' item'+(openBlockers>1?'s':''):'None'},
+    {icon:'📁',label:'Documents Shared',val:sharedDocs+' file'+(sharedDocs!==1?'s':'')}
+  ].map(function(c){
+    return '<div style="background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:16px;text-align:center">'
+      +'<div style="font-size:24px;margin-bottom:4px">'+c.icon+'</div>'
+      +'<div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#aaa;margin-bottom:4px">'+c.label+'</div>'
+      +'<div style="font-size:16px;font-weight:700;color:#1A2E3B">'+esc(c.val)+'</div></div>';
+  }).join('');
+
+  /* UPDATES */
+  var updHTML='';
+  if(CUR.updates.length){
+    updHTML=CUR.updates.filter(function(u){return u.title;}).slice(0,20).map(function(u){
+      var cc=CAT_COLOR[u.category]||'#888';
+      return '<div style="display:flex;gap:14px;padding:12px 0;border-bottom:1px solid #f0f0f0">'
+        +'<div style="flex-shrink:0;text-align:right;min-width:80px"><div style="font-size:11px;color:#aaa;margin-top:2px">'+esc(u.date)+'</div></div>'
+        +'<div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">'
+        +(u.category?'<span style="background:'+cc+'20;border:1px solid '+cc+'50;color:'+cc+';font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px">'+esc(u.category)+'</span>':'')
+        +'<span style="font-size:13px;font-weight:600;color:#1A2E3B">'+esc(u.title)+'</span></div>'
+        +(u.body?'<div style="font-size:12px;color:#666;line-height:1.5">'+esc(u.body).replace(/\n/g,'<br/>')+'</div>':'')
+        +'</div></div>';
+    }).join('');
+  }
+
+  /* BLOCKERS */
+  var blkHTML='';
+  var activeBlk=CUR.blockers.filter(function(b){return b.title&&b.status!=='Resolved';});
+  if(activeBlk.length){
+    blkHTML=activeBlk.map(function(b){
+      var bc=BLK_COLOR[b.status]||'#D85A30';
+      var isClient=b.status==='Client Action Required';
+      return '<div style="background:'+(isClient?'#FFFBF0':'#FFF8F6')+';border:1.5px solid '+(isClient?'#EF9F27':'#D85A30')+'40;border-radius:10px;padding:14px;margin-bottom:8px">'
+        +'<div style="display:flex;align-items:flex-start;gap:10px">'
+        +'<div style="font-size:18px;flex-shrink:0">'+(isClient?'⚠️':'🚧')+'</div>'
+        +'<div style="flex:1"><div style="font-size:13px;font-weight:700;color:#1A2E3B;margin-bottom:3px">'+esc(b.title)+'</div>'
+        +(b.detail?'<div style="font-size:12px;color:#666;margin-bottom:6px">'+esc(b.detail)+'</div>':'')
+        +'<div style="display:flex;gap:10px;flex-wrap:wrap">'
+        +(b.owner?'<span style="font-size:11px;color:#888">Owner: <strong>'+esc(b.owner)+'</strong></span>':'')
+        +(b.dueDate?'<span style="font-size:11px;color:#888">Due: <strong>'+esc(b.dueDate)+'</strong></span>':'')
+        +'<span style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:'+bc+';background:'+bc+'15;padding:2px 7px;border-radius:4px">'+esc(b.status)+'</span>'
+        +'</div></div></div></div>';
+    }).join('');
+  }
+
+  /* DOCUMENTS */
+  var docsHTML='';
+  if(CUR.documents.length){
+    docsHTML='<table style="width:100%;border-collapse:collapse;font-size:12px">'
+      +'<tr style="background:#f5f4f1"><th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;border-bottom:1px solid #e0e0e0">Document</th>'
+      +'<th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;border-bottom:1px solid #e0e0e0">Type</th>'
+      +'<th style="padding:8px 10px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;border-bottom:1px solid #e0e0e0">Date</th>'
+      +'<th style="padding:8px 10px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;border-bottom:1px solid #e0e0e0">Ver.</th>'
+      +'<th style="padding:8px 10px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;border-bottom:1px solid #e0e0e0">Status</th></tr>'
+      +CUR.documents.map(function(d,ri){
+        var sc=DOC_STATUS_COLOR[d.status]||'#888';
+        return '<tr style="background:'+(ri%2===0?'#fafaf8':'#fff')+'">'
+          +'<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;color:#1A2E3B">📄 '+esc(d.name)+'</td>'
+          +'<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#666">'+esc(d.type)+'</td>'
+          +'<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#888;text-align:center">'+esc(d.date)+'</td>'
+          +'<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#888;text-align:center">'+esc(d.version)+'</td>'
+          +'<td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center"><span style="color:'+sc+';font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">'+esc(d.status)+'</span></td></tr>';
+      }).join('')
+      +'</table>';
+  }
+
+  /* MILESTONES */
+  var msHTML='';
+  if(CUR.milestones.length){
+    msHTML=CUR.milestones.map(function(ms){
+      var mc=MS_COLOR[ms.status]||'#888';
+      var done=ms.status==='Complete';
+      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0">'
+        +'<div style="width:10px;height:10px;border-radius:50%;background:'+mc+';flex-shrink:0"></div>'
+        +'<div style="flex:1;font-size:13px;color:'+(done?'#aaa':'#1A2E3B')+';'+(done?'text-decoration:line-through':'')+'">'+esc(ms.title)+'</div>'
+        +'<div style="font-size:11px;color:#aaa;flex-shrink:0">'+esc(ms.date)+'</div>'
+        +'<div style="flex-shrink:0"><span style="font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:'+mc+';background:'+mc+'18;padding:2px 7px;border-radius:4px;border:1px solid '+mc+'40">'+esc(ms.status)+'</span></div>'
+        +'</div>';
+    }).join('');
+  }
+
+  /* SECTION WRAPPER */
+  function sec(title,icon,content){
+    return '<div style="background:#fff;border:1px solid #E8E6E0;border-radius:14px;margin-bottom:16px;overflow:hidden">'
+      +'<div style="padding:14px 20px 12px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px">'
+      +'<span style="font-size:16px">'+icon+'</span>'
+      +'<span style="font-size:14px;font-weight:700;color:#1A2E3B">'+title+'</span></div>'
+      +'<div style="padding:16px 20px">'+content+'</div></div>';
+  }
+
+  var contactLine='';
+  if(m.pmName||m.pmEmail||m.pmPhone){
+    contactLine='<div style="display:flex;gap:20px;flex-wrap:wrap;font-size:12px;color:#666">'
+      +(m.pmName?'<span><strong>'+esc(m.pmName)+'</strong></span>':'')
+      +(m.pmEmail?'<span>✉ <a href="mailto:'+esc(m.pmEmail)+'" style="color:#1B6FA8">'+esc(m.pmEmail)+'</a></span>':'')
+      +(m.pmPhone?'<span>📱 '+esc(m.pmPhone)+'</span>':'')
+      +'</div>';
+  }
+
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/>'
+    +'<meta name="viewport" content="width=device-width,initial-scale=1"/>'
+    +'<title>'+esc(m.clientName)+' — '+esc(m.projectName)+' | SCM Solution</title>'
+    +'<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet"/>'
+    +'<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:"Barlow",sans-serif;background:#F5F4F1;color:#1A2E3B;font-size:14px;line-height:1.5}a{color:#1B6FA8}@media(max-width:600px){.stat-grid{grid-template-columns:1fr 1fr!important}.ph-sub{display:none}}</style>'
+    +'</head><body>'
+
+    /* TOP NAV */
+    +'<div style="background:#1A2E3B;padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between">'
+    +'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:18px;font-weight:800;letter-spacing:.1em;color:#E8F1F8">SCM<span style="font-weight:400"> Solution</span></div>'
+    +'<div style="font-size:11px;color:rgba(255,255,255,.35)">Project Portal</div></div>'
+
+    /* HERO */
+    +'<div style="background:#fff;border-bottom:1px solid #e8e8e8;padding:28px 24px 24px">'
+    +'<div style="max-width:960px;margin:0 auto">'
+    +'<div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#aaa;margin-bottom:6px">'+esc(m.clientName)+(m.projectCode?' · '+esc(m.projectCode):'')+'</div>'
+    +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">'
+    +'<div><h1 style="font-family:\'Barlow Condensed\',sans-serif;font-size:30px;font-weight:800;color:#1A2E3B;line-height:1.1">'+esc(m.projectName)+'</h1>'
+    +(m.overview?'<p style="font-size:13px;color:#666;margin-top:6px;max-width:600px;line-height:1.6">'+esc(m.overview).replace(/\n/g,'<br/>')+'</p>':'')
+    +'</div>'
+    +'<div style="text-align:right;flex-shrink:0">'
+    +'<div style="display:inline-flex;align-items:center;gap:8px;background:'+statBg+';border:1.5px solid '+statColor+'50;border-radius:8px;padding:8px 16px">'
+    +'<div style="width:8px;height:8px;border-radius:50%;background:'+statColor+'"></div>'
+    +'<span style="font-size:13px;font-weight:700;color:'+statColor+'">'+esc(statLabel)+'</span></div>'
+    +'<div style="font-size:10px;color:#aaa;margin-top:6px">Last updated: '+esc(m.lastUpdated||'—')+'</div>'
+    +'</div></div>'
+
+    /* PHASE PROGRESS */
+    +'<div style="margin-top:24px;padding:20px;background:#FAFAF8;border:1px solid #E8E6E0;border-radius:12px">'
+    +'<div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#aaa;margin-bottom:14px">Project Phase</div>'
+    +'<div style="display:flex;align-items:flex-start;gap:0">'+phaseBar+'</div></div>'
+    +'</div></div>'
+
+    /* BODY */
+    +'<div style="max-width:960px;margin:0 auto;padding:24px 24px 60px">'
+
+    /* STAT CARDS */
+    +'<div class="stat-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:20px">'+statCards+'</div>'
+
+    /* BLOCKERS */
+    +(activeBlk.length?sec('Action Required 🚧','',blkHTML):'')
+
+    /* UPDATES */
+    +(CUR.updates.filter(function(u){return u.title;}).length
+      ?sec('Project Updates','📢',updHTML||'<div style="color:#aaa;font-size:13px">No updates yet.</div>')
+      :'')
+
+    /* DOCUMENTS */
+    +(CUR.documents.length?sec('Documents','📁',docsHTML):'')
+
+    /* MILESTONES */
+    +(CUR.milestones.length?sec('Milestones','🎯',msHTML):'')
+
+    /* CONTACT */
+    +(contactLine?sec('Your SCM Contact','📞',contactLine):'')
+
+    +'<div style="text-align:center;padding-top:24px;font-size:11px;color:#bbb">'
+    +'SCM Solution LTD · '+esc(m.clientName)+' · '+esc(m.projectName)+(m.projectCode?' · '+esc(m.projectCode):'')
+    +'<br/>This document is confidential and intended only for the named client</div>'
+    +'</div></body></html>';
+}
+
+function renderPreview(){
+  var m=CUR.meta;
+  document.getElementById('prev-title').textContent=m.clientName+' — '+m.projectName;
+  CUR.meta.lastUpdated=today(); debounceSave();
+  var html=generateHTML();
+  var iframe=document.getElementById('prev-iframe');
+  iframe.contentDocument.open(); iframe.contentDocument.write(html); iframe.contentDocument.close();
+}
+function printDash(){ document.getElementById('prev-iframe').contentWindow.print(); }
+function exportHTML(){
+  var m=CUR.meta;
+  var html=generateHTML();
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=(m.projectCode||m.clientName).replace(/[^a-zA-Z0-9-_]/g,'-')+'-dashboard.html';
+  a.click(); URL.revokeObjectURL(a.href);
+}
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+loadAll(); renderList();
+</script>
+</body>
+</html>

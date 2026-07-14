@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tech Pack — SCM Bridge OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1A2E3B;--navy2:#2C4A5E;
+  --teal:#1D9E75;--teal-dk:#085041;--teal-lt:#E1F5EE;--teal-bd:#5DCAA5;
+  --amber:#EF9F27;--amber-lt:#FAEEDA;
+  --coral:#D85A30;--coral-lt:#FAECE7;
+  --gray-bg:#F5F4F1;--gray-line:#E0DED8;--gray-mid:#888780;--gray-dk:#444441;
+  --white:#fff;--black:#1A1A19;--blue-btn:#1B6FA8;
+}
+body{font-family:'Barlow',sans-serif;background:var(--gray-bg);color:var(--black);font-size:14px;line-height:1.5}
+input,textarea,select,button{font-family:inherit}
+button{cursor:pointer;border:none;background:none}
+textarea{resize:vertical}
+.screen{display:none;min-height:100vh}.screen.active{display:block}
+
+#home{background:var(--navy)}
+.home-wrap{max-width:720px;margin:0 auto;padding:36px 24px 60px}
+.home-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:6px}
+.home-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--white);line-height:1.1;margin-bottom:4px}
+.home-sub{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:28px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.btn-primary{background:var(--teal);color:var(--white);border-radius:10px;padding:11px 22px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:filter .15s}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-ghost{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:11px 18px;font-size:13px;transition:background .15s}
+.btn-ghost:hover{background:rgba(255,255,255,.14)}
+.new-form{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:20px;margin-bottom:24px;display:none;animation:fadeUp .2s ease}
+.nf-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:14px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.fg-full{grid-column:1/-1}
+.fl label{display:block;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:3px}
+.fl input,.fl select{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--white);outline:none;transition:border-color .15s}
+.fl input:focus,.fl select:focus{border-color:var(--teal-bd)}
+.fl input::placeholder{color:rgba(255,255,255,.3)}
+.sessions-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px}
+.tp-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.tp-info{flex:1;min-width:0}
+.tp-name{font-size:15px;color:var(--white);margin-bottom:2px}
+.tp-meta{font-size:11px;color:rgba(255,255,255,.4)}
+.tp-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.btn-teal{background:var(--teal);color:var(--white);border-radius:20px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.btn-sm{border-radius:8px;padding:7px 14px;font-size:12px}
+.btn-danger{color:rgba(255,80,80,.6);font-size:11px;padding:4px}
+.empty{text-align:center;padding:48px 0;color:rgba(255,255,255,.3);font-size:14px}
+
+#form-screen{background:var(--gray-bg)}
+.form-hdr{background:var(--teal-dk);padding:12px 18px 10px;position:sticky;top:52px;z-index:100;box-shadow:0 2px 14px rgba(0,0,0,.22)}
+.form-hdr-inner{max-width:900px;margin:0 auto}
+.form-top{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.form-back{font-size:18px;color:var(--teal-lt);background:rgba(255,255,255,.1);border-radius:8px;padding:4px 10px}
+.form-back:hover{background:rgba(255,255,255,.2)}
+.form-heading{flex:1;font-size:15px;color:var(--white);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.form-actions{display:flex;gap:7px;align-items:center;flex-shrink:0}
+.save-msg{font-size:11px;color:var(--teal-bd);min-width:55px}
+.btn-blue{background:var(--blue-btn);color:var(--white);border-radius:20px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.form-body{max-width:900px;margin:0 auto;padding:14px 14px 60px}
+
+.sec-card{background:var(--white);border-radius:14px;overflow:hidden;margin-bottom:10px;border:1px solid var(--gray-line);animation:fadeUp .2s ease}
+.sec-hdr{display:flex;align-items:center;gap:9px;padding:11px 14px;cursor:pointer;user-select:none;background:#FAFAF8}
+.sec-num{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--teal);min-width:20px}
+.sec-title{flex:1;font-size:14px;font-weight:500}
+.sec-chev{font-size:11px;color:var(--gray-mid);transition:transform .2s}
+.sec-chev.open{transform:rotate(180deg)}
+.sec-body-wrap{display:none}
+.sec-body-wrap.open{display:block}
+.sec-body{padding:16px}
+.sec-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid);margin-bottom:6px;margin-top:14px}
+.sec-lbl:first-child{margin-top:0}
+.sec-ta{width:100%;min-height:80px;padding:9px 11px;font-size:13px;border:1px solid var(--gray-line);border-radius:8px;background:#FAFAF8;color:var(--black);line-height:1.6;font-family:'Barlow',sans-serif}
+.sec-ta:focus{outline:none;border-color:var(--teal)}
+.sec-in{width:100%;padding:7px 10px;font-size:13px;border:1px solid var(--gray-line);border-radius:8px;background:#FAFAF8;color:var(--black)}
+.sec-in:focus{outline:none;border-color:var(--teal)}
+.sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sec-full{grid-column:1/-1}
+.fld{display:flex;flex-direction:column;gap:3px}
+.fld-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid)}
+
+.dt-wrap{overflow-x:auto;margin-bottom:6px}
+.dtbl{width:100%;border-collapse:collapse;font-size:12px}
+.dtbl th{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid);padding:6px 7px;border-bottom:1px solid var(--gray-line);text-align:left;background:#FAFAF8;white-space:nowrap}
+.dtbl td{padding:3px 3px;border-bottom:1px solid var(--gray-line);vertical-align:middle}
+.dtbl tr:last-child td{border-bottom:none}
+.dt-in{width:100%;padding:5px 7px;font-size:12px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--black);font-family:'Barlow',sans-serif}
+.dt-in:focus{outline:none;border-color:var(--teal);background:var(--teal-lt)}
+.dt-rm{color:rgba(216,90,48,.35);font-size:15px;padding:2px 5px;cursor:pointer;border-radius:4px;line-height:1;border:none;background:none}
+.dt-rm:hover{color:var(--coral);background:var(--coral-lt)}
+.btn-add-row{margin-top:6px;font-size:12px;color:var(--teal);padding:5px 11px;border:1px dashed var(--teal-bd);border-radius:7px;background:var(--teal-lt);cursor:pointer;transition:all .15s}
+.btn-add-row:hover{background:var(--teal);color:var(--white)}
+
+.spec-panel{background:#FAFAF8;border:1px solid var(--gray-line);border-radius:10px;padding:14px;margin-bottom:10px}
+.spec-panel-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.spec-panel-label{font-size:12px;font-weight:700;color:var(--gray-mid);flex-shrink:0}
+
+.img-box{border:1.5px dashed var(--teal-bd);border-radius:10px;padding:14px;text-align:center;cursor:pointer;background:var(--teal-lt);margin-bottom:10px;min-height:70px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;position:relative}
+.img-box img{max-width:100%;max-height:220px;border-radius:6px;display:block}
+.img-box-hint{font-size:11px;color:var(--teal-dk);opacity:.7}
+.img-box-icon{font-size:22px;color:var(--teal)}
+.img-box-replace{font-size:10px;color:var(--teal-dk);margin-top:4px;opacity:.6}
+
+#preview-screen{background:#e8e8e8}
+.prev-hdr{background:var(--navy);padding:10px 20px;display:flex;align-items:center;gap:10px;position:sticky;top:52px;z-index:100}
+.prev-title{flex:1;font-size:13px;color:rgba(255,255,255,.5)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.fg,.sec-grid{grid-template-columns:1fr}.fg-full,.sec-full{grid-column:1}}
+</style>
+</head>
+<body>
+<div id="site-nav-root"></div>
+<script src="../nav.js"></script>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="home-wrap">
+    <div class="home-label">SCM Solution LTD</div>
+    <div class="home-title">Tech Pack</div>
+    <div class="home-sub">Soft goods technical specification documents for factory production</div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="showNewForm()">+ New Tech Pack</button>
+    </div>
+    <div class="new-form" id="new-form">
+      <div class="nf-title">New Tech Pack</div>
+      <div class="fg">
+        <div class="fl fg-full"><label>Product Name *</label><input id="nf-product" placeholder="e.g. Children's Safety Vest"/></div>
+        <div class="fl"><label>Client / Brand</label><input id="nf-client" placeholder="e.g. Vayyar Care"/></div>
+        <div class="fl"><label>Version</label><input id="nf-version" placeholder="V1"/></div>
+        <div class="fl"><label>Date</label><input id="nf-date" type="date"/></div>
+        <div class="fl"><label>Designer / Author</label><input id="nf-designer" placeholder="e.g. Patrick McGuinness"/></div>
+        <div class="fl"><label>Season / Year</label><input id="nf-season" placeholder="e.g. FW2025"/></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="createTP()">Create Tech Pack</button>
+        <button class="btn-ghost" onclick="hideNewForm()">Cancel</button>
+      </div>
+    </div>
+    <div class="sessions-label">Saved Tech Packs</div>
+    <div id="tp-list"><div class="empty">No tech packs yet — tap New Tech Pack to begin</div></div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div id="form-screen" class="screen">
+  <div class="form-hdr">
+    <div class="form-hdr-inner">
+      <div class="form-top">
+        <button class="form-back" onclick="goHome()">←</button>
+        <div class="form-heading" id="form-heading">Tech Pack</div>
+        <div class="form-actions">
+          <span class="save-msg" id="save-msg"></span>
+          <button class="btn-blue btn-sm" onclick="goPreview()">Preview / Export</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-body" id="form-body"></div>
+</div>
+
+<!-- PREVIEW -->
+<div id="preview-screen" class="screen">
+  <div class="prev-hdr">
+    <button class="form-back" onclick="goForm()" style="color:#fff;font-size:18px;background:rgba(255,255,255,.1);border-radius:8px;padding:4px 10px">←</button>
+    <span class="prev-title" id="prev-title">Tech Pack Preview</span>
+    <button class="btn-teal btn-sm" onclick="printTP()">Print / Export PDF</button>
+  </div>
+  <iframe id="prev-iframe" style="width:100%;height:calc(100vh - 104px);border:none;background:#fff"></iframe>
+</div>
+
+<script>
+var SAVE_KEY = 'scm_techpack_v1';
+var ALL = [];
+var CUR = null;
+var _st = null;
+
+function loadAll() { try { ALL = JSON.parse(localStorage.getItem(SAVE_KEY)||'[]'); } catch(e){ ALL=[]; } }
+function saveAll() {
+  localStorage.setItem(SAVE_KEY, JSON.stringify(ALL));
+  var m = document.getElementById('save-msg');
+  if (m) { m.textContent='Saved ✓'; setTimeout(function(){ m.textContent=''; },1500); }
+}
+function debounceSave() {
+  clearTimeout(_st);
+  _st = setTimeout(function(){
+    if (!CUR) return;
+    var i = ALL.findIndex(function(t){ return t.id===CUR.id; });
+    if (i===-1) ALL.push(CUR); else ALL[i]=CUR;
+    saveAll();
+  }, 600);
+}
+
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+
+function blankTP(meta) {
+  return {
+    id: uid(), created: new Date().toISOString().slice(0,10), meta: meta,
+    desc: { text:'', img:'' },
+    schedule: {
+      milestones: [{ date:'', note:'' }],
+      fc: { sizes:['Small','Large'], rows:[{ year:'2025', qtys:['',''] }] }
+    },
+    specs: [{ id:uid(), name:'', patternFile:'', img:'', fabric:'', fabricSpec:'', seams:'', notes:'', annotations:[{ ref:'', detail:'' }] }],
+    pom: { sizes:['S','L'], rows:[{ point:'', specs:['',''], tol:'±1cm' }] },
+    cmf: { rows:[{ component:'', material:'', color:'', code:'', spec:'', notes:'' }] },
+    bom: { rows:[{ num:'1', component:'', material:'', supplier:'', color:'', qty:'', unit:'pcs', notes:'' }] }
+  };
+}
+
+/* SCREENS */
+function show(id){ document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');}); document.getElementById(id).classList.add('active'); }
+function goHome(){ show('home'); renderList(); }
+function goForm(){ show('form-screen'); }
+function goPreview(){ show('preview-screen'); renderPreview(); }
+
+/* HOME */
+function showNewForm(){ document.getElementById('new-form').style.display='block'; document.getElementById('nf-date').value=new Date().toISOString().slice(0,10); }
+function hideNewForm(){ document.getElementById('new-form').style.display='none'; }
+function createTP(){
+  var p=document.getElementById('nf-product').value.trim();
+  if(!p){alert('Product name required');return;}
+  var meta={productName:p,client:document.getElementById('nf-client').value.trim(),version:document.getElementById('nf-version').value.trim()||'V1',date:document.getElementById('nf-date').value,designer:document.getElementById('nf-designer').value.trim(),season:document.getElementById('nf-season').value.trim(),confidential:true};
+  CUR=blankTP(meta); ALL.push(CUR); saveAll(); hideNewForm(); openTP(CUR);
+}
+function openTP(tp){ CUR=tp; show('form-screen'); document.getElementById('form-heading').textContent=tp.meta.productName+' — '+tp.meta.version; renderForm(); }
+function deleteTP(id){ if(!confirm('Delete this tech pack?'))return; ALL=ALL.filter(function(t){return t.id!==id;}); saveAll(); renderList(); }
+function renderList(){
+  var el=document.getElementById('tp-list');
+  if(!ALL.length){el.innerHTML='<div class="empty">No tech packs yet — tap New Tech Pack to begin</div>';return;}
+  el.innerHTML=ALL.slice().reverse().map(function(tp){
+    var eid=tp.id;
+    return '<div class="tp-card">'
+      +'<div class="tp-info"><div class="tp-name">'+esc(tp.meta.productName)+' <span style="font-size:11px;opacity:.5">'+esc(tp.meta.version)+'</span></div>'
+      +'<div class="tp-meta">'+(tp.meta.client?esc(tp.meta.client)+' · ':'')+esc(tp.created)+'</div></div>'
+      +'<div class="tp-actions">'
+      +'<button class="btn-teal btn-sm" onclick="openById(\''+eid+'\')">Open</button>'
+      +'<button class="btn-danger" onclick="deleteTP(\''+eid+'\')">Delete</button>'
+      +'</div></div>';
+  }).join('');
+}
+function openById(id){ var tp=ALL.find(function(t){return t.id===id;}); if(tp) openTP(tp); }
+
+/* FORM */
+var SECS=[
+  {key:'meta',num:'1',title:'Cover Details'},
+  {key:'desc',num:'2',title:'Product Description'},
+  {key:'schedule',num:'3',title:'Schedule & Forecast'},
+  {key:'specs',num:'4',title:'Technical Specifications'},
+  {key:'pom',num:'5',title:'Points of Measure'},
+  {key:'cmf',num:'6',title:'Color & Material'},
+  {key:'bom',num:'7',title:'Bill of Materials'}
+];
+var OPEN={meta:true,desc:false,schedule:false,specs:false,pom:false,cmf:false,bom:false};
+
+function toggleSec(k){
+  OPEN[k]=!OPEN[k];
+  document.getElementById('sbw-'+k).className='sec-body-wrap'+(OPEN[k]?' open':'');
+  document.getElementById('sch-'+k).className='sec-chev'+(OPEN[k]?' open':'');
+}
+
+function renderForm(){
+  document.getElementById('form-body').innerHTML=SECS.map(function(s){
+    return '<div class="sec-card"><div class="sec-hdr" onclick="toggleSec(\''+s.key+'\')">'
+      +'<span class="sec-num">'+s.num+'</span><span class="sec-title">'+s.title+'</span>'
+      +'<span class="sec-chev'+(OPEN[s.key]?' open':'')+'" id="sch-'+s.key+'">▾</span>'
+      +'</div><div class="sec-body-wrap'+(OPEN[s.key]?' open':'')+'" id="sbw-'+s.key+'">'
+      +build(s.key)+'</div></div>';
+  }).join('');
+}
+
+function rerender(k){ var el=document.getElementById('sbw-'+k); if(el) el.innerHTML=build(k); }
+
+function build(k){
+  if(k==='meta') return bMeta();
+  if(k==='desc') return bDesc();
+  if(k==='schedule') return bSchedule();
+  if(k==='specs') return bSpecs();
+  if(k==='pom') return bPOM();
+  if(k==='cmf') return bCMF();
+  if(k==='bom') return bBOM();
+  return '';
+}
+
+/* SECTION: META */
+function bMeta(){
+  var m=CUR.meta;
+  function fld(lbl,type,val,onch,full){
+    return '<div class="fld'+(full?' sec-full':'')+'"><label class="fld-lbl">'+lbl+'</label>'
+      +'<input type="'+type+'" class="sec-in" value="'+esc(val)+'" onchange="'+onch+'"/></div>';
+  }
+  return '<div class="sec-body"><div class="sec-grid sec-full">'
+    +fld('Product Name','text',m.productName,'CUR.meta.productName=this.value;document.getElementById("form-heading").textContent=CUR.meta.productName+" — "+CUR.meta.version;debounceSave()',true)
+    +fld('Client / Brand','text',m.client||'','CUR.meta.client=this.value;debounceSave()')
+    +fld('Version','text',m.version,'CUR.meta.version=this.value;document.getElementById("form-heading").textContent=CUR.meta.productName+" — "+CUR.meta.version;debounceSave()')
+    +fld('Date','date',m.date,'CUR.meta.date=this.value;debounceSave()')
+    +fld('Designer / Author','text',m.designer||'','CUR.meta.designer=this.value;debounceSave()')
+    +fld('Season / Year','text',m.season||'','CUR.meta.season=this.value;debounceSave()')
+    +'<div class="sec-full" style="display:flex;align-items:center;gap:8px;padding-top:2px">'
+    +'<input type="checkbox" id="conf-ck"'+(m.confidential?' checked':'')+' onchange="CUR.meta.confidential=this.checked;debounceSave()"/>'
+    +'<label for="conf-ck" style="font-size:12px;color:var(--gray-dk)">Mark as Confidential</label>'
+    +'</div></div></div>';
+}
+
+/* SECTION: DESC */
+function bDesc(){
+  var d=CUR.desc;
+  return '<div class="sec-body">'
+    +'<div class="sec-lbl">Product Description</div>'
+    +'<textarea class="sec-ta" placeholder="Describe the product — material, purpose, key features, sizing..." onchange="CUR.desc.text=this.value;debounceSave()">'+esc(d.text)+'</textarea>'
+    +'<div class="sec-lbl">Reference / Hero Image (optional)</div>'
+    +'<div class="img-box" onclick="document.getElementById(\'desc-img-inp\').click()">'
+    +(d.img?'<img src="'+d.img+'"/><div class="img-box-replace">Click to replace</div>':'<div class="img-box-icon">📷</div><div class="img-box-hint">Click to upload product image</div>')
+    +'</div>'
+    +'<input type="file" id="desc-img-inp" accept="image/*" style="display:none" onchange="upImg(this,\'desc\')"/>'
+    +'</div>';
+}
+
+/* SECTION: SCHEDULE */
+function bSchedule(){
+  var sc=CUR.schedule, fc=sc.fc;
+  var msHtml='<div class="dt-wrap"><table class="dtbl"><thead><tr><th style="width:130px">Date</th><th>Milestone</th><th style="width:30px"></th></tr></thead><tbody>'
+    +sc.milestones.map(function(ms,i){
+      return '<tr><td><input class="dt-in" type="date" value="'+esc(ms.date)+'" onchange="CUR.schedule.milestones['+i+'].date=this.value;debounceSave()"/></td>'
+        +'<td><input class="dt-in" value="'+esc(ms.note)+'" placeholder="e.g. Golden samples approved" onchange="CUR.schedule.milestones['+i+'].note=this.value;debounceSave()"/></td>'
+        +'<td><button class="dt-rm" onclick="rmMs('+i+')">×</button></td></tr>';
+    }).join('')
+    +'</tbody></table></div>'
+    +'<button class="btn-add-row" onclick="addMs()">+ Add Milestone</button>';
+
+  var sizeCtrl='<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">'
+    +'<span style="font-size:11px;color:var(--gray-mid)">Sizes:</span>'
+    +fc.sizes.map(function(s,i){ return '<input class="sec-in" style="width:88px;padding:5px 8px;font-size:12px" value="'+esc(s)+'" placeholder="Size '+(i+1)+'" onchange="CUR.schedule.fc.sizes['+i+']=this.value;debounceSave();rerender(\'schedule\')"/>'; }).join('')
+    +'<button class="btn-add-row" onclick="addFcSz()" style="padding:4px 9px;font-size:11px">+Size</button>'
+    +(fc.sizes.length>1?'<button class="btn-add-row" onclick="rmFcSz()" style="padding:4px 9px;font-size:11px;border-color:var(--coral);color:var(--coral);background:var(--coral-lt)">−Size</button>':'')
+    +'</div>';
+
+  var fcHtml='<div class="dt-wrap"><table class="dtbl"><thead><tr><th style="width:65px">Year</th>'
+    +fc.sizes.map(function(s){ return '<th>'+esc(s)+'</th>'; }).join('')
+    +'<th style="width:30px"></th></tr></thead><tbody>'
+    +fc.rows.map(function(row,i){
+      return '<tr><td><input class="dt-in" value="'+esc(row.year)+'" placeholder="2025" onchange="CUR.schedule.fc.rows['+i+'].year=this.value;debounceSave()"/></td>'
+        +fc.sizes.map(function(s,j){ return '<td><input class="dt-in" value="'+esc(row.qtys[j]||'')+'" placeholder="0" style="text-align:right" onchange="CUR.schedule.fc.rows['+i+'].qtys['+j+']=this.value;debounceSave()"/></td>'; }).join('')
+        +'<td><button class="dt-rm" onclick="rmFcRow('+i+')">×</button></td></tr>';
+    }).join('')
+    +'</tbody></table></div>'
+    +'<button class="btn-add-row" onclick="addFcRow()">+ Add Year</button>';
+
+  return '<div class="sec-body"><div class="sec-lbl">Schedule Milestones</div>'+msHtml
+    +'<div class="sec-lbl" style="margin-top:18px">Forecast Quantities</div>'+sizeCtrl+fcHtml+'</div>';
+}
+function addMs(){ CUR.schedule.milestones.push({date:'',note:''});debounceSave();rerender('schedule'); }
+function rmMs(i){ CUR.schedule.milestones.splice(i,1);if(!CUR.schedule.milestones.length)addMs();else{debounceSave();rerender('schedule');} }
+function addFcRow(){ CUR.schedule.fc.rows.push({year:'',qtys:CUR.schedule.fc.sizes.map(function(){return '';})});debounceSave();rerender('schedule'); }
+function rmFcRow(i){ CUR.schedule.fc.rows.splice(i,1);if(!CUR.schedule.fc.rows.length)addFcRow();else{debounceSave();rerender('schedule');} }
+function addFcSz(){ CUR.schedule.fc.sizes.push('');CUR.schedule.fc.rows.forEach(function(r){r.qtys.push('');});debounceSave();rerender('schedule'); }
+function rmFcSz(){ if(CUR.schedule.fc.sizes.length<=1)return;CUR.schedule.fc.sizes.pop();CUR.schedule.fc.rows.forEach(function(r){r.qtys.pop();});debounceSave();rerender('schedule'); }
+
+/* SECTION: SPECS */
+function bSpecs(){
+  var html='<div class="sec-body">';
+  CUR.specs.forEach(function(sp,si){
+    html+='<div class="spec-panel">'
+      +'<div class="spec-panel-hdr">'
+      +'<span class="spec-panel-label">Panel '+(si+1)+':</span>'
+      +'<input class="sec-in" style="flex:1;font-size:13px;font-weight:600" value="'+esc(sp.name)+'" placeholder="e.g. Large, Small, Pocket" onchange="CUR.specs['+si+'].name=this.value;debounceSave()"/>'
+      +(CUR.specs.length>1?'<button class="btn-danger" onclick="rmSpec('+si+')">Remove</button>':'')
+      +'</div>'
+      +'<div class="sec-lbl" style="margin-top:0">Technical Drawing / Reference Image</div>'
+      +'<div class="img-box" onclick="document.getElementById(\'sp-img-'+si+'\').click()" style="min-height:'+(sp.img?'80px':'65px')+'">'
+      +(sp.img?'<img src="'+sp.img+'"/><div class="img-box-replace">Click to replace</div>':'<div class="img-box-icon">📐</div><div class="img-box-hint">Upload technical drawing or annotated flat sketch</div>')
+      +'</div>'
+      +'<input type="file" id="sp-img-'+si+'" accept="image/*" style="display:none" onchange="upSpecImg('+si+',this)"/>'
+      +'<div class="sec-grid" style="margin-bottom:10px">'
+      +'<div class="fld"><label class="fld-lbl">Pattern File Ref</label><input class="sec-in" style="font-size:12px" value="'+esc(sp.patternFile)+'" placeholder="e.g. Vest_Large_V1.pdf" onchange="CUR.specs['+si+'].patternFile=this.value;debounceSave()"/></div>'
+      +'<div class="fld"><label class="fld-lbl">Fabric / Material</label><input class="sec-in" style="font-size:12px" value="'+esc(sp.fabric)+'" placeholder="e.g. Polyester + Spandex Mesh" onchange="CUR.specs['+si+'].fabric=this.value;debounceSave()"/></div>'
+      +'<div class="fld"><label class="fld-lbl">Fabric Spec / Part No.</label><input class="sec-in" style="font-size:12px" value="'+esc(sp.fabricSpec)+'" placeholder="TBD" onchange="CUR.specs['+si+'].fabricSpec=this.value;debounceSave()"/></div>'
+      +'<div class="fld"><label class="fld-lbl">Seam / Stitch Type</label><input class="sec-in" style="font-size:12px" value="'+esc(sp.seams)+'" placeholder="e.g. Flatlock stitch" onchange="CUR.specs['+si+'].seams=this.value;debounceSave()"/></div>'
+      +'<div class="fld sec-full"><label class="fld-lbl">Additional Notes</label><input class="sec-in" style="font-size:12px" value="'+esc(sp.notes)+'" placeholder="e.g. Small size includes plastic snap buttons on side seams" onchange="CUR.specs['+si+'].notes=this.value;debounceSave()"/></div>'
+      +'</div>'
+      +'<div class="sec-lbl">Callout Annotations</div>'
+      +'<div class="dt-wrap"><table class="dtbl"><thead><tr><th>Ref / Label</th><th>Specification / Detail</th><th></th></tr></thead><tbody>'
+      +sp.annotations.map(function(an,ai){
+        return '<tr>'
+          +'<td><input class="dt-in" value="'+esc(an.ref)+'" placeholder="e.g. Shoulder Seam" onchange="CUR.specs['+si+'].annotations['+ai+'].ref=this.value;debounceSave()"/></td>'
+          +'<td><input class="dt-in" value="'+esc(an.detail)+'" placeholder="e.g. Flatlock stitch" onchange="CUR.specs['+si+'].annotations['+ai+'].detail=this.value;debounceSave()"/></td>'
+          +'<td><button class="dt-rm" onclick="rmAnn('+si+','+ai+')">×</button></td></tr>';
+      }).join('')
+      +'</tbody></table></div>'
+      +'<button class="btn-add-row" onclick="addAnn('+si+')">+ Add Callout</button>'
+      +'</div>';
+  });
+  html+='<button class="btn-add-row" onclick="addSpec()" style="width:100%;text-align:center;margin-top:4px">+ Add Spec Panel</button>';
+  return html+'</div>';
+}
+function addSpec(){ CUR.specs.push({id:uid(),name:'',patternFile:'',img:'',fabric:'',fabricSpec:'',seams:'',notes:'',annotations:[{ref:'',detail:''}]});debounceSave();rerender('specs'); }
+function rmSpec(i){ CUR.specs.splice(i,1);debounceSave();rerender('specs'); }
+function addAnn(si){ CUR.specs[si].annotations.push({ref:'',detail:''});debounceSave();rerender('specs'); }
+function rmAnn(si,ai){ CUR.specs[si].annotations.splice(ai,1);debounceSave();rerender('specs'); }
+function upSpecImg(si,inp){ var f=inp.files[0];if(!f)return;resizeImg(f,1200,900,function(url){CUR.specs[si].img=url;debounceSave();rerender('specs');}); }
+
+/* SECTION: POM */
+function bPOM(){
+  var p=CUR.pom;
+  var szCtrl='<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">'
+    +'<span style="font-size:11px;color:var(--gray-mid)">Size columns:</span>'
+    +p.sizes.map(function(s,i){ return '<input class="sec-in" style="width:76px;padding:5px 8px;font-size:12px" value="'+esc(s)+'" onchange="CUR.pom.sizes['+i+']=this.value;debounceSave();rerender(\'pom\')"/>'; }).join('')
+    +'<button class="btn-add-row" onclick="addPomSz()" style="padding:4px 9px;font-size:11px">+Size</button>'
+    +(p.sizes.length>1?'<button class="btn-add-row" onclick="rmPomSz()" style="padding:4px 9px;font-size:11px;border-color:var(--coral);color:var(--coral);background:var(--coral-lt)">−Size</button>':'')
+    +'</div>';
+  var tbl='<div class="dt-wrap"><table class="dtbl"><thead><tr><th>Measurement Point</th>'
+    +p.sizes.map(function(s){ return '<th>'+esc(s)+'</th>'; }).join('')
+    +'<th style="width:70px">Tolerance</th><th></th></tr></thead><tbody>'
+    +p.rows.map(function(row,i){
+      return '<tr><td><input class="dt-in" value="'+esc(row.point)+'" placeholder="e.g. Chest Width" onchange="CUR.pom.rows['+i+'].point=this.value;debounceSave()"/></td>'
+        +p.sizes.map(function(s,j){ return '<td><input class="dt-in" value="'+esc(row.specs[j]||'')+'" placeholder="cm" style="text-align:right" onchange="CUR.pom.rows['+i+'].specs['+j+']=this.value;debounceSave()"/></td>'; }).join('')
+        +'<td><input class="dt-in" value="'+esc(row.tol)+'" placeholder="±1cm" onchange="CUR.pom.rows['+i+'].tol=this.value;debounceSave()"/></td>'
+        +'<td><button class="dt-rm" onclick="rmPomRow('+i+')">×</button></td></tr>';
+    }).join('')
+    +'</tbody></table></div>'
+    +'<button class="btn-add-row" onclick="addPomRow()">+ Add Measurement</button>';
+  return '<div class="sec-body">'+szCtrl+tbl+'</div>';
+}
+function addPomRow(){ CUR.pom.rows.push({point:'',specs:CUR.pom.sizes.map(function(){return '';}),tol:'±1cm'});debounceSave();rerender('pom'); }
+function rmPomRow(i){ CUR.pom.rows.splice(i,1);debounceSave();rerender('pom'); }
+function addPomSz(){ CUR.pom.sizes.push('');CUR.pom.rows.forEach(function(r){r.specs.push('');});debounceSave();rerender('pom'); }
+function rmPomSz(){ if(CUR.pom.sizes.length<=1)return;CUR.pom.sizes.pop();CUR.pom.rows.forEach(function(r){r.specs.pop();});debounceSave();rerender('pom'); }
+
+/* SECTION: CMF */
+function bCMF(){
+  var rows=CUR.cmf.rows;
+  var FIELDS=['component','material','color','code','spec','notes'];
+  var HEADS=['Component','Material','Color Name','Color Code','Spec / Part No.','Notes'];
+  var PH={component:'e.g. Main Body',material:'e.g. Polyester Mesh',color:'e.g. Heather Grey',code:'Pantone 423 C',spec:'TBD',notes:''};
+  return '<div class="sec-body"><div class="dt-wrap"><table class="dtbl" style="min-width:680px"><thead><tr>'
+    +HEADS.map(function(h){ return '<th>'+h+'</th>'; }).join('')+'<th></th>'
+    +'</tr></thead><tbody>'
+    +rows.map(function(row,i){
+      return '<tr>'+FIELDS.map(function(f){ return '<td><input class="dt-in" value="'+esc(row[f]||'')+'" placeholder="'+esc(PH[f]||'')+'" onchange="CUR.cmf.rows['+i+'][\''+f+'\']=this.value;debounceSave()"/></td>'; }).join('')
+        +'<td><button class="dt-rm" onclick="rmCMF('+i+')">×</button></td></tr>';
+    }).join('')
+    +'</tbody></table></div>'
+    +'<button class="btn-add-row" onclick="addCMF()">+ Add Material</button></div>';
+}
+function addCMF(){ CUR.cmf.rows.push({component:'',material:'',color:'',code:'',spec:'',notes:''});debounceSave();rerender('cmf'); }
+function rmCMF(i){ CUR.cmf.rows.splice(i,1);debounceSave();rerender('cmf'); }
+
+/* SECTION: BOM */
+function bBOM(){
+  var rows=CUR.bom.rows;
+  var FIELDS=['component','material','supplier','color','qty','unit','notes'];
+  var HEADS=['Component','Material / Description','Supplier','Color','Qty','Unit','Notes'];
+  var PH={component:'e.g. Main body fabric',material:'Polyester+Spandex Mesh',supplier:'TBD',color:'',qty:'',unit:'m',notes:''};
+  var W={qty:'50px',unit:'50px'};
+  return '<div class="sec-body"><div class="dt-wrap"><table class="dtbl" style="min-width:740px"><thead><tr>'
+    +'<th style="width:30px">#</th>'+HEADS.map(function(h){ return '<th>'+h+'</th>'; }).join('')+'<th></th>'
+    +'</tr></thead><tbody>'
+    +rows.map(function(row,i){
+      return '<tr><td><input class="dt-in" value="'+esc(row.num||'')+'" style="width:28px;text-align:center" onchange="CUR.bom.rows['+i+'].num=this.value;debounceSave()"/></td>'
+        +FIELDS.map(function(f){ var s=W[f]?(' style="width:'+W[f]+'"'):''; return '<td><input class="dt-in"'+s+' value="'+esc(row[f]||'')+'" placeholder="'+esc(PH[f]||'')+'" onchange="CUR.bom.rows['+i+'][\''+f+'\']=this.value;debounceSave()"/></td>'; }).join('')
+        +'<td><button class="dt-rm" onclick="rmBOM('+i+')">×</button></td></tr>';
+    }).join('')
+    +'</tbody></table></div>'
+    +'<button class="btn-add-row" onclick="addBOM()">+ Add Item</button></div>';
+}
+function addBOM(){ var n=CUR.bom.rows.length+1;CUR.bom.rows.push({num:String(n),component:'',material:'',supplier:'',color:'',qty:'',unit:'pcs',notes:''});debounceSave();rerender('bom'); }
+function rmBOM(i){ CUR.bom.rows.splice(i,1);debounceSave();rerender('bom'); }
+
+/* IMAGE UPLOAD */
+function upImg(inp,key){ var f=inp.files[0];if(!f)return;resizeImg(f,1200,900,function(url){CUR.desc.img=url;debounceSave();rerender('desc');}); }
+function resizeImg(file,maxW,maxH,cb){
+  var img=new Image(),url=URL.createObjectURL(file);
+  img.onload=function(){
+    URL.revokeObjectURL(url);
+    var scale=Math.min(1,maxW/img.width,maxH/img.height);
+    var c=document.createElement('canvas');c.width=img.width*scale;c.height=img.height*scale;
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    cb(c.toDataURL('image/jpeg',0.82));
+  };
+  img.src=url;
+}
+
+/* PREVIEW */
+function renderPreview(){
+  var m=CUR.meta, d=CUR.desc, sc=CUR.schedule;
+  document.getElementById('prev-title').textContent=m.productName+' '+m.version;
+
+  /* header */
+  var hdr='<div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1D9E75;padding-bottom:18px;margin-bottom:28px">'
+    +'<div><div style="font-family:monospace;font-size:24px;font-weight:800;letter-spacing:.03em">'+esc(m.productName)+'</div>'
+    +(m.client?'<div style="font-size:13px;color:#555;margin-top:2px">'+esc(m.client)+'</div>':'')
+    +(m.designer||m.season?'<div style="font-size:12px;color:#888;margin-top:1px">'+(m.designer?esc(m.designer):'')+((m.designer&&m.season)?' · ':'')+esc(m.season||'')+'</div>':'')
+    +'</div>'
+    +'<div style="text-align:right"><div style="font-family:monospace;font-size:18px;font-weight:700;color:#1D9E75">'+esc(m.version)+'</div>'
+    +'<div style="font-size:12px;color:#888">'+esc(m.date)+'</div>'
+    +(m.confidential?'<div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:#f0f0f0;padding:2px 8px;border-radius:4px;margin-top:4px;display:inline-block">Confidential</div>':'')
+    +'</div></div>';
+
+  /* product desc */
+  var descHtml='';
+  if(d.text||d.img){
+    descHtml=sh('Product Description')
+      +(d.img?'<img src="'+d.img+'" style="max-width:320px;max-height:260px;float:left;margin:0 20px 12px 0;border-radius:6px;border:1px solid #e0e0e0"/>':'')
+      +(d.text?'<p style="font-size:13px;line-height:1.7;color:#333">'+esc(d.text).replace(/\n/g,'<br/>')+'</p>':'')
+      +'<div style="clear:both"></div>';
+    descHtml='<div style="margin-bottom:28px">'+descHtml+'</div>';
+  }
+
+  /* schedule */
+  var schedHtml='';
+  var hasMilestones=sc.milestones.some(function(ms){return ms.note;});
+  var hasFc=sc.fc.rows.some(function(r){return r.year;});
+  if(hasMilestones||hasFc){
+    var msCol=hasMilestones?'<div><div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#888;margin-bottom:8px">Milestones</div>'
+      +sc.milestones.filter(function(ms){return ms.note;}).map(function(ms){
+        return '<div style="display:flex;gap:10px;padding:5px 0;border-bottom:1px solid #eee;font-size:12px"><span style="color:#888;white-space:nowrap;min-width:88px">'+esc(ms.date)+'</span><span>'+esc(ms.note)+'</span></div>';
+      }).join('')+'</div>':'';
+    var fcCol=hasFc?'<div><div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#888;margin-bottom:8px">Forecast Quantities</div>'
+      +'<table style="border-collapse:collapse;font-size:12px;width:100%">'
+      +'<tr>'+['Year'].concat(sc.fc.sizes).map(function(s,i){ return '<th style="padding:6px 9px;background:'+(i===0?'#1D9E75':'#2CAE85')+';color:#fff;text-align:'+(i===0?'left':'right')+'">'+esc(s)+'</th>'; }).join('')+'</tr>'
+      +sc.fc.rows.filter(function(r){return r.year;}).map(function(row,ri){
+        return '<tr style="background:'+(ri%2===0?'#f9f9f9':'#fff')+'"><td style="padding:5px 9px;border:1px solid #e8e8e8">'+esc(row.year)+'</td>'
+          +sc.fc.sizes.map(function(s,j){ var q=parseInt(row.qtys[j]||0);return '<td style="padding:5px 9px;border:1px solid #e8e8e8;text-align:right">'+(q?q.toLocaleString():'—')+'</td>'; }).join('')+'</tr>';
+      }).join('')+'</table></div>':'';
+    schedHtml='<div style="margin-bottom:28px">'+sh('Schedule & Forecast')
+      +'<div style="display:grid;grid-template-columns:'+(msCol&&fcCol?'1fr 1fr':'1fr')+';gap:24px">'+msCol+fcCol+'</div></div>';
+  }
+
+  /* tech specs */
+  var specsHtml=CUR.specs.filter(function(sp){return sp.name||sp.fabric||sp.annotations.some(function(a){return a.ref;});}).map(function(sp){
+    var annRows=sp.annotations.filter(function(a){return a.ref;});
+    var hasImg=!!sp.img;
+    return '<div style="margin-bottom:20px;page-break-inside:avoid">'
+      +'<div style="font-size:14px;font-weight:700;color:#1A2E3B;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid #e0e0e0">'+(sp.name?esc(sp.name):'Specification')+'</div>'
+      +'<div style="display:grid;grid-template-columns:'+(hasImg?'1fr 1fr':'1fr')+';gap:18px;align-items:start">'
+      +(hasImg?'<img src="'+sp.img+'" style="max-width:100%;border-radius:6px;border:1px solid #e0e0e0"/>':'')
+      +'<div>'
+      +(sp.patternFile?'<div style="font-size:11px;color:#888;margin-bottom:6px">Pattern File: '+esc(sp.patternFile)+'</div>':'')
+      +(sp.fabric?'<div style="font-size:12px;margin-bottom:3px"><strong>Material:</strong> '+esc(sp.fabric)+(sp.fabricSpec?' ('+esc(sp.fabricSpec)+')':'')+'</div>':'')
+      +(sp.seams?'<div style="font-size:12px;margin-bottom:8px"><strong>Construction:</strong> '+esc(sp.seams)+'</div>':'')
+      +(sp.notes?'<div style="font-size:12px;color:#555;margin-bottom:8px;font-style:italic">'+esc(sp.notes)+'</div>':'')
+      +(annRows.length?'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:6px">'
+        +'<tr><th style="padding:5px 8px;background:#f5f5f5;border:1px solid #e0e0e0;text-align:left;font-weight:700;color:#555">Ref</th>'
+        +'<th style="padding:5px 8px;background:#f5f5f5;border:1px solid #e0e0e0;text-align:left;font-weight:700;color:#555">Specification</th></tr>'
+        +annRows.map(function(a){ return '<tr><td style="padding:5px 8px;border:1px solid #e0e0e0;font-weight:600">'+esc(a.ref)+'</td><td style="padding:5px 8px;border:1px solid #e0e0e0">'+esc(a.detail)+'</td></tr>'; }).join('')
+        +'</table>':'')
+      +'</div></div></div>';
+  }).join('');
+  var specsSection=specsHtml?'<div style="margin-bottom:28px">'+sh('Technical Specifications')+specsHtml+'</div>':'';
+
+  /* POM */
+  var pomRows=CUR.pom.rows.filter(function(r){return r.point;});
+  var pomSection=pomRows.length?'<div style="margin-bottom:28px">'+sh('Points of Measure')
+    +'<table style="width:100%;border-collapse:collapse;font-size:12px">'
+    +'<tr>'+['Measurement Point'].concat(CUR.pom.sizes).concat(['Tolerance']).map(function(s,i){ return '<th style="padding:6px 9px;background:'+(i===0?'#1D9E75':'#2CAE85')+';color:#fff;text-align:'+(i===0?'left':'right')+'">'+esc(s)+'</th>'; }).join('')+'</tr>'
+    +pomRows.map(function(row,ri){
+      return '<tr style="background:'+(ri%2===0?'#f9f9f9':'#fff')+'"><td style="padding:5px 9px;border:1px solid #e0e0e0;font-weight:500">'+esc(row.point)+'</td>'
+        +CUR.pom.sizes.map(function(s,j){ return '<td style="padding:5px 9px;border:1px solid #e0e0e0;text-align:right">'+esc(row.specs[j]||'—')+'</td>'; }).join('')
+        +'<td style="padding:5px 9px;border:1px solid #e0e0e0;text-align:center;color:#888">'+esc(row.tol)+'</td></tr>';
+    }).join('')
+    +'</table></div>':'';
+
+  /* CMF */
+  var cmfRows=CUR.cmf.rows.filter(function(r){return r.component||r.material;});
+  var CMFH=['Component','Material','Color Name','Color Code','Spec','Notes'];
+  var CMFF=['component','material','color','code','spec','notes'];
+  var cmfSection=cmfRows.length?'<div style="margin-bottom:28px">'+sh('Color & Material Breakdown')
+    +'<table style="width:100%;border-collapse:collapse;font-size:12px">'
+    +'<tr>'+CMFH.map(function(h,i){ return '<th style="padding:6px 9px;background:'+(i===0?'#1D9E75':'#2CAE85')+';color:#fff;text-align:left">'+h+'</th>'; }).join('')+'</tr>'
+    +cmfRows.map(function(row,ri){
+      return '<tr style="background:'+(ri%2===0?'#f9f9f9':'#fff')+'">'+CMFF.map(function(f){ return '<td style="padding:5px 9px;border:1px solid #e0e0e0">'+esc(row[f]||'')+'</td>'; }).join('')+'</tr>';
+    }).join('')
+    +'</table></div>':'';
+
+  /* BOM */
+  var bomRows=CUR.bom.rows.filter(function(r){return r.component||r.material;});
+  var BOMH=['#','Component','Material','Supplier','Color','Qty','Unit','Notes'];
+  var BOMF=['num','component','material','supplier','color','qty','unit','notes'];
+  var bomSection=bomRows.length?'<div style="margin-bottom:28px">'+sh('Bill of Materials')
+    +'<table style="width:100%;border-collapse:collapse;font-size:12px">'
+    +'<tr>'+BOMH.map(function(h,i){ return '<th style="padding:6px 9px;background:'+(i===0?'#1D9E75':'#2CAE85')+';color:#fff;text-align:'+(i<=1?'left':'right')+'">'+h+'</th>'; }).join('')+'</tr>'
+    +bomRows.map(function(row,ri){
+      return '<tr style="background:'+(ri%2===0?'#f9f9f9':'#fff')+'">'+BOMF.map(function(f,fi){ return '<td style="padding:5px 9px;border:1px solid #e0e0e0;text-align:'+(fi>1?'right':'left')+'">'+esc(row[f]||'')+'</td>'; }).join('')+'</tr>';
+    }).join('')
+    +'</table></div>':'';
+
+  var doc='<!DOCTYPE html><html><head><meta charset="UTF-8"/>'
+    +'<style>@page{size:A4;margin:18mm}body{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#1a1a1a;padding:24px;max-width:840px;margin:0 auto}img{max-width:100%}table{page-break-inside:auto}tr{page-break-inside:avoid;page-break-after:auto}@media print{body{padding:0;max-width:100%}}</style>'
+    +'</head><body>'+hdr+descHtml+schedHtml+specsSection+pomSection+cmfSection+bomSection+'</body></html>';
+
+  var iframe=document.getElementById('prev-iframe');
+  iframe.contentDocument.open();
+  iframe.contentDocument.write(doc);
+  iframe.contentDocument.close();
+}
+
+function sh(title){
+  return '<div style="font-family:monospace;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-bottom:2px solid #1D9E75;padding-bottom:5px;margin-bottom:14px;color:#1A2E3B">'+title+'</div>';
+}
+
+function printTP(){ document.getElementById('prev-iframe').contentWindow.print(); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+loadAll();
+renderList();
+</script>
+</body>
+</html>

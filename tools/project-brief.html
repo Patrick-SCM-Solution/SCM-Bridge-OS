@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Project Brief — SCM Bridge OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1A2E3B;--navy2:#2C4A5E;
+  --teal:#1D9E75;--teal-dk:#085041;--teal-lt:#E1F5EE;--teal-bd:#5DCAA5;
+  --amber:#EF9F27;--amber-lt:#FAEEDA;
+  --coral:#D85A30;--coral-lt:#FAECE7;
+  --gray-bg:#F5F4F1;--gray-line:#E0DED8;--gray-mid:#888780;--gray-dk:#444441;
+  --white:#fff;--black:#1A1A19;--blue-btn:#1B6FA8;
+}
+body{font-family:'Barlow',sans-serif;background:var(--gray-bg);color:var(--black);font-size:14px;line-height:1.5}
+input,textarea,select,button{font-family:inherit}
+button{cursor:pointer;border:none;background:none}
+textarea{resize:vertical}
+.screen{display:none;min-height:100vh}.screen.active{display:block}
+
+#home{background:var(--navy)}
+.home-wrap{max-width:720px;margin:0 auto;padding:36px 24px 60px}
+.home-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:6px}
+.home-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--white);line-height:1.1;margin-bottom:4px}
+.home-sub{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:28px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.btn-primary{background:var(--teal);color:var(--white);border-radius:10px;padding:11px 22px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:filter .15s}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-ghost{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:11px 18px;font-size:13px;transition:background .15s}
+.btn-ghost:hover{background:rgba(255,255,255,.14)}
+.new-form{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:20px;margin-bottom:24px;display:none;animation:fadeUp .2s ease}
+.nf-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:14px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.fg-full{grid-column:1/-1}
+.fl label{display:block;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:3px}
+.fl input,.fl select{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--white);outline:none;transition:border-color .15s}
+.fl input:focus,.fl select:focus{border-color:var(--teal-bd)}
+.fl input::placeholder{color:rgba(255,255,255,.3)}
+.fl select option{background:var(--navy);color:var(--white)}
+.sessions-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px}
+.pb-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.pb-info{flex:1;min-width:0}
+.pb-name{font-size:15px;color:var(--white);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pb-meta{font-size:11px;color:rgba(255,255,255,.4)}
+.pb-tag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;margin-top:4px}
+.tag-draft{background:rgba(239,159,39,.2);color:#EF9F27;border:1px solid rgba(239,159,39,.3)}
+.tag-sent{background:rgba(29,158,117,.2);color:var(--teal-bd);border:1px solid rgba(29,158,117,.3)}
+.pb-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.btn-teal{background:var(--teal);color:var(--white);border-radius:20px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.btn-sm{border-radius:8px;padding:7px 14px;font-size:12px}
+.btn-danger{color:rgba(255,80,80,.6);font-size:11px;padding:4px}
+.empty{text-align:center;padding:48px 0;color:rgba(255,255,255,.3);font-size:14px}
+
+#form-screen{background:var(--gray-bg)}
+.form-hdr{background:var(--teal-dk);padding:12px 18px 10px;position:sticky;top:52px;z-index:100;box-shadow:0 2px 14px rgba(0,0,0,.22)}
+.form-hdr-inner{max-width:820px;margin:0 auto}
+.form-top{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.form-back{font-size:18px;color:var(--teal-lt);background:rgba(255,255,255,.1);border-radius:8px;padding:4px 10px}
+.form-back:hover{background:rgba(255,255,255,.2)}
+.form-heading{flex:1;font-size:15px;color:var(--white);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.form-actions{display:flex;gap:7px;align-items:center;flex-shrink:0}
+.save-msg{font-size:11px;color:var(--teal-bd);min-width:55px}
+.btn-blue{background:var(--blue-btn);color:var(--white);border-radius:20px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.form-body{max-width:820px;margin:0 auto;padding:14px 14px 60px}
+
+.sec-card{background:var(--white);border-radius:14px;overflow:hidden;margin-bottom:10px;border:1px solid var(--gray-line);animation:fadeUp .2s ease}
+.sec-hdr{display:flex;align-items:center;gap:9px;padding:11px 14px;cursor:pointer;user-select:none;background:#FAFAF8}
+.sec-icon{font-size:15px}
+.sec-num{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--teal);min-width:20px}
+.sec-title{flex:1;font-size:14px;font-weight:500}
+.sec-req{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--coral);background:var(--coral-lt);padding:2px 6px;border-radius:4px}
+.sec-chev{font-size:11px;color:var(--gray-mid);transition:transform .2s}
+.sec-chev.open{transform:rotate(180deg)}
+.sec-body-wrap{display:none}.sec-body-wrap.open{display:block}
+.sec-body{padding:16px}
+.sec-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid);margin-bottom:6px;margin-top:14px}
+.sec-lbl:first-child{margin-top:0}
+.sec-ta{width:100%;min-height:76px;padding:9px 11px;font-size:13px;border:1px solid var(--gray-line);border-radius:8px;background:#FAFAF8;color:var(--black);line-height:1.6;font-family:'Barlow',sans-serif}
+.sec-ta:focus{outline:none;border-color:var(--teal)}
+.sec-in{width:100%;padding:7px 10px;font-size:13px;border:1px solid var(--gray-line);border-radius:8px;background:#FAFAF8;color:var(--black)}
+.sec-in:focus{outline:none;border-color:var(--teal)}
+.sec-sel{width:100%;padding:7px 10px;font-size:13px;border:1px solid var(--gray-line);border-radius:8px;background:#FAFAF8;color:var(--black)}
+.sec-sel:focus{outline:none;border-color:var(--teal)}
+.sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sec-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.sec-full{grid-column:1/-1}
+.fld{display:flex;flex-direction:column;gap:3px}
+.fld-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid)}
+
+/* CHECKLIST GROUPS */
+.ck-group{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
+.ck-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#FAFAF8;border:1px solid var(--gray-line);border-radius:8px;cursor:pointer;transition:all .15s;user-select:none}
+.ck-item:hover{border-color:var(--teal-bd);background:var(--teal-lt)}
+.ck-item.checked{border-color:var(--teal);background:var(--teal-lt)}
+.ck-item input[type=checkbox]{accent-color:var(--teal);width:14px;height:14px;flex-shrink:0}
+.ck-item label{font-size:12px;color:var(--black);cursor:pointer;flex:1}
+.ck-item.checked label{color:var(--teal-dk);font-weight:500}
+.ck-cols{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+
+/* VARIANTS TABLE */
+.dt-wrap{overflow-x:auto;margin-bottom:6px}
+.dtbl{width:100%;border-collapse:collapse;font-size:12px}
+.dtbl th{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid);padding:6px 7px;border-bottom:1px solid var(--gray-line);text-align:left;background:#FAFAF8}
+.dtbl td{padding:3px 3px;border-bottom:1px solid var(--gray-line);vertical-align:middle}
+.dtbl tr:last-child td{border-bottom:none}
+.dt-in{width:100%;padding:5px 7px;font-size:12px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--black);font-family:'Barlow',sans-serif}
+.dt-in:focus{outline:none;border-color:var(--teal);background:var(--teal-lt)}
+.dt-rm{color:rgba(216,90,48,.35);font-size:15px;padding:2px 5px;cursor:pointer;border-radius:4px;line-height:1;border:none;background:none}
+.dt-rm:hover{color:var(--coral);background:var(--coral-lt)}
+.btn-add-row{margin-top:6px;font-size:12px;color:var(--teal);padding:5px 11px;border:1px dashed var(--teal-bd);border-radius:7px;background:var(--teal-lt);cursor:pointer;transition:all .15s}
+.btn-add-row:hover{background:var(--teal);color:var(--white)}
+
+/* STATUS TOGGLE */
+.status-row{display:flex;gap:8px;margin-top:10px}
+.status-pill{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--gray-line);color:var(--gray-mid);transition:all .15s}
+.status-pill.active-draft{background:var(--amber-lt);border-color:var(--amber);color:#7A5200}
+.status-pill.active-sent{background:var(--teal-lt);border-color:var(--teal);color:var(--teal-dk)}
+
+/* COMPLETENESS BAR */
+.comp-bar{height:4px;background:var(--gray-line);border-radius:2px;margin-top:6px;overflow:hidden}
+.comp-fill{height:100%;background:var(--teal);border-radius:2px;transition:width .4s}
+
+#preview-screen{background:#e0dfd9}
+.prev-hdr{background:var(--navy);padding:10px 20px;display:flex;align-items:center;gap:10px;position:sticky;top:52px;z-index:100}
+.prev-title{flex:1;font-size:13px;color:rgba(255,255,255,.5)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.fg,.sec-grid,.sec-grid-3,.ck-cols{grid-template-columns:1fr}.fg-full,.sec-full{grid-column:1}}
+</style>
+</head>
+<body>
+<div id="site-nav-root"></div>
+<script src="../nav.js"></script>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="home-wrap">
+    <div class="home-label">SCM Solution LTD</div>
+    <div class="home-title">Project Brief</div>
+    <div class="home-sub">Structured product briefs — give factories exactly what they need to quote accurately</div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="showNewForm()">+ New Brief</button>
+    </div>
+    <div class="new-form" id="new-form">
+      <div class="nf-title">New Project Brief</div>
+      <div class="fg">
+        <div class="fl fg-full"><label>Product Name *</label><input id="nf-product" placeholder="e.g. Children's Safety Vest"/></div>
+        <div class="fl"><label>Project Code / Ref *</label><input id="nf-code" placeholder="e.g. SCM-2025-001"/></div>
+        <div class="fl"><label>Product Category</label>
+          <select id="nf-cat">
+            <option value="">— Select —</option>
+            <option>Consumer Electronics</option>
+            <option>Medical / Health Tech</option>
+            <option>Industrial / Safety Equipment</option>
+            <option>Apparel / Soft Goods</option>
+            <option>Packaging</option>
+            <option>Mechanical Components</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="fl"><label>Date</label><input id="nf-date" type="date"/></div>
+        <div class="fl"><label>Issued By</label><input id="nf-issued" placeholder="e.g. Patrick McGuinness"/></div>
+        <div class="fl"><label>NDA Required?</label>
+          <select id="nf-nda">
+            <option value="yes">Yes — NDA required before sharing details</option>
+            <option value="no">No — Open to share</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="createBrief()">Create Brief</button>
+        <button class="btn-ghost" onclick="hideNewForm()">Cancel</button>
+      </div>
+    </div>
+    <div class="sessions-label">Saved Briefs</div>
+    <div id="pb-list"><div class="empty">No project briefs yet — tap New Brief to begin</div></div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div id="form-screen" class="screen">
+  <div class="form-hdr">
+    <div class="form-hdr-inner">
+      <div class="form-top">
+        <button class="form-back" onclick="goHome()">←</button>
+        <div class="form-heading" id="form-heading">Project Brief</div>
+        <div class="form-actions">
+          <span class="save-msg" id="save-msg"></span>
+          <button class="btn-blue btn-sm" onclick="goPreview()">Preview / Export</button>
+        </div>
+      </div>
+      <div class="comp-bar"><div class="comp-fill" id="comp-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="form-body" id="form-body"></div>
+</div>
+
+<!-- PREVIEW -->
+<div id="preview-screen" class="screen">
+  <div class="prev-hdr">
+    <button class="form-back" onclick="goForm()" style="color:#fff;font-size:18px;background:rgba(255,255,255,.1);border-radius:8px;padding:4px 10px">←</button>
+    <span class="prev-title" id="prev-title">Project Brief Preview</span>
+    <button class="btn-teal btn-sm" onclick="printBrief()">Print / Export PDF</button>
+  </div>
+  <iframe id="prev-iframe" style="width:100%;height:calc(100vh - 104px);border:none;background:#fff"></iframe>
+</div>
+
+<script>
+var SAVE_KEY = 'scm_brief_v1';
+var ALL = [], CUR = null, _st = null;
+
+function loadAll(){ try{ ALL=JSON.parse(localStorage.getItem(SAVE_KEY)||'[]'); }catch(e){ ALL=[]; } }
+function saveAll(){
+  localStorage.setItem(SAVE_KEY, JSON.stringify(ALL));
+  var m=document.getElementById('save-msg');
+  if(m){ m.textContent='Saved ✓'; setTimeout(function(){ m.textContent=''; },1500); }
+}
+function debounceSave(){
+  clearTimeout(_st);
+  _st=setTimeout(function(){
+    if(!CUR) return;
+    var i=ALL.findIndex(function(t){ return t.id===CUR.id; });
+    if(i===-1) ALL.push(CUR); else ALL[i]=CUR;
+    saveAll(); updateComp();
+  },600);
+}
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+
+function blankBrief(meta){
+  return {
+    id:uid(), created:new Date().toISOString().slice(0,10), status:'draft', meta:meta,
+    desc:{ overview:'', application:'', keyFeatures:'' },
+    tech:{
+      process:'', materials:'', dimensions:'', weight:'', tolerance:'',
+      img:'',
+      variants:[{sku:'',description:'',notes:''}],
+      assetsAvailable:[]
+    },
+    commercial:{
+      sampleQty:'', sampleBy:'', moqTarget:'', targetCost:'',
+      forecast:[{year:'',qty:''}],
+      productionTarget:'', paymentTerms:'', incoterms:'EXW'
+    },
+    quality:{ standards:'', testing:'', certifications:'', qcNotes:'' },
+    response:{
+      deadline:'', contact:'SCM Solution LTD', email:'', phone:'',
+      requireItems:['Unit pricing at stated MOQ volumes','Tiered pricing (if available)','Sample unit cost and lead time','Production lead time (post sample approval)','Payment terms','Factory certifications / audit reports']
+    }
+  };
+}
+
+/* SCREENS */
+function show(id){ document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');}); document.getElementById(id).classList.add('active'); }
+function goHome(){ show('home'); renderList(); }
+function goForm(){ show('form-screen'); }
+function goPreview(){ show('preview-screen'); renderPreview(); }
+
+/* HOME */
+function showNewForm(){
+  document.getElementById('new-form').style.display='block';
+  document.getElementById('nf-date').value=new Date().toISOString().slice(0,10);
+}
+function hideNewForm(){ document.getElementById('new-form').style.display='none'; }
+
+function createBrief(){
+  var p=document.getElementById('nf-product').value.trim();
+  var c=document.getElementById('nf-code').value.trim();
+  if(!p||!c){ alert('Product name and project code are required'); return; }
+  var meta={
+    productName:p, projectCode:c,
+    category:document.getElementById('nf-cat').value,
+    date:document.getElementById('nf-date').value,
+    issuedBy:document.getElementById('nf-issued').value.trim(),
+    ndaRequired:document.getElementById('nf-nda').value==='yes',
+    confidential:true
+  };
+  CUR=blankBrief(meta); ALL.push(CUR); saveAll(); hideNewForm(); openBrief(CUR);
+}
+
+function openBrief(b){ CUR=b; show('form-screen'); document.getElementById('form-heading').textContent=b.meta.productName+' — '+b.meta.projectCode; renderForm(); }
+function openById(id){ var b=ALL.find(function(t){return t.id===id;}); if(b) openBrief(b); }
+function deleteBrief(id){ if(!confirm('Delete this brief?'))return; ALL=ALL.filter(function(t){return t.id!==id;}); saveAll(); renderList(); }
+
+function renderList(){
+  var el=document.getElementById('pb-list');
+  if(!ALL.length){ el.innerHTML='<div class="empty">No project briefs yet — tap New Brief to begin</div>'; return; }
+  el.innerHTML=ALL.slice().reverse().map(function(b){
+    var tag=b.status==='sent'?'<span class="pb-tag tag-sent">Sent</span>':'<span class="pb-tag tag-draft">Draft</span>';
+    return '<div class="pb-card">'
+      +'<div class="pb-info"><div class="pb-name">'+esc(b.meta.productName)+'<span style="font-size:11px;opacity:.5;margin-left:8px">'+esc(b.meta.projectCode)+'</span></div>'
+      +'<div class="pb-meta">'+(b.meta.category?esc(b.meta.category)+' · ':'')+esc(b.created)+'</div>'
+      +tag+'</div>'
+      +'<div class="pb-actions">'
+      +'<button class="btn-teal btn-sm" onclick="openById(\''+b.id+'\')">Open</button>'
+      +'<button class="btn-danger" onclick="deleteBrief(\''+b.id+'\')">Delete</button>'
+      +'</div></div>';
+  }).join('');
+}
+
+/* COMPLETENESS */
+function updateComp(){
+  if(!CUR) return;
+  var checks=[
+    CUR.meta.productName, CUR.meta.projectCode,
+    CUR.desc.overview, CUR.desc.application,
+    CUR.tech.process, CUR.tech.materials, CUR.tech.dimensions,
+    CUR.commercial.sampleQty, CUR.commercial.sampleBy, CUR.commercial.moqTarget,
+    CUR.commercial.forecast.some(function(r){return r.year&&r.qty;}),
+    CUR.commercial.productionTarget,
+    CUR.response.deadline, CUR.response.email,
+    CUR.response.requireItems.length > 0
+  ];
+  var filled=checks.filter(Boolean).length;
+  var pct=Math.round(filled/checks.length*100);
+  var bar=document.getElementById('comp-fill');
+  if(bar) bar.style.width=pct+'%';
+}
+
+/* FORM */
+var SECS=[
+  {key:'meta',     icon:'📋', num:'1', title:'Brief Info',           req:true},
+  {key:'desc',     icon:'💡', num:'2', title:'Product Overview',     req:true},
+  {key:'tech',     icon:'⚙️',  num:'3', title:'Technical Requirements', req:true},
+  {key:'commercial',icon:'📦', num:'4', title:'Commercial & Timeline', req:true},
+  {key:'quality',  icon:'✅', num:'5', title:'Quality & Compliance',  req:false},
+  {key:'response', icon:'📨', num:'6', title:'Response Instructions', req:true}
+];
+var OPEN={meta:true,desc:false,technical:false,commercial:false,quality:false,response:false};
+
+function toggleSec(k){
+  OPEN[k]=!OPEN[k];
+  document.getElementById('sbw-'+k).className='sec-body-wrap'+(OPEN[k]?' open':'');
+  document.getElementById('sch-'+k).className='sec-chev'+(OPEN[k]?' open':'');
+}
+function renderForm(){
+  document.getElementById('form-body').innerHTML=SECS.map(function(s){
+    return '<div class="sec-card"><div class="sec-hdr" onclick="toggleSec(\''+s.key+'\')">'
+      +'<span class="sec-icon">'+s.icon+'</span>'
+      +'<span class="sec-title">'+s.title+'</span>'
+      +(s.req?'<span class="sec-req">Required</span>':'')
+      +'<span class="sec-chev'+(OPEN[s.key]?' open':'')+'" id="sch-'+s.key+'">▾</span>'
+      +'</div><div class="sec-body-wrap'+(OPEN[s.key]?' open':'')+'" id="sbw-'+s.key+'">'
+      +build(s.key)+'</div></div>';
+  }).join('');
+  updateComp();
+}
+function rerender(k){ var el=document.getElementById('sbw-'+k); if(el) el.innerHTML=build(k); updateComp(); }
+function build(k){
+  if(k==='meta')       return bMeta();
+  if(k==='desc')       return bDesc();
+  if(k==='tech')       return bTech();
+  if(k==='commercial') return bCommercial();
+  if(k==='quality')    return bQuality();
+  if(k==='response')   return bResponse();
+  return '';
+}
+
+function fld(lbl,type,val,onch,ph,full,note){
+  var cls='fld'+(full?' sec-full':'');
+  return '<div class="'+cls+'"><label class="fld-lbl">'+lbl+'</label>'
+    +'<input type="'+type+'" class="sec-in" value="'+esc(val)+'" placeholder="'+esc(ph||'')+'" onchange="'+onch+'"/>'
+    +(note?'<span style="font-size:10px;color:var(--gray-mid)">'+note+'</span>':'')
+    +'</div>';
+}
+function fsel(lbl,opts,val,onch,full){
+  var cls='fld'+(full?' sec-full':'');
+  return '<div class="'+cls+'"><label class="fld-lbl">'+lbl+'</label>'
+    +'<select class="sec-sel" onchange="'+onch+'">'
+    +opts.map(function(o){ return '<option value="'+esc(o.v||o)+'"'+(val===(o.v||o)?' selected':'')+'>'+esc(o.l||o)+'</option>'; }).join('')
+    +'</select></div>';
+}
+
+/* META */
+function bMeta(){
+  var m=CUR.meta;
+  return '<div class="sec-body"><div class="sec-grid">'
+    +fld('Product Name','text',m.productName,'CUR.meta.productName=this.value;document.getElementById("form-heading").textContent=CUR.meta.productName+" — "+CUR.meta.projectCode;debounceSave()','e.g. Children\'s Safety Vest',true)
+    +fld('Project Code / Ref','text',m.projectCode,'CUR.meta.projectCode=this.value;document.getElementById("form-heading").textContent=CUR.meta.productName+" — "+CUR.meta.projectCode;debounceSave()','e.g. SCM-2025-001')
+    +fsel('Product Category',[{v:'',l:'— Select —'},'Consumer Electronics','Medical / Health Tech','Industrial / Safety Equipment','Apparel / Soft Goods','Packaging','Mechanical Components','Other'],m.category,'CUR.meta.category=this.value;debounceSave()')
+    +fld('Date','date',m.date,'CUR.meta.date=this.value;debounceSave()','')
+    +fld('Issued By','text',m.issuedBy||'','CUR.meta.issuedBy=this.value;debounceSave()','e.g. SCM Solution LTD')
+    +'<div class="fld" style="justify-content:center">'
+    +'<label class="fld-lbl">NDA Required?</label>'
+    +'<div style="display:flex;gap:8px;padding-top:4px">'
+    +'<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="radio" name="nda" value="yes"'+(m.ndaRequired?' checked':'')+' onchange="CUR.meta.ndaRequired=true;debounceSave()"/> Yes</label>'
+    +'<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="radio" name="nda" value="no"'+(!m.ndaRequired?' checked':'')+' onchange="CUR.meta.ndaRequired=false;debounceSave()"/> No</label>'
+    +'</div></div>'
+    +'</div>'
+    +'<div class="sec-lbl">Brief Status</div>'
+    +'<div class="status-row">'
+    +'<div class="status-pill'+(CUR.status==='draft'?' active-draft':'')+'" onclick="setStatus(\'draft\')">Draft</div>'
+    +'<div class="status-pill'+(CUR.status==='sent'?' active-sent':'')+'" onclick="setStatus(\'sent\')">Sent to Factory</div>'
+    +'</div>'
+    +'</div>';
+}
+function setStatus(s){ CUR.status=s; debounceSave(); rerender('meta'); }
+
+/* DESC */
+function bDesc(){
+  var d=CUR.desc;
+  return '<div class="sec-body">'
+    +'<div class="sec-lbl">Product Overview <span style="color:var(--coral)">*</span></div>'
+    +'<textarea class="sec-ta" placeholder="What is this product? What does it do? Who uses it? Keep it clear — a factory engineer should understand in 30 seconds." onchange="CUR.desc.overview=this.value;debounceSave()">'+esc(d.overview)+'</textarea>'
+    +'<div class="sec-lbl">Application / Use Case</div>'
+    +'<textarea class="sec-ta" style="min-height:60px" placeholder="Where / how is the product used? e.g. Worn by children aged 2–6 during outdoor activity to securely hold a wearable monitoring device." onchange="CUR.desc.application=this.value;debounceSave()">'+esc(d.application)+'</textarea>'
+    +'<div class="sec-lbl">Key Product Requirements</div>'
+    +'<textarea class="sec-ta" style="min-height:60px" placeholder="List the non-negotiable requirements that will affect the factory\'s ability to quote or manufacture — e.g. CE/UL compliance, skin-safe materials, specific IP rating, child safety standards." onchange="CUR.desc.keyFeatures=this.value;debounceSave()">'+esc(d.keyFeatures)+'</textarea>'
+    +'</div>';
+}
+
+/* TECH */
+var PROCESS_OPTS=[{v:'',l:'— Select Process —'},'Injection Moulding','Die Casting (Aluminium)','Die Casting (Zinc)','Aluminium Extrusion','Sheet Metal Fabrication','CNC Machining','PCB Assembly (PCBA)','Textile / Cut & Sew','Silicone Moulding','3D Printing (Prototype)','Assembly Only','Multiple Processes','Other'];
+var ASSETS_LIST=['2D Drawings (PDF / DWG)','3D CAD Files (STEP / STP)','Tech Pack','Physical Sample / Reference Product','Brand / CMF Guidelines','BOM Draft','Specification Sheet','Safety Test Reports'];
+
+function bTech(){
+  var t=CUR.tech;
+  var assetCks=ASSETS_LIST.map(function(a,i){
+    var checked=t.assetsAvailable.indexOf(a)!==-1;
+    return '<label class="ck-item'+(checked?' checked':'')+'" id="asset-'+i+'">'
+      +'<input type="checkbox"'+(checked?' checked':'')+' onchange="toggleAsset(\''+a.replace(/'/g,'\\\'')+'\')" />'
+      +'<label style="font-size:12px;cursor:pointer">'+a+'</label>'
+      +'</label>';
+  }).join('');
+  var varRows=t.variants.map(function(v,i){
+    return '<tr>'
+      +'<td><input class="dt-in" value="'+esc(v.sku)+'" placeholder="SKU-001" onchange="CUR.tech.variants['+i+'].sku=this.value;debounceSave()"/></td>'
+      +'<td><input class="dt-in" value="'+esc(v.description)+'" placeholder="e.g. Small — Toddler 2–4 yrs" onchange="CUR.tech.variants['+i+'].description=this.value;debounceSave()"/></td>'
+      +'<td><input class="dt-in" value="'+esc(v.notes)+'" placeholder="e.g. Includes snap buttons" onchange="CUR.tech.variants['+i+'].notes=this.value;debounceSave()"/></td>'
+      +'<td><button class="dt-rm" onclick="rmVariant('+i+')">×</button></td></tr>';
+  }).join('');
+  return '<div class="sec-body">'
+    +'<div class="sec-grid">'
+    +fsel('Manufacturing Process',PROCESS_OPTS,t.process,'CUR.tech.process=this.value;debounceSave()')
+    +fld('Material(s)','text',t.materials,'CUR.tech.materials=this.value;debounceSave()','e.g. Polyester + Spandex Mesh')
+    +fld('Key Dimensions','text',t.dimensions,'CUR.tech.dimensions=this.value;debounceSave()','e.g. 300mm × 250mm × 5mm, or refer to drawing')
+    +fld('Target Weight','text',t.weight,'CUR.tech.weight=this.value;debounceSave()','e.g. < 150g')
+    +fld('Tolerance Requirements','text',t.tolerance||'','CUR.tech.tolerance=this.value;debounceSave()','e.g. ±0.5mm on critical dims','','Optional — leave blank if not yet defined')
+    +'</div>'
+    +'<div class="sec-lbl">SKUs / Variants</div>'
+    +'<div class="dt-wrap"><table class="dtbl"><thead><tr><th>SKU / Ref</th><th>Description</th><th>Key Differences</th><th></th></tr></thead>'
+    +'<tbody id="variant-rows">'+varRows+'</tbody></table></div>'
+    +'<button class="btn-add-row" onclick="addVariant()">+ Add Variant / SKU</button>'
+    +'<div class="sec-lbl">Assets We Can Share with Factory</div>'
+    +'<div class="ck-cols">'+assetCks+'</div>'
+    +'</div>';
+}
+function addVariant(){ CUR.tech.variants.push({sku:'',description:'',notes:''}); debounceSave(); rerender('tech'); }
+function rmVariant(i){ CUR.tech.variants.splice(i,1); debounceSave(); rerender('tech'); }
+function toggleAsset(a){
+  var idx=CUR.tech.assetsAvailable.indexOf(a);
+  if(idx===-1) CUR.tech.assetsAvailable.push(a); else CUR.tech.assetsAvailable.splice(idx,1);
+  debounceSave();
+}
+
+/* COMMERCIAL */
+var INCOTERMS=['EXW','FOB','CIF','DDP','DAP','FCA'];
+var PAYMENT=['TBD','T/T 30% deposit, 70% before shipment','T/T 50/50','L/C at sight','Net 30','Net 60'];
+
+function bCommercial(){
+  var c=CUR.commercial;
+  var fcRows=c.forecast.map(function(row,i){
+    return '<tr>'
+      +'<td><input class="dt-in" value="'+esc(row.year)+'" placeholder="2025" style="width:60px" onchange="CUR.commercial.forecast['+i+'].year=this.value;debounceSave()"/></td>'
+      +'<td><input class="dt-in" value="'+esc(row.qty)+'" placeholder="10,000" style="text-align:right" onchange="CUR.commercial.forecast['+i+'].qty=this.value;debounceSave()"/></td>'
+      +'<td><button class="dt-rm" onclick="rmFc('+i+')">×</button></td></tr>';
+  }).join('');
+  return '<div class="sec-body">'
+    +'<div class="sec-lbl">Sample Requirements</div>'
+    +'<div class="sec-grid">'
+    +fld('Sample Quantity','text',c.sampleQty,'CUR.commercial.sampleQty=this.value;debounceSave()','e.g. 12 units (6 per size)','','For safety / field testing')
+    +fld('Samples Needed By','date',c.sampleBy,'CUR.commercial.sampleBy=this.value;debounceSave()','')
+    +'</div>'
+    +'<div class="sec-lbl">Production Requirements</div>'
+    +'<div class="sec-grid">'
+    +fld('MOQ Target','text',c.moqTarget,'CUR.commercial.moqTarget=this.value;debounceSave()','e.g. 5,000 units per SKU')
+    +fld('Target Unit Cost','text',c.targetCost,'CUR.commercial.targetCost=this.value;debounceSave()','e.g. USD 8–12 EXW','','Optional — share if it helps factories self-qualify')
+    +fld('Target Production Start','date',c.productionTarget,'CUR.commercial.productionTarget=this.value;debounceSave()','')
+    +fsel('Preferred Incoterms',INCOTERMS,c.incoterms,'CUR.commercial.incoterms=this.value;debounceSave()')
+    +fsel('Expected Payment Terms',PAYMENT.map(function(p){return {v:p,l:p};}),c.paymentTerms||'TBD','CUR.commercial.paymentTerms=this.value;debounceSave()')
+    +'</div>'
+    +'<div class="sec-lbl">Volume Forecast</div>'
+    +'<div class="dt-wrap"><table class="dtbl" style="max-width:300px"><thead><tr><th>Year</th><th>Projected Units</th><th></th></tr></thead>'
+    +'<tbody>'+fcRows+'</tbody></table></div>'
+    +'<button class="btn-add-row" onclick="addFc()">+ Add Year</button>'
+    +'</div>';
+}
+function addFc(){ CUR.commercial.forecast.push({year:'',qty:''}); debounceSave(); rerender('commercial'); }
+function rmFc(i){ CUR.commercial.forecast.splice(i,1); debounceSave(); rerender('commercial'); }
+
+/* QUALITY */
+function bQuality(){
+  var q=CUR.quality;
+  function ta(lbl,val,onch,ph){ return '<div class="fld sec-full"><label class="fld-lbl">'+lbl+'</label><textarea class="sec-ta" style="min-height:60px" placeholder="'+esc(ph)+'" onchange="'+onch+'">'+esc(val)+'</textarea></div>'; }
+  return '<div class="sec-body"><div class="sec-grid">'
+    +ta('Quality Standards Required',q.standards,'CUR.quality.standards=this.value;debounceSave()','e.g. ISO 9001, CE Mark, UL, RoHS, EN 71 (toy safety)')
+    +ta('Testing Requirements',q.testing,'CUR.quality.testing=this.value;debounceSave()','e.g. Drop test, IP54 water resistance, tensile strength on seams, child-safe material testing')
+    +ta('Factory Certifications Required',q.certifications,'CUR.quality.certifications=this.value;debounceSave()','e.g. BSCI, SMETA, ISO 14001, OEKO-TEX')
+    +ta('QC & Inspection Notes',q.qcNotes,'CUR.quality.qcNotes=this.value;debounceSave()','e.g. Inline inspection required, pre-shipment inspection by third party, AQL 2.5')
+    +'</div></div>';
+}
+
+/* RESPONSE */
+var DEFAULT_ITEMS=['Unit pricing at stated MOQ volumes','Tiered pricing (if available)','Sample unit cost and lead time','Production lead time (post sample approval)','Payment terms','Factory certifications / audit reports'];
+
+function bResponse(){
+  var r=CUR.response;
+  var items=r.requireItems.length?r.requireItems:DEFAULT_ITEMS.slice();
+  var itemList=items.map(function(item,i){
+    return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">'
+      +'<span style="color:var(--teal);font-size:14px">✓</span>'
+      +'<input class="sec-in" style="font-size:12px;flex:1" value="'+esc(item)+'" onchange="CUR.response.requireItems['+i+']=this.value;debounceSave()"/>'
+      +'<button class="dt-rm" onclick="rmRespItem('+i+')">×</button>'
+      +'</div>';
+  }).join('');
+  return '<div class="sec-body">'
+    +'<div class="sec-lbl">What We Need Factory to Provide</div>'
+    +'<div id="resp-items">'+itemList+'</div>'
+    +'<button class="btn-add-row" onclick="addRespItem()">+ Add Item</button>'
+    +'<div class="sec-lbl" style="margin-top:16px">Response Deadline</div>'
+    +'<div class="sec-grid">'
+    +fld('Respond By Date','date',r.deadline,'CUR.response.deadline=this.value;debounceSave()','')
+    +fld('Contact Name / Company','text',r.contact,'CUR.response.contact=this.value;debounceSave()','SCM Solution LTD')
+    +fld('Contact Email','email',r.email,'CUR.response.email=this.value;debounceSave()','e.g. hello@scmsolution.com')
+    +fld('Contact Phone','text',r.phone||'','CUR.response.phone=this.value;debounceSave()','e.g. +61 4xx xxx xxx')
+    +'</div></div>';
+}
+function addRespItem(){ CUR.response.requireItems.push(''); debounceSave(); rerender('response'); }
+function rmRespItem(i){ CUR.response.requireItems.splice(i,1); debounceSave(); rerender('response'); }
+
+/* PREVIEW */
+function renderPreview(){
+  var m=CUR.meta, d=CUR.desc, t=CUR.tech, c=CUR.commercial, q=CUR.quality, r=CUR.response;
+  document.getElementById('prev-title').textContent=m.productName+' — '+m.projectCode;
+
+  function sh(title,color){
+    color=color||'#1D9E75';
+    return '<div style="font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border-bottom:2px solid '+color+';padding-bottom:5px;margin:22px 0 12px;color:#1A2E3B">'+title+'</div>';
+  }
+  function row2(l1,v1,l2,v2){
+    return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:8px">'
+      +'<div><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:2px">'+l1+'</div><div style="font-size:12px;color:#1a1a1a">'+esc(v1||'—')+'</div></div>'
+      +(l2!==undefined?'<div><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:2px">'+l2+'</div><div style="font-size:12px;color:#1a1a1a">'+esc(v2||'—')+'</div></div>':'')
+      +'</div>';
+  }
+
+  /* HEADER */
+  var hdr='<div style="background:#1A2E3B;padding:24px 32px;display:flex;justify-content:space-between;align-items:flex-start">'
+    +'<div>'
+    +'<div style="font-family:monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#5DCAA5;margin-bottom:6px">SCM Solution LTD — Project Brief</div>'
+    +'<div style="font-size:26px;font-weight:800;color:#fff;font-family:Arial,sans-serif;letter-spacing:.01em">'+esc(m.productName)+'</div>'
+    +(m.category?'<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:3px">'+esc(m.category)+'</div>':'')
+    +'</div>'
+    +'<div style="text-align:right">'
+    +'<div style="font-family:monospace;font-size:14px;font-weight:700;color:#1D9E75;margin-bottom:4px">'+esc(m.projectCode)+'</div>'
+    +'<div style="font-size:11px;color:rgba(255,255,255,.4)">Issued: '+esc(m.date)+'</div>'
+    +(m.issuedBy?'<div style="font-size:11px;color:rgba(255,255,255,.4)">By: '+esc(m.issuedBy)+'</div>':'')
+    +(m.ndaRequired?'<div style="margin-top:8px;display:inline-block;background:rgba(239,159,39,.2);border:1px solid rgba(239,159,39,.5);border-radius:4px;padding:3px 10px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#EF9F27">NDA Required</div>':'')
+    +(m.confidential?'<div style="margin-top:4px;display:inline-block;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:3px 10px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4)">Confidential</div>':'')
+    +'</div></div>';
+
+  /* OVERVIEW */
+  var overviewHtml='';
+  if(d.overview||d.application||d.keyFeatures){
+    overviewHtml=sh('Product Overview')
+      +(d.overview?'<p style="font-size:13px;line-height:1.7;color:#333;margin-bottom:10px">'+esc(d.overview).replace(/\n/g,'<br/>')+'</p>':'')
+      +(d.application?'<p style="font-size:12px;line-height:1.6;color:#555;margin-bottom:10px"><strong>Application:</strong> '+esc(d.application).replace(/\n/g,'<br/>')+'</p>':'')
+      +(d.keyFeatures?'<div style="background:#f9f9f7;border-left:3px solid #1D9E75;padding:10px 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;color:#333"><strong>Key Requirements:</strong><br/>'+esc(d.keyFeatures).replace(/\n/g,'<br/>')+'</div>':'');
+  }
+
+  /* TECH SPECS */
+  var techHtml='';
+  var hastech=t.process||t.materials||t.dimensions||t.weight||t.variants.some(function(v){return v.sku||v.description;});
+  if(hastech){
+    techHtml=sh('Technical Requirements')
+      +row2('Manufacturing Process',t.process,'Materials',t.materials)
+      +row2('Key Dimensions',t.dimensions,'Target Weight',t.weight)
+      +(t.tolerance?row2('Tolerances',t.tolerance,'',''):'')
+      +(t.variants.filter(function(v){return v.sku||v.description;}).length?
+        '<div style="margin-top:10px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:6px">SKUs / Variants</div>'
+        +'<table style="width:100%;border-collapse:collapse;font-size:12px">'
+        +'<tr style="background:#f0f0ee"><th style="padding:5px 8px;text-align:left;border:1px solid #ddd">SKU</th><th style="padding:5px 8px;text-align:left;border:1px solid #ddd">Description</th><th style="padding:5px 8px;text-align:left;border:1px solid #ddd">Notes</th></tr>'
+        +t.variants.filter(function(v){return v.sku||v.description;}).map(function(v,i){
+          return '<tr style="background:'+(i%2===0?'#fff':'#fafaf8')+'"><td style="padding:5px 8px;border:1px solid #ddd">'+esc(v.sku)+'</td><td style="padding:5px 8px;border:1px solid #ddd">'+esc(v.description)+'</td><td style="padding:5px 8px;border:1px solid #ddd">'+esc(v.notes)+'</td></tr>';
+        }).join('')
+        +'</table></div>':'')
+      +(t.assetsAvailable.length?'<div style="margin-top:12px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:6px">Assets Available to Share</div>'
+        +'<div style="display:flex;flex-wrap:wrap;gap:6px">'+t.assetsAvailable.map(function(a){ return '<span style="background:#E1F5EE;border:1px solid #5DCAA5;border-radius:4px;padding:3px 9px;font-size:11px;color:#085041">✓ '+esc(a)+'</span>'; }).join('')+'</div></div>':'');
+  }
+
+  /* COMMERCIAL */
+  var commHtml='';
+  var hascomm=c.sampleQty||c.moqTarget||c.forecast.some(function(r){return r.year;});
+  if(hascomm){
+    commHtml=sh('Commercial & Volume Requirements')
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">'
+      +'<div>'
+      +(c.sampleQty||c.sampleBy?'<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:4px">Sample Requirement</div>'
+        +'<div style="font-size:12px;color:#1a1a1a">'+(c.sampleQty?esc(c.sampleQty):'TBD')+(c.sampleBy?' — needed by '+esc(c.sampleBy):'')+'</div></div>':'')
+      +(c.moqTarget?'<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:4px">MOQ Target</div><div style="font-size:12px">'+esc(c.moqTarget)+'</div></div>':'')
+      +(c.targetCost?'<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:4px">Target Unit Cost</div><div style="font-size:12px">'+esc(c.targetCost)+'</div></div>':'')
+      +(c.productionTarget?'<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:4px">Production Target Date</div><div style="font-size:12px">'+esc(c.productionTarget)+'</div></div>':'')
+      +(c.incoterms?'<div><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:4px">Preferred Incoterms</div><div style="font-size:12px">'+esc(c.incoterms)+'</div></div>':'')
+      +'</div>'
+      +(c.forecast.filter(function(r){return r.year;}).length?'<div>'
+        +'<div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:6px">Volume Forecast</div>'
+        +'<table style="border-collapse:collapse;font-size:12px"><tr style="background:#1D9E75;color:#fff">'
+        +'<th style="padding:5px 10px;text-align:left">Year</th><th style="padding:5px 10px;text-align:right">Projected Units</th></tr>'
+        +c.forecast.filter(function(r){return r.year;}).map(function(row,ri){
+          return '<tr style="background:'+(ri%2===0?'#f9f9f7':'#fff')+'"><td style="padding:5px 10px;border:1px solid #e0e0e0">'+esc(row.year)+'</td>'
+            +'<td style="padding:5px 10px;border:1px solid #e0e0e0;text-align:right">'+esc(row.qty)+'</td></tr>';
+        }).join('')
+        +'</table></div>':'')
+      +'</div>';
+  }
+
+  /* QUALITY */
+  var qualHtml='';
+  if(q.standards||q.testing||q.certifications||q.qcNotes){
+    qualHtml=sh('Quality & Compliance Requirements')
+      +(q.standards?'<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:2px">Standards</div><div style="font-size:12px;color:#333">'+esc(q.standards).replace(/\n/g,'<br/>')+'</div></div>':'')
+      +(q.testing?'<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:2px">Testing Requirements</div><div style="font-size:12px;color:#333">'+esc(q.testing).replace(/\n/g,'<br/>')+'</div></div>':'')
+      +(q.certifications?'<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:2px">Factory Certifications Required</div><div style="font-size:12px;color:#333">'+esc(q.certifications).replace(/\n/g,'<br/>')+'</div></div>':'')
+      +(q.qcNotes?'<div><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:2px">QC Notes</div><div style="font-size:12px;color:#333">'+esc(q.qcNotes).replace(/\n/g,'<br/>')+'</div></div>':'');
+  }
+
+  /* RESPONSE INSTRUCTIONS */
+  var respItems=r.requireItems.filter(Boolean);
+  var respHtml=sh('What We Need From You','#E8851A')
+    +'<div style="background:#FFFBF2;border:1.5px solid #EF9F27;border-radius:8px;padding:16px 20px">'
+    +'<div style="font-size:12px;color:#7A5200;margin-bottom:12px">Please provide a formal written response covering <strong>all of the following</strong>:</div>'
+    +'<div>'+respItems.map(function(item){ return '<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:7px"><span style="color:#EF9F27;font-size:14px;line-height:1.4">→</span><span style="font-size:12px;color:#1a1a1a;line-height:1.5">'+esc(item)+'</span></div>'; }).join('')+'</div>'
+    +(r.deadline?'<div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(239,159,39,.3)"><strong style="font-size:12px;color:#7A5200">Response Deadline:</strong> <span style="font-size:12px">'+esc(r.deadline)+'</span></div>':'')
+    +'</div>'
+    +'<div style="margin-top:14px">'
+    +(r.contact||r.email?'<div style="font-size:11px;color:#888;margin-bottom:4px">Send your response to:</div>'
+      +'<div style="font-size:13px;font-weight:600;color:#1a1a1a">'+esc(r.contact)+'</div>'
+      +(r.email?'<div style="font-size:12px;color:#1B6FA8">'+esc(r.email)+'</div>':'')
+      +(r.phone?'<div style="font-size:12px;color:#555">'+esc(r.phone)+'</div>':'')
+      :'')
+    +'</div>';
+
+  var doc='<!DOCTYPE html><html><head><meta charset="UTF-8"/>'
+    +'<style>@page{size:A4;margin:0}body{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#1a1a1a;margin:0;padding:0}@media print{body{padding:0}}</style>'
+    +'</head><body>'
+    +hdr
+    +'<div style="padding:24px 32px">'
+    +overviewHtml+techHtml+commHtml+qualHtml+respHtml
+    +'<div style="margin-top:32px;padding-top:16px;border-top:1px solid #e0e0e0;font-size:10px;color:#aaa;text-align:center">'
+    +'SCM Solution LTD · Project Brief · '+esc(m.projectCode)+' · Issued '+esc(m.date)
+    +(m.confidential?' · Confidential — do not distribute':'')
+    +'</div>'
+    +'</div></body></html>';
+
+  var iframe=document.getElementById('prev-iframe');
+  iframe.contentDocument.open(); iframe.contentDocument.write(doc); iframe.contentDocument.close();
+}
+
+function printBrief(){ document.getElementById('prev-iframe').contentWindow.print(); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+loadAll(); renderList();
+</script>
+</body>
+</html>

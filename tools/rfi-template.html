@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RFI Template — SCM Bridge OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1A2E3B;--navy2:#2C4A5E;
+  --teal:#1D9E75;--teal-dk:#085041;--teal-lt:#E1F5EE;--teal-bd:#5DCAA5;
+  --amber:#EF9F27;--amber-lt:#FAEEDA;
+  --coral:#D85A30;--coral-lt:#FAECE7;
+  --gray-bg:#F5F4F1;--gray-line:#E0DED8;--gray-mid:#888780;--gray-dk:#444441;
+  --white:#fff;--black:#1A1A19;--blue-btn:#1B6FA8;
+}
+body{font-family:'Barlow',sans-serif;background:var(--gray-bg);color:var(--black);font-size:14px;line-height:1.5}
+input,textarea,select,button{font-family:inherit}
+button{cursor:pointer;border:none;background:none}
+textarea{resize:vertical}
+.screen{display:none;min-height:100vh}.screen.active{display:block}
+
+/* HOME */
+#home{background:var(--navy)}
+.home-wrap{max-width:720px;margin:0 auto;padding:36px 24px 60px}
+.home-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:6px}
+.home-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--white);line-height:1.1;margin-bottom:4px}
+.home-sub{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:28px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.btn-primary{background:var(--teal);color:var(--white);border-radius:10px;padding:11px 22px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:filter .15s}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-ghost{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:11px 18px;font-size:13px;transition:background .15s}
+.btn-ghost:hover{background:rgba(255,255,255,.14)}
+.new-form{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:20px;margin-bottom:24px;display:none;animation:fadeUp .2s ease}
+.nf-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:14px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.fg-full{grid-column:1/-1}
+.fl label{display:block;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-bd);margin-bottom:3px}
+.fl input,.fl select{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--white);outline:none;transition:border-color .15s}
+.fl input:focus,.fl select:focus{border-color:var(--teal-bd)}
+.fl input::placeholder{color:rgba(255,255,255,.3)}
+.fl select option{background:var(--navy);color:var(--white)}
+.sessions-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px}
+.rfi-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.rfi-info{flex:1;min-width:0}
+.rfi-name{font-size:15px;color:var(--white);margin-bottom:2px}
+.rfi-meta{font-size:11px;color:rgba(255,255,255,.4)}
+.rfi-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.btn-teal{background:var(--teal);color:var(--white);border-radius:20px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.btn-sm{border-radius:8px;padding:7px 14px;font-size:12px}
+.btn-danger{color:rgba(255,80,80,.6);font-size:11px;padding:4px}
+.empty{text-align:center;padding:48px 0;color:rgba(255,255,255,.3);font-size:14px}
+
+/* FORM SCREEN */
+#form-screen{background:var(--gray-bg)}
+.form-hdr{background:var(--teal-dk);padding:12px 18px 10px;position:sticky;top:52px;z-index:100;box-shadow:0 2px 14px rgba(0,0,0,.22)}
+.form-hdr-inner{max-width:760px;margin:0 auto}
+.form-top{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.form-back{font-size:18px;color:var(--teal-lt);background:rgba(255,255,255,.1);border-radius:8px;padding:4px 10px}
+.form-back:hover{background:rgba(255,255,255,.2)}
+.form-heading{flex:1;font-size:15px;color:var(--white);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.form-actions{display:flex;gap:7px;align-items:center;flex-shrink:0}
+.save-msg{font-size:11px;color:var(--teal-bd);min-width:55px}
+.btn-blue{background:var(--blue-btn);color:var(--white);border-radius:20px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.form-body{max-width:760px;margin:0 auto;padding:14px 14px 60px}
+
+/* SECTION CARDS */
+.sec-card{background:var(--white);border-radius:14px;overflow:hidden;margin-bottom:10px;border:1px solid var(--gray-line);animation:fadeUp .2s ease}
+.sec-hdr{display:flex;align-items:center;gap:9px;padding:11px 14px;cursor:pointer;user-select:none;background:#FAFAF8}
+.sec-num{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--teal);min-width:20px}
+.sec-title{flex:1;font-size:14px;font-weight:500}
+.sec-chev{font-size:11px;color:var(--gray-mid);transition:transform .2s}
+.sec-chev.up{transform:rotate(-90deg)}
+.sec-body{padding:16px}
+.sec-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-mid);margin-bottom:6px;margin-top:14px}
+.sec-lbl:first-child{margin-top:0}
+.sec-ta{width:100%;min-height:80px;padding:9px 11px;font-size:13px;border:1px solid var(--gray-line);border-radius:8px;background:#FAFAF8;color:var(--black);line-height:1.6;font-family:'Barlow',sans-serif}
+.sec-ta:focus{outline:none;border-color:var(--teal)}
+.sec-ta.sm{min-height:55px}
+.sec-in{width:100%;padding:7px 10px;font-size:13px;border:1px solid var(--gray-line);border-radius:8px;background:#FAFAF8;color:var(--black)}
+.sec-in:focus{outline:none;border-color:var(--teal)}
+.sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.sec-full{grid-column:1/-1}
+
+/* QUESTION ROWS */
+.q-row{background:#FAFAF8;border:1px solid var(--gray-line);border-radius:9px;padding:12px 14px;margin-bottom:8px}
+.q-text{font-size:13px;font-weight:500;color:var(--black);margin-bottom:6px}
+.q-hint{font-size:11px;color:var(--gray-mid);font-style:italic;margin-bottom:7px}
+.q-input{width:100%;padding:7px 9px;font-size:13px;border:1px solid var(--gray-line);border-radius:7px;background:var(--white);color:var(--black);font-family:'Barlow',sans-serif;resize:vertical}
+.q-input:focus{outline:none;border-color:var(--teal)}
+
+/* PREVIEW SCREEN */
+#preview-screen{background:var(--gray-bg)}
+.prev-hdr{background:var(--navy);padding:10px 20px;display:flex;align-items:center;gap:10px;position:sticky;top:52px;z-index:100}
+.prev-title{flex:1;font-size:13px;color:rgba(255,255,255,.5)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.fg,.sec-grid{grid-template-columns:1fr}.fg-full,.sec-full{grid-column:1}}
+</style>
+</head>
+<body>
+<div id="site-nav-root"></div>
+<script src="../nav.js"></script>
+
+<!-- ══ HOME ══════════════════════════════════════════════════════════════════ -->
+<div id="home" class="screen active">
+  <div class="home-wrap">
+    <div class="home-label">SCM Solution LTD</div>
+    <div class="home-title">RFI Template</div>
+    <div class="home-sub">Request for Information — sent to candidate factories before a visit or shortlisting decision</div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="showNewForm()">+ New RFI</button>
+    </div>
+    <div class="new-form" id="new-form">
+      <div class="nf-title">New Request for Information</div>
+      <div class="fg">
+        <div class="fl fg-full"><label>Factory Name *</label><input id="nf-factory" placeholder="e.g. Shin-Fu Aluminum Co., Ltd."/></div>
+        <div class="fl"><label>Date Issued</label><input id="nf-date" type="date"/></div>
+        <div class="fl"><label>Response Deadline</label><input id="nf-deadline" type="date"/></div>
+        <div class="fl fg-full"><label>Project / Product</label><input id="nf-project" placeholder="e.g. Motis Project — 4 core firefighting products"/></div>
+        <div class="fl"><label>Issued By (Company)</label><input id="nf-from-company" placeholder="SCM Solution LTD"/></div>
+        <div class="fl"><label>Issued By (Name)</label><input id="nf-from-name" placeholder="e.g. Patrick McGuinness"/></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="createRfi()">Create RFI</button>
+        <button class="btn-ghost" onclick="hideNewForm()">Cancel</button>
+      </div>
+    </div>
+    <div id="rfi-list"><div class="empty">No RFIs yet — tap New RFI to begin</div></div>
+  </div>
+</div>
+
+<!-- ══ FORM SCREEN ═══════════════════════════════════════════════════════════ -->
+<div id="form-screen" class="screen">
+  <div class="form-hdr">
+    <div class="form-hdr-inner">
+      <div class="form-top">
+        <button class="form-back" onclick="goHome()">←</button>
+        <div class="form-heading" id="form-heading">RFI</div>
+        <div class="form-actions">
+          <span class="save-msg" id="save-msg"></span>
+          <button class="btn-blue btn-sm" onclick="goPreview()">Preview / Export</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-body" id="form-body"></div>
+</div>
+
+<!-- ══ PREVIEW SCREEN ════════════════════════════════════════════════════════ -->
+<div id="preview-screen" class="screen">
+  <div class="prev-hdr">
+    <div class="prev-title" id="prev-title">RFI Preview</div>
+    <button class="btn-teal btn-sm" onclick="printRfi()">Print / Save PDF</button>
+    <button class="btn-ghost btn-sm" onclick="goForm()">← Back</button>
+  </div>
+  <div id="prev-body"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+// DATA STRUCTURE
+// ════════════════════════════════════════════════════════════════════════════
+/*
+  RFI sections (all freetext answers keyed by question id):
+  1. header (meta) — factory, date, deadline, project, from
+  2. intro — project context, volumes, timeline, budget indication
+  3. company — background, size, headcount, years, certifications
+  4. capabilities — main processes, materials, equipment
+  5. quality — QC systems, certifications, past audits
+  6. references — similar products, existing clients
+  7. commercial — MOQ, capacity, standard lead times
+  8. response — contact, format, instructions
+*/
+
+const QUESTIONS = [
+  // INTRO
+  {id:"q_project_brief",   section:"intro",       label:"Project / Product Brief",               hint:"Summarise what you are looking to manufacture and any key technical context.",             rows:4},
+  {id:"q_volumes",         section:"intro",       label:"Target Production Volumes",              hint:"Estimated initial order quantity and annual forecast (e.g. 1,000 units initial / 5,000 per year).", rows:2},
+  {id:"q_timeline",        section:"intro",       label:"Target Timeline",                        hint:"Key dates — sample required by, first production shipment target.",                       rows:2},
+  {id:"q_key_reqs",        section:"intro",       label:"Key Technical Requirements",             hint:"Materials, finishes, tolerances, certifications, or any non-negotiables for this project.", rows:3},
+  // COMPANY
+  {id:"q_company_overview",section:"company",     label:"Company Overview",                       hint:"Describe your company, ownership, history, and what makes you a strong manufacturing partner.", rows:3},
+  {id:"q_years",           section:"company",     label:"Years in Business",                      hint:"",                                                                                       rows:1},
+  {id:"q_facility",        section:"company",     label:"Facility Size & Location(s)",            hint:"Total floor space, number of buildings, locations.",                                      rows:2},
+  {id:"q_headcount",       section:"company",     label:"Total Headcount",                        hint:"Total employees, and split between production, QC, engineering, and management if possible.", rows:2},
+  {id:"q_certs",           section:"company",     label:"Current Certifications",                 hint:"ISO 9001, 14001, IATF 16949, specific product certifications, etc.",                     rows:2},
+  // CAPABILITIES
+  {id:"q_main_processes",  section:"capabilities",label:"Main Manufacturing Processes",           hint:"List the core production processes performed in-house.",                                   rows:3},
+  {id:"q_materials",       section:"capabilities",label:"Materials You Work With",                hint:"Metal types, grades, polymers, or other materials regularly processed.",                   rows:2},
+  {id:"q_equipment",       section:"capabilities",label:"Key Equipment & Machines",               hint:"Equipment relevant to this enquiry — type, quantity, approximate age/condition.",          rows:3},
+  {id:"q_outsourced",      section:"capabilities",label:"Outsourced Processes",                   hint:"Which processes are outsourced and to whom (e.g. surface treatment, heat treatment, testing)?", rows:2},
+  // QUALITY
+  {id:"q_qc_system",       section:"quality",     label:"Quality Management System",              hint:"How is quality controlled? IQC, IPQC, OQC processes, sampling plans.",                    rows:3},
+  {id:"q_inspection",      section:"quality",     label:"Inspection Equipment",                   hint:"Key inspection and measurement tools available in-house.",                                 rows:2},
+  {id:"q_testing",         section:"quality",     label:"Testing Capabilities",                   hint:"Functional, dimensional, destructive, environmental, or other testing you can perform.",   rows:2},
+  {id:"q_audit_history",   section:"quality",     label:"Recent Audit History",                   hint:"Any third-party audits in the past 3 years — customer, certification body, social compliance.", rows:2},
+  // REFERENCES
+  {id:"q_similar_products",section:"references",  label:"Similar Products / Projects",            hint:"Examples of similar parts or products you have manufactured — share photos or specs if possible.", rows:3},
+  {id:"q_clients",         section:"references",  label:"Existing Customer References",           hint:"Types of clients you work with (industries, regions). We understand specific names may be confidential.", rows:2},
+  {id:"q_export",          section:"references",  label:"Export Experience",                      hint:"Countries you currently export to. Experience with shipping to Australia / Western markets.",rows:2},
+  // COMMERCIAL
+  {id:"q_moq",             section:"commercial",  label:"Minimum Order Quantity (MOQ)",           hint:"Your standard MOQ for a product in this category.",                                        rows:1},
+  {id:"q_capacity",        section:"commercial",  label:"Monthly Production Capacity",            hint:"For a product in this category, what is your available monthly capacity?",                 rows:2},
+  {id:"q_lead_time_proto", section:"commercial",  label:"Sample / Prototype Lead Time",           hint:"Typical time from confirmed order to sample delivery.",                                    rows:1},
+  {id:"q_lead_time_prod",  section:"commercial",  label:"Mass Production Lead Time",              hint:"Typical lead time from PO to shipment at target volumes.",                                 rows:1},
+  {id:"q_payment",         section:"commercial",  label:"Standard Payment Terms",                 hint:"Your typical payment structure (e.g. 30% deposit, 70% on shipment).",                      rows:1},
+];
+
+const SECTIONS = [
+  {key:"intro",        num:"1", title:"Project Context — What We Are Building"},
+  {key:"company",      num:"2", title:"Company Background"},
+  {key:"capabilities", num:"3", title:"Manufacturing Capabilities"},
+  {key:"quality",      num:"4", title:"Quality Systems"},
+  {key:"references",   num:"5", title:"Reference Projects & Export Experience"},
+  {key:"commercial",   num:"6", title:"Commercial Parameters"},
+];
+
+// ════════════════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════════════════
+const SK="scm_rfi_v1";
+let rfis=[], activeId=null, collapsed={};
+
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function getRfi(){return rfis.find(r=>r.id===activeId)||null;}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+
+function blankRfi(meta){
+  const answers={};
+  QUESTIONS.forEach(q=>{answers[q.id]="";});
+  return {id:uid(), meta:{...meta}, answers, createdAt:new Date().toISOString()};
+}
+
+function load(){try{rfis=JSON.parse(localStorage.getItem(SK)||"[]");}catch{rfis=[];}}
+function save(){try{localStorage.setItem(SK,JSON.stringify(rfis));}catch(e){console.error(e);}}
+let saveTimer=null;
+function ds(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{save();showSave();},600);}
+function showSave(){const el=document.getElementById("save-msg");if(el){el.textContent="Saved ✓";setTimeout(()=>{if(el.textContent==="Saved ✓")el.textContent="";},2000);}}
+
+function showScreen(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");window.scrollTo(0,0);}
+function goHome(){showScreen("home");renderHome();}
+function goForm(){showScreen("form-screen");renderForm();}
+function goPreview(){showScreen("preview-screen");renderPreview();}
+
+// ════════════════════════════════════════════════════════════════════════════
+// HOME
+// ════════════════════════════════════════════════════════════════════════════
+function showNewForm(){document.getElementById("new-form").style.display="block";document.getElementById("nf-factory").focus();}
+function hideNewForm(){document.getElementById("new-form").style.display="none";}
+
+function createRfi(){
+  const factory=document.getElementById("nf-factory").value.trim();
+  if(!factory){alert("Factory name is required.");return;}
+  const meta={
+    factory,
+    date:document.getElementById("nf-date").value||new Date().toISOString().slice(0,10),
+    deadline:document.getElementById("nf-deadline").value||"",
+    project:document.getElementById("nf-project").value.trim(),
+    fromCompany:document.getElementById("nf-from-company").value.trim()||"SCM Solution LTD",
+    fromName:document.getElementById("nf-from-name").value.trim(),
+  };
+  const rfi=blankRfi(meta);
+  rfis.push(rfi); save(); hideNewForm();
+  ["nf-factory","nf-date","nf-deadline","nf-project","nf-from-company","nf-from-name"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  openRfi(rfi.id);
+}
+
+function openRfi(id){activeId=id;collapsed={};showScreen("form-screen");renderForm();}
+function delRfi(id){if(!confirm("Delete this RFI?"))return;rfis=rfis.filter(r=>r.id!==id);save();renderHome();}
+
+function renderHome(){
+  const c=document.getElementById("rfi-list");
+  if(!rfis.length){c.innerHTML='<div class="empty">No RFIs yet — tap New RFI to begin</div>';return;}
+  let html=`<div class="sessions-label">Saved RFIs (${rfis.length})</div>`;
+  rfis.slice().reverse().forEach(r=>{
+    html+=`<div class="rfi-card">
+      <div class="rfi-info">
+        <div class="rfi-name">${esc(r.meta.factory)}</div>
+        <div class="rfi-meta">${[r.meta.project,r.meta.date,r.meta.deadline?"Response by "+r.meta.deadline:""].filter(Boolean).map(esc).join(" · ")}</div>
+      </div>
+      <div class="rfi-actions">
+        <button class="btn-teal btn-sm" onclick="openRfi('${r.id}')">Open</button>
+        <button class="btn-danger" onclick="delRfi('${r.id}')">Delete</button>
+      </div>
+    </div>`;
+  });
+  c.innerHTML=html;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FORM
+// ════════════════════════════════════════════════════════════════════════════
+function toggleSec(id){
+  collapsed[id]=!collapsed[id];
+  const b=document.getElementById("sbody-"+id);
+  const c=document.getElementById("schev-"+id);
+  if(b)b.style.display=collapsed[id]?"none":"block";
+  if(c)c.classList.toggle("up",!!collapsed[id]);
+}
+
+function updMeta(field,value){const r=getRfi();if(!r)return;r.meta[field]=value;document.getElementById("form-heading").textContent="RFI — "+r.meta.factory;ds();}
+function updAnswer(qid,value){const r=getRfi();if(!r)return;r.answers[qid]=value;ds();}
+
+function buildMetaEdit(r){
+  const m=r.meta;
+  return `<div style="background:var(--white);border-radius:14px;padding:14px 16px;margin-bottom:10px;border:1.5px solid var(--teal-bd)">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-dk);margin-bottom:10px">Document Header</div>
+    <div class="sec-grid">
+      <div><div class="sec-lbl" style="margin-top:0">To (Factory)</div><input class="sec-in" value="${esc(m.factory||"")}" oninput="updMeta('factory',this.value)"/></div>
+      <div><div class="sec-lbl" style="margin-top:0">From (Company)</div><input class="sec-in" value="${esc(m.fromCompany||"")}" oninput="updMeta('fromCompany',this.value)"/></div>
+      <div><div class="sec-lbl" style="margin-top:0">From (Name)</div><input class="sec-in" value="${esc(m.fromName||"")}" oninput="updMeta('fromName',this.value)"/></div>
+      <div><div class="sec-lbl" style="margin-top:0">Project / Product</div><input class="sec-in" value="${esc(m.project||"")}" oninput="updMeta('project',this.value)"/></div>
+      <div><div class="sec-lbl" style="margin-top:0">Date Issued</div><input class="sec-in" type="date" value="${esc(m.date||"")}" oninput="updMeta('date',this.value)"/></div>
+      <div><div class="sec-lbl" style="margin-top:0">Response Deadline</div><input class="sec-in" type="date" value="${esc(m.deadline||"")}" oninput="updMeta('deadline',this.value)"/></div>
+    </div>
+  </div>`;
+}
+
+function buildSections(r){
+  return SECTIONS.map(sec=>{
+    const qs=QUESTIONS.filter(q=>q.section===sec.key);
+    const hasAnswer=qs.some(q=>r.answers[q.id]);
+    const coll=!!collapsed[sec.key];
+    const content=qs.map(q=>`<div class="q-row">
+      <div class="q-text">${esc(q.label)}</div>
+      ${q.hint?`<div class="q-hint">${esc(q.hint)}</div>`:""}
+      <textarea class="q-input" rows="${q.rows||2}" oninput="updAnswer('${q.id}',this.value)">${esc(r.answers[q.id]||"")}</textarea>
+    </div>`).join("");
+    return `<div class="sec-card">
+      <div class="sec-hdr" onclick="toggleSec('${sec.key}')">
+        <span class="sec-num">${sec.num}</span>
+        <span class="sec-title">${sec.title}</span>
+        ${hasAnswer?'<span style="font-size:10px;color:var(--teal);background:var(--teal-lt);padding:2px 7px;border-radius:10px">✓</span>':""}
+        <span class="sec-chev${coll?" up":""}" id="schev-${sec.key}">▼</span>
+      </div>
+      <div class="sec-body" id="sbody-${sec.key}"${coll?' style="display:none"':""}>
+        ${content}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderForm(){
+  const r=getRfi();if(!r)return;
+  document.getElementById("form-heading").textContent="RFI — "+r.meta.factory;
+  document.getElementById("form-body").innerHTML=buildMetaEdit(r)+buildSections(r);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// PREVIEW / EXPORT
+// ════════════════════════════════════════════════════════════════════════════
+function generateHTML(){
+  const r=getRfi();if(!r)return"";
+  const m=r.meta;
+  const css=`*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;background:#F5F4F1;color:#1A1A19;padding-bottom:40px}.cover{background:#1A2E3B;padding:36px 40px;color:white;margin-bottom:20px}.ct{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#5DCAA5;font-family:Helvetica,sans-serif;margin-bottom:8px}.cs{font-size:26px;font-weight:bold;margin-bottom:3px}.cp{font-size:14px;color:rgba(255,255,255,.55);margin-bottom:22px}.meta-row{display:flex;gap:28px;flex-wrap:wrap}.ml{font-size:9px;color:#5DCAA5;letter-spacing:.1em;text-transform:uppercase;font-family:Helvetica,sans-serif;margin-bottom:2px}.mv{font-size:13px}.intro-note{background:rgba(255,255,255,.07);border-left:3px solid #5DCAA5;padding:12px 16px;font-size:12px;color:rgba(255,255,255,.6);line-height:1.6;margin-top:18px}.card{background:white;margin:0 20px 16px;border-radius:10px;padding:20px 24px}.ch{font-family:Helvetica,sans-serif;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#888;margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid #E0DED8;font-weight:700}.q-block{margin-bottom:18px}.q-block:last-child{margin-bottom:0}.ql{font-family:Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#2C4A5E;margin-bottom:4px}.qa-box{background:#FAFAF8;border:1px solid #E0DED8;border-radius:6px;padding:10px 12px;min-height:40px;font-size:13px;color:#333;line-height:1.6;white-space:pre-wrap}.qa-empty{color:#bbb;font-style:italic}.footer{padding:14px 20px;display:flex;justify-content:space-between;font-size:11px;color:#888;font-family:Helvetica,sans-serif}@media print{body{background:white}.cover{-webkit-print-color-adjust:exact;print-color-adjust:exact}}`;
+
+  const sectionsHTML=SECTIONS.map(sec=>{
+    const qs=QUESTIONS.filter(q=>q.section===sec.key);
+    const qHtml=qs.map(q=>{
+      const ans=r.answers[q.id]||"";
+      return `<div class="q-block">
+        <div class="ql">${esc(q.label)}</div>
+        ${q.hint?`<div style="font-size:11px;color:#888;font-style:italic;margin-bottom:5px">${esc(q.hint)}</div>`:""}
+        <div class="qa-box${!ans?" qa-empty":""}">${ans?esc(ans):"—"}</div>
+      </div>`;
+    }).join("");
+    return `<div class="card"><div class="ch">${esc(sec.num)}. ${esc(sec.title)}</div>${qHtml}</div>`;
+  }).join("");
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>RFI — ${esc(m.factory)}</title><style>${css}</style></head><body>
+  <div class="cover">
+    <div class="ct">Request for Information</div>
+    <div class="cs">To: ${esc(m.factory)}</div>
+    <div class="cp">${esc(m.project||"")}</div>
+    <div class="meta-row">
+      <div><div class="ml">From</div><div class="mv">${esc(m.fromName||"")}${m.fromCompany?" · "+esc(m.fromCompany):""}</div></div>
+      <div><div class="ml">Date Issued</div><div class="mv">${esc(m.date||"—")}</div></div>
+      ${m.deadline?`<div><div class="ml">Response Requested By</div><div class="mv">${esc(m.deadline)}</div></div>`:""}
+    </div>
+    <div class="intro-note">
+      Thank you for taking the time to complete this Request for Information. Your responses will help us evaluate whether there is a good fit for a potential manufacturing partnership. All information shared will be treated confidentially.
+      ${m.deadline?`<br/><br/><strong>Please return your completed responses by ${esc(m.deadline)}.</strong>`:""}
+    </div>
+  </div>
+  ${sectionsHTML}
+  <div class="footer">
+    <span>${esc(m.fromCompany||"SCM Solution LTD")} — Confidential</span>
+    <span>RFI — ${esc(m.factory)} — ${esc(m.date||"")}</span>
+  </div>
+  </body></html>`;
+}
+
+function renderPreview(){
+  const r=getRfi();if(!r)return;
+  document.getElementById("prev-title").textContent="RFI — "+r.meta.factory;
+  const body=document.getElementById("prev-body");
+  body.innerHTML="";
+  const iframe=document.createElement("iframe");
+  iframe.style.cssText="width:100%;height:calc(100vh - 50px);border:none;background:#fff;display:block";
+  body.appendChild(iframe);
+  iframe.contentDocument.open();
+  iframe.contentDocument.write(generateHTML());
+  iframe.contentDocument.close();
+}
+function printRfi(){const f=document.querySelector("#prev-body iframe");if(f)f.contentWindow.print();}
+
+// ════════════════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════════════════
+load();
+renderHome();
+</script>
+</body>
+</html>
