@@ -1,21 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>TRD — Technical Requirements Document — SCM Bridge OS</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/scm-styles.css"/>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#1A2E3B;--navy2:#2C4A5E;
-  --teal:#1D9E75;--teal-dk:#085041;--teal-lt:#E1F5EE;--teal-bd:#5DCAA5;
-  --amber:#EF9F27;--amber-lt:#FAEEDA;
-  --coral:#D85A30;--coral-lt:#FAECE7;
-  --purple:#6C4EBF;--purple-lt:#EDE8F8;
-  --gray-bg:#F5F4F1;--gray-line:#E0DED8;--gray-mid:#888780;--gray-dk:#444441;
-  --white:#fff;--black:#1A1A19;--blue-btn:#1B6FA8;
-}
 body{font-family:'Barlow',sans-serif;background:var(--gray-bg);color:var(--black);font-size:14px;line-height:1.5}
 input,textarea,select,button{font-family:inherit}
 button{cursor:pointer;border:none;background:none}
@@ -140,7 +131,7 @@ textarea{resize:vertical}
 @media(max-width:600px){.fg,.sec-grid,.sec-grid-3{grid-template-columns:1fr}.fg-full,.sec-full{grid-column:1}}
 </style>
 </head>
-<body>
+<body class="light-mode">
 <div id="site-nav-root"></div>
 <script src="../nav.js"></script>
 
@@ -659,7 +650,7 @@ function renderPreview(){
     +'SCM Solution LTD · Technical Requirements Document · '+esc(m.productCode)+' · Version '+esc(m.version)+' · '+esc(m.date)
     +' · '+esc(m.classification)+'</div></div>';
 
-  var doc='<!DOCTYPE html><html><head><meta charset="UTF-8"/><style>@page{size:A4;margin:0}body{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#1a1a1a;margin:0;padding:0}@media print{body{padding:0}}</style></head><body>'+hdr+body+'</body></html>';
+  var doc='<!DOCTYPE html><html><head><meta charset="UTF-8"/><style>@page{size:A4;margin:0}body{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#1a1a1a;margin:0;padding:0}@media print{body{padding:0}}</style></head><body class="light-mode">'+hdr+body+'</body></html>';
   var iframe=document.getElementById('prev-iframe');
   iframe.contentDocument.open(); iframe.contentDocument.write(doc); iframe.contentDocument.close();
 }

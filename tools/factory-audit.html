@@ -1,20 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>SCM Audit Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/scm-styles.css"/>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#1A2E3B;--navy2:#2C4A5E;
-  --teal:#1D9E75;--teal-dk:#085041;--teal-lt:#E1F5EE;--teal-bd:#5DCAA5;
-  --amber:#EF9F27;--amber-lt:#FAEEDA;
-  --coral:#D85A30;--coral-lt:#FAECE7;
-  --gray-bg:#F5F4F1;--gray-line:#E0DED8;--gray-mid:#888780;--gray-dk:#444441;
-  --white:#fff;--black:#1A1A19;--blue-btn:#1B6FA8;
-}
 body{font-family:'Barlow',sans-serif;background:var(--gray-bg);color:var(--black);font-size:14px;line-height:1.5}
 input,textarea,select,button{font-family:inherit}
 button{cursor:pointer;border:none;background:none}
@@ -194,7 +186,9 @@ textarea{resize:vertical}
 @media(max-width:600px){.field-grid{grid-template-columns:1fr}.ratings-grid{grid-template-columns:1fr}.audit-top{flex-wrap:wrap}}
 </style>
 </head>
-<body>
+<body class="light-mode">
+<div id="site-nav-root"></div>
+<script src="../nav.js"></script>
 
 <!-- ══ HOME ══════════════════════════════════════════════════════════════════ -->
 <div id="home" class="screen active">
@@ -873,9 +867,9 @@ function renderReport(){
 
   const ftBadgeHtml = ftInfo ? `<div style="display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:4px;background:rgba(124,92,191,.2);color:#B8A0E8;border:1px solid rgba(124,92,191,.4);margin-bottom:20px">${ftInfo.icon} ${ftInfo.label} Specialist Audit</div>` : "";
 
-  const css=`*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;background:#F5F4F1;color:#1A1A19;padding-bottom:40px}.cover{background:#1A2E3B;padding:40px;color:white;margin-bottom:20px}.ct{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#5DCAA5;font-family:Helvetica,sans-serif;margin-bottom:10px}.cs{font-size:28px;margin-bottom:4px}.cp{font-size:16px;color:rgba(255,255,255,.6);margin-bottom:24px}.mg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}.ml{font-size:9px;color:#5DCAA5;letter-spacing:.1em;text-transform:uppercase;font-family:Helvetica,sans-serif;margin-bottom:3px}.mv{font-size:13px}.card{background:white;margin:0 20px 20px;border-radius:12px;padding:24px}.ch{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#888;font-family:Helvetica,sans-serif;margin-bottom:16px}.sg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px}.sc{border-radius:10px;padding:16px 12px;text-align:center;border:0.5px solid}.sn{font-size:32px;font-weight:bold;line-height:1}.sl{font-size:11px;font-family:Helvetica,sans-serif;margin-top:5px}.ah{background:#2C4A5E;padding:14px 20px;margin:0 20px;border-radius:12px 12px 0 0}.al{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#5DCAA5;font-family:Helvetica,sans-serif}.ab{background:white;margin:0 20px 20px;border-radius:0 0 12px 12px;overflow:hidden}.gh{background:#E8EFF4;padding:10px 20px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#2C4A5E;font-family:Helvetica,sans-serif;font-weight:bold;border-bottom:0.5px solid #E0DED8}.sr{padding:16px 20px;border-bottom:0.5px solid #E0DED8}.st{display:flex;align-items:center;gap:10px;margin-bottom:8px}.stt{flex:1;font-size:14px}.pill{font-size:10px;padding:3px 10px;border-radius:20px;font-family:Helvetica,sans-serif;white-space:nowrap}.notes{font-size:13px;color:#444;line-height:1.6;padding:8px 12px;background:#FAFAF8;border-radius:6px;margin-bottom:8px}.chips{display:flex;flex-wrap:wrap;gap:5px}.chip{font-size:11px;padding:3px 9px;border-radius:20px;background:#E1F5EE;color:#085041;font-family:Helvetica,sans-serif}.photos{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}.pw{display:flex;flex-direction:column;gap:3px}.pi{width:160px;height:120px;object-fit:cover;border-radius:8px;border:0.5px solid #E0DED8}.pn{font-size:9px;color:#888;font-family:Helvetica,sans-serif;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.footer{padding:16px 20px;display:flex;justify-content:space-between;font-size:11px;color:#888;font-family:Helvetica,sans-serif}`;
+  const css=`body{font-family:Georgia,serif;background:#F5F4F1;color:#1A1A19;padding-bottom:40px}.cover{background:#1A2E3B;padding:40px;color:white;margin-bottom:20px}.ct{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#5DCAA5;font-family:Helvetica,sans-serif;margin-bottom:10px}.cs{font-size:28px;margin-bottom:4px}.cp{font-size:16px;color:rgba(255,255,255,.6);margin-bottom:24px}.mg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}.ml{font-size:9px;color:#5DCAA5;letter-spacing:.1em;text-transform:uppercase;font-family:Helvetica,sans-serif;margin-bottom:3px}.mv{font-size:13px}.card{background:white;margin:0 20px 20px;border-radius:12px;padding:24px}.ch{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#888;font-family:Helvetica,sans-serif;margin-bottom:16px}.sg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px}.sc{border-radius:10px;padding:16px 12px;text-align:center;border:0.5px solid}.sn{font-size:32px;font-weight:bold;line-height:1}.sl{font-size:11px;font-family:Helvetica,sans-serif;margin-top:5px}.ah{background:#2C4A5E;padding:14px 20px;margin:0 20px;border-radius:12px 12px 0 0}.al{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#5DCAA5;font-family:Helvetica,sans-serif}.ab{background:white;margin:0 20px 20px;border-radius:0 0 12px 12px;overflow:hidden}.gh{background:#E8EFF4;padding:10px 20px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#2C4A5E;font-family:Helvetica,sans-serif;font-weight:bold;border-bottom:0.5px solid #E0DED8}.sr{padding:16px 20px;border-bottom:0.5px solid #E0DED8}.st{display:flex;align-items:center;gap:10px;margin-bottom:8px}.stt{flex:1;font-size:14px}.pill{font-size:10px;padding:3px 10px;border-radius:20px;font-family:Helvetica,sans-serif;white-space:nowrap}.notes{font-size:13px;color:#444;line-height:1.6;padding:8px 12px;background:#FAFAF8;border-radius:6px;margin-bottom:8px}.chips{display:flex;flex-wrap:wrap;gap:5px}.chip{font-size:11px;padding:3px 9px;border-radius:20px;background:#E1F5EE;color:#085041;font-family:Helvetica,sans-serif}.photos{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}.pw{display:flex;flex-direction:column;gap:3px}.pi{width:160px;height:120px;object-fit:cover;border-radius:8px;border:0.5px solid #E0DED8}.pn{font-size:9px;color:#888;font-family:Helvetica,sans-serif;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.footer{padding:16px 20px;display:flex;justify-content:space-between;font-size:11px;color:#888;font-family:Helvetica,sans-serif}`;
 
-  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"/><title>SCM Report — ${esc(supplier)}</title><style>${css}</style></head><body>
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"/><title>SCM Report — ${esc(supplier)}</title><style>${css}</style></head><body class="light-mode">
     <div class="cover"><div class="ct">SCM Solution LTD — Factory Partnership Visit Report</div>
     <div class="cs">${esc(supplier)}</div><div class="cp">${esc(product)}</div>${ftBadgeHtml}
     <div class="mg">

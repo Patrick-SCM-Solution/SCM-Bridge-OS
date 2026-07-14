@@ -1,20 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Factory Visit Report</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/scm-styles.css"/>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#1A2E3B;--navy2:#2C4A5E;
-  --teal:#1D9E75;--teal-dk:#085041;--teal-lt:#E1F5EE;--teal-bd:#5DCAA5;
-  --amber:#EF9F27;--amber-lt:#FAEEDA;
-  --coral:#D85A30;--coral-lt:#FAECE7;
-  --gray-bg:#F5F4F1;--gray-line:#E0DED8;--gray-mid:#888780;--gray-dk:#444441;
-  --white:#fff;--black:#1A1A19;--blue-btn:#1B6FA8;
-}
 body{font-family:'Barlow',sans-serif;background:var(--gray-bg);color:var(--black);font-size:14px;line-height:1.5}
 input,textarea,select,button{font-family:inherit}
 button{cursor:pointer;border:none;background:none}
@@ -169,7 +161,7 @@ textarea{resize:vertical}
 @media(max-width:600px){.fg,.meta-grid{grid-template-columns:1fr}.fg-full,.meta-full{grid-column:1}}
 </style>
 </head>
-<body>
+<body class="light-mode">
 <div id="site-nav-root"></div>
 <script src="../nav.js"></script>
 
@@ -836,9 +828,9 @@ function generateHTML(){
   const actionsFiltered=r.actions.filter(a=>a.action);
   const actHTML=actionsFiltered.length?genTableHTML(actionsFiltered,["action","owner","deadline","status","notes"],["Action Item","Owner","Deadline","Status","Notes"]):"<p style='font-size:13px;color:#888'>No action items recorded.</p>";
 
-  const css=`*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;background:#F5F4F1;color:#1A1A19;padding-bottom:40px}.cover{background:#1A2E3B;padding:40px;color:white;margin-bottom:20px}.ct{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#5DCAA5;font-family:Helvetica,sans-serif;margin-bottom:10px}.cs{font-size:30px;font-weight:bold;margin-bottom:4px}.cp{font-size:15px;color:rgba(255,255,255,.55);margin-bottom:26px}.meta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.ml{font-size:9px;color:#5DCAA5;letter-spacing:.1em;text-transform:uppercase;font-family:Helvetica,sans-serif;margin-bottom:3px}.mv{font-size:13px}.card{background:white;margin:0 20px 16px;border-radius:12px;padding:22px 24px}.ch{font-family:Helvetica,sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#888;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #E0DED8}.notes{font-size:13px;color:#333;line-height:1.7}@media print{body{background:white}.cover{-webkit-print-color-adjust:exact;print-color-adjust:exact}.card{margin:0 0 12px;border-radius:0}}`;
+  const css=`body{font-family:Georgia,serif;background:#F5F4F1;color:#1A1A19;padding-bottom:40px}.cover{background:#1A2E3B;padding:40px;color:white;margin-bottom:20px}.ct{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#5DCAA5;font-family:Helvetica,sans-serif;margin-bottom:10px}.cs{font-size:30px;font-weight:bold;margin-bottom:4px}.cp{font-size:15px;color:rgba(255,255,255,.55);margin-bottom:26px}.meta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.ml{font-size:9px;color:#5DCAA5;letter-spacing:.1em;text-transform:uppercase;font-family:Helvetica,sans-serif;margin-bottom:3px}.mv{font-size:13px}.card{background:white;margin:0 20px 16px;border-radius:12px;padding:22px 24px}.ch{font-family:Helvetica,sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#888;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #E0DED8}.notes{font-size:13px;color:#333;line-height:1.7}@media print{body{background:white}.cover{-webkit-print-color-adjust:exact;print-color-adjust:exact}.card{margin:0 0 12px;border-radius:0}}`;
 
-  return`<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Factory Visit Report — ${esc(m.factory)}</title><style>${css}</style></head><body>
+  return`<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Factory Visit Report — ${esc(m.factory)}</title><style>${css}</style></head><body class="light-mode">
   <div class="cover">
     <div class="ct">SCM Solution LTD — Factory Visit Report</div>
     <div class="cs">${esc(m.factory)}</div>

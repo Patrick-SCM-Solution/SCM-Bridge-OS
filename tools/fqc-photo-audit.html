@@ -1,20 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>FQC Photo Audit — SCM Bridge OS</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/scm-styles.css"/>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#1A2E3B;--navy2:#2C4A5E;
-  --teal:#1D9E75;--teal-dk:#085041;--teal-lt:#E1F5EE;--teal-bd:#5DCAA5;
-  --amber:#EF9F27;--amber-lt:#FAEEDA;
-  --coral:#D85A30;--coral-lt:#FAECE7;
-  --gray-bg:#F5F4F1;--gray-line:#E0DED8;--gray-mid:#888780;--gray-dk:#444441;
-  --white:#fff;--black:#1A1A19;--blue-btn:#1B6FA8;
-}
 body{font-family:'Barlow',sans-serif;background:var(--gray-bg);color:var(--black);font-size:14px;line-height:1.5}
 input,textarea,select,button{font-family:inherit}
 button{cursor:pointer;border:none}
@@ -89,7 +81,7 @@ canvas{border:2px dashed var(--gray-line);background:var(--gray-bg);border-radiu
 @media(max-width:480px){.tmpl-grid{grid-template-columns:1fr}}
 </style>
 </head>
-<body>
+<body class="light-mode">
 <div id="site-nav-root"></div>
 <script src="../nav.js"></script>
 
@@ -983,7 +975,7 @@ function exportReport(){
     +'.sig-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}'
     +'.sig-box{border:1px solid #ddd;background:#fafafa;padding:10px;text-align:center;border-radius:6px;font-size:12px}'
     +'.sig-box img{max-width:100%;height:auto;max-height:80px}'
-    +'</style></head><body><div class="card">'
+    +'</style></head><body class="light-mode"><div class="card">'
     +'<div class="hdr"><div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#1D9E75;margin-bottom:4px">SCM Solution LTD</div>'
     +'<h1 style="font-size:22px;margin-bottom:2px">FQC Technical Evaluation Report</h1>'
     +'<div style="font-size:13px;color:#666">'+esc(cfg.name)+(appData.meta.client?' · '+esc(appData.meta.client):'')+'</div></div>'

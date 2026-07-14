@@ -1,20 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>RFI Template — SCM Bridge OS</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/scm-styles.css"/>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#1A2E3B;--navy2:#2C4A5E;
-  --teal:#1D9E75;--teal-dk:#085041;--teal-lt:#E1F5EE;--teal-bd:#5DCAA5;
-  --amber:#EF9F27;--amber-lt:#FAEEDA;
-  --coral:#D85A30;--coral-lt:#FAECE7;
-  --gray-bg:#F5F4F1;--gray-line:#E0DED8;--gray-mid:#888780;--gray-dk:#444441;
-  --white:#fff;--black:#1A1A19;--blue-btn:#1B6FA8;
-}
 body{font-family:'Barlow',sans-serif;background:var(--gray-bg);color:var(--black);font-size:14px;line-height:1.5}
 input,textarea,select,button{font-family:inherit}
 button{cursor:pointer;border:none;background:none}
@@ -99,7 +91,7 @@ textarea{resize:vertical}
 @media(max-width:600px){.fg,.sec-grid{grid-template-columns:1fr}.fg-full,.sec-full{grid-column:1}}
 </style>
 </head>
-<body>
+<body class="light-mode">
 <div id="site-nav-root"></div>
 <script src="../nav.js"></script>
 
@@ -354,7 +346,7 @@ function renderForm(){
 function generateHTML(){
   const r=getRfi();if(!r)return"";
   const m=r.meta;
-  const css=`*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;background:#F5F4F1;color:#1A1A19;padding-bottom:40px}.cover{background:#1A2E3B;padding:36px 40px;color:white;margin-bottom:20px}.ct{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#5DCAA5;font-family:Helvetica,sans-serif;margin-bottom:8px}.cs{font-size:26px;font-weight:bold;margin-bottom:3px}.cp{font-size:14px;color:rgba(255,255,255,.55);margin-bottom:22px}.meta-row{display:flex;gap:28px;flex-wrap:wrap}.ml{font-size:9px;color:#5DCAA5;letter-spacing:.1em;text-transform:uppercase;font-family:Helvetica,sans-serif;margin-bottom:2px}.mv{font-size:13px}.intro-note{background:rgba(255,255,255,.07);border-left:3px solid #5DCAA5;padding:12px 16px;font-size:12px;color:rgba(255,255,255,.6);line-height:1.6;margin-top:18px}.card{background:white;margin:0 20px 16px;border-radius:10px;padding:20px 24px}.ch{font-family:Helvetica,sans-serif;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#888;margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid #E0DED8;font-weight:700}.q-block{margin-bottom:18px}.q-block:last-child{margin-bottom:0}.ql{font-family:Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#2C4A5E;margin-bottom:4px}.qa-box{background:#FAFAF8;border:1px solid #E0DED8;border-radius:6px;padding:10px 12px;min-height:40px;font-size:13px;color:#333;line-height:1.6;white-space:pre-wrap}.qa-empty{color:#bbb;font-style:italic}.footer{padding:14px 20px;display:flex;justify-content:space-between;font-size:11px;color:#888;font-family:Helvetica,sans-serif}@media print{body{background:white}.cover{-webkit-print-color-adjust:exact;print-color-adjust:exact}}`;
+  const css=`body{font-family:Georgia,serif;background:#F5F4F1;color:#1A1A19;padding-bottom:40px}.cover{background:#1A2E3B;padding:36px 40px;color:white;margin-bottom:20px}.ct{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#5DCAA5;font-family:Helvetica,sans-serif;margin-bottom:8px}.cs{font-size:26px;font-weight:bold;margin-bottom:3px}.cp{font-size:14px;color:rgba(255,255,255,.55);margin-bottom:22px}.meta-row{display:flex;gap:28px;flex-wrap:wrap}.ml{font-size:9px;color:#5DCAA5;letter-spacing:.1em;text-transform:uppercase;font-family:Helvetica,sans-serif;margin-bottom:2px}.mv{font-size:13px}.intro-note{background:rgba(255,255,255,.07);border-left:3px solid #5DCAA5;padding:12px 16px;font-size:12px;color:rgba(255,255,255,.6);line-height:1.6;margin-top:18px}.card{background:white;margin:0 20px 16px;border-radius:10px;padding:20px 24px}.ch{font-family:Helvetica,sans-serif;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#888;margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid #E0DED8;font-weight:700}.q-block{margin-bottom:18px}.q-block:last-child{margin-bottom:0}.ql{font-family:Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#2C4A5E;margin-bottom:4px}.qa-box{background:#FAFAF8;border:1px solid #E0DED8;border-radius:6px;padding:10px 12px;min-height:40px;font-size:13px;color:#333;line-height:1.6;white-space:pre-wrap}.qa-empty{color:#bbb;font-style:italic}.footer{padding:14px 20px;display:flex;justify-content:space-between;font-size:11px;color:#888;font-family:Helvetica,sans-serif}@media print{body{background:white}.cover{-webkit-print-color-adjust:exact;print-color-adjust:exact}}`;
 
   const sectionsHTML=SECTIONS.map(sec=>{
     const qs=QUESTIONS.filter(q=>q.section===sec.key);
@@ -369,7 +361,7 @@ function generateHTML(){
     return `<div class="card"><div class="ch">${esc(sec.num)}. ${esc(sec.title)}</div>${qHtml}</div>`;
   }).join("");
 
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>RFI — ${esc(m.factory)}</title><style>${css}</style></head><body>
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>RFI — ${esc(m.factory)}</title><style>${css}</style></head><body class="light-mode">
   <div class="cover">
     <div class="ct">Request for Information</div>
     <div class="cs">To: ${esc(m.factory)}</div>
