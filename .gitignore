@@ -4,3 +4,6 @@
 *.scmb.json
 data/
 exports/
+
+# Private client config — load locally, never goes to GitHub
+private-configs.js

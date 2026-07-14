@@ -291,6 +291,7 @@ canvas{border:2px dashed var(--gray-line);background:var(--gray-bg);border-radiu
   </div>
 </div>
 
+<script src="../private-configs.js" onerror="void 0"></script>
 <script>
 // ── BUILT-IN CONFIGS ────────────────────────────────────────────
 var BUILTINS = [
@@ -359,6 +360,8 @@ var BUILTINS = [
     disclaimer:''
   }
 ];
+
+if(window.SCM_PRIVATE_BUILTINS&&window.SCM_PRIVATE_BUILTINS.length)BUILTINS=BUILTINS.concat(window.SCM_PRIVATE_BUILTINS);
 
 var CUSTOM_KEY='scm_fqc_configs_v1';
 var SESSION_KEY='scm_fqc_session_v1';
