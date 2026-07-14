@@ -32,7 +32,7 @@
   var pmActive = file === 'index.html' || file === '';
   var clActive = p.indexOf('/checklists/') !== -1;
   var fwActive = file === 'workflow.html';
-  var tlActive = /^(handoff-manifest|project-asset-registry|chinese-srs|project-report|scm-dashboard-v3|odoo-playbook|factory-audit|nda-template|scm-playbook|sow-template|factory-visit-report|supplier-pipeline|rfi-template|rfq-template|fabric-techpack|project-brief|trd-template|client-dashboard)\.html$/.test(file);
+  var tlActive = /^(handoff-manifest|project-asset-registry|chinese-srs|project-report|scm-dashboard-v3|odoo-playbook|factory-audit|fqc-photo-audit|nda-template|scm-playbook|sow-template|factory-visit-report|supplier-pipeline|rfi-template|rfq-template|fabric-techpack|project-brief|trd-template|client-dashboard)\.html$/.test(file);
 
   var root = document.getElementById('site-nav-root');
   if (!root) return;
@@ -60,6 +60,7 @@
     + '        <span class="nav-link nav-dropdown-toggle" tabindex="0">Tools</span>\n'
     + '        <div class="nav-dropdown-menu">\n'
     + '          <a href="' + base + 'tools/factory-audit.html" class="nav-link' + a('factory-audit.html') + '">Factory Audit</a>\n'
+    + '          <a href="' + base + 'tools/fqc-photo-audit.html" class="nav-link' + a('fqc-photo-audit.html') + '">FQC Photo Audit</a>\n'
     + '          <a href="' + base + 'tools/factory-visit-report.html" class="nav-link' + a('factory-visit-report.html') + '">Visit Report</a>\n'
     + '          <a href="' + base + 'tools/project-brief.html" class="nav-link' + a('project-brief.html') + '">Project Brief</a>\n'
     + '          <a href="' + base + 'tools/trd-template.html" class="nav-link' + a('trd-template.html') + '">TRD</a>\n'
