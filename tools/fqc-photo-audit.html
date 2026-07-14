@@ -312,6 +312,42 @@ var BUILTINS = [
     disclaimer:''
   },
   {
+    id:'smart-lock-jp', name:'Electronic Lock — JP / KKE Market', client:'', lotSize:1000, sampleSize:20,
+    isoLevel:'S-2', passThreshold:0, builtin:true,
+    photoSlots:[
+      {id:'carton',label:'Master Carton'},
+      {id:'labels',label:'Compliance Labels'},
+      {id:'product',label:'Product Front'},
+      {id:'keypad',label:'Keypad / Buttons'}
+    ],
+    tests:[
+      {label:'A1 · Unit count matches packing list?'},
+      {label:'A2 · Inner carton count matches PO / master carton spec?'},
+      {label:'A3 · Master carton markings, seals & barcodes match shipping spec?'},
+      {label:'A4 · No visible damage to master cartons or inner boxes?'},
+      {label:'B1 · CE / PSE markings present and correctly positioned?'},
+      {label:'B2 · All regulatory labels legible — no overlap or damage?'},
+      {label:'B3 · Country of Origin label present and correct?'},
+      {label:'B4 · Serial number label legible and matches factory log? [Traceability]'},
+      {label:'B5 · Firmware version on label matches approved build spec?'},
+      {label:'B6 · App compatibility label correct (iOS / Android min version)?'},
+      {label:'B7 · Wireless band label correct for JP market (2.4 GHz BT/Wi-Fi)?'},
+      {label:'C1 · Keypad housing: no scratches, dents or mould flash?'},
+      {label:'C2 · Surface finish uniform — no colour variation or oxidation?'},
+      {label:'C3 · Display / indicator clean — no dead pixels or condensation?'},
+      {label:'C4 · Keypad buttons: uniform tactile click, no sticking?'},
+      {label:'D1 · Deadbolt throw: smooth full extension & retraction?'},
+      {label:'D2 · Mechanical key override: smooth insertion, turn & lock/unlock?'},
+      {label:'D3 · Battery compartment cover: secure fit, no gap or rattle?'},
+      {label:'D4 · Door-side sensor / magnet alignment acceptable (if equipped)?'},
+      {label:'E1 · Power-on: audio chime and keypad indicator active?'},
+      {label:'E2 · Keycode unlock: master code + ≥1 user code confirmed?'},
+      {label:'E3 · Bluetooth pairing: app connects within 30 s?'},
+      {label:'E4 · Factory Reset performed per spec?',yesLabel:'Yes / Reset Done',noLabel:'No / Reset Failed'}
+    ],
+    disclaimer:'INSPECTION NOTICE: This 23-point protocol covers five sections — A: Quantity & Packaging, B: Labeling / Traceability / Config, C: Cosmetic, D: Mechanical, E: Electrical / Firmware. AQL tiers apply (Critical AQL 0, Major AQL 1.0, Minor AQL 2.5). Serial capture is mandatory for all failures. Final lot release requires HQ engineering sign-off. The factory retains full liability for latent defects in uninspected balance stock.'
+  },
+  {
     id:'generic', name:'Generic Product Audit', client:'', lotSize:500, sampleSize:20,
     isoLevel:'S-2', passThreshold:0, builtin:true,
     photoSlots:[{id:'packaging',label:'Packaging'},{id:'product',label:'Product'}],
