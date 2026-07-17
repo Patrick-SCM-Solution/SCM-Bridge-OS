@@ -2,40 +2,78 @@
 
 A structured reference and tooling system for hardware product development, covering the full journey from Idea through to Mass Production.
 
-Built for use alongside Google Drive, Notion, and Odoo Knowledge.
+Built for use alongside Google Drive and Odoo. All tools run as static HTML — no server, no login, no build step.
 
-**Live Site → [patrick-scm-solution.github.io/SCM-Bridge-OS](https://patrick-scm-solution.github.io/SCM-Bridge-OS/)** 
+**Live Site → [patrick-scm-solution.github.io/SCM-Bridge-OS](https://patrick-scm-solution.github.io/SCM-Bridge-OS/)**
+
 ---
 
 ## Live Pages
 
-| Page | URL |
+### Phase Map & Framework
+
+| Tool | URL |
 |------|-----|
-| Page | URL |
+| Phase Map (home) | [/index.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/index.html) |
+| SCM Bridge Framework | [/tools/workflow.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/workflow.html) |
+| SCM Bridge Playbook | [/tools/scm-playbook.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/scm-playbook.html) |
+
+### Asset Checklists
+
+| Tool | URL |
 |------|-----|
-| Phase Map | [https://patrick-scm-solution.github.io/SCM-Bridge-OS/index.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/index.html) |
-| Shared Stylesheet | [https://patrick-scm-solution.github.io/SCM-Bridge-OS/css/scm-styles.css](https://patrick-scm-solution.github.io/SCM-Bridge-OS/css/scm-styles.css) |
-| ME Asset Checklist | [https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/me-assets.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/me-assets.html) |
-| EE Asset Checklist | [https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/ee-assets.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/ee-assets.html) |
-| CMF & Materials | [https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/cmf-materials.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/cmf-materials.html) |
-| Tooling & Molds | [https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/tooling-molds.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/tooling-molds.html) |
-| Packaging Engineering | [https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/packaging.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/packaging.html) |
-| Handoff Manifest Builder | [https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/handoff-manifest.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/handoff-manifest.html) |
-| Project Asset Registry | [https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/project-asset-registry.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/project-asset-registry.html) |
-| Chinese SCM Reference | [https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/chinese-srs.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/chinese-srs.html) |
-| SCM Dashboard | [https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/scm-dashboard-v3.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/scm-dashboard-v3.html) |
-| Factory-Onsite-Audit-APP  | [https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/Factory-Onsite-Audit-APP.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/Factory-Onsite-Audit-APP.html) |
+| ME Asset Checklist | [/checklists/me-assets.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/me-assets.html) |
+| EE Asset Checklist | [/checklists/ee-assets.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/ee-assets.html) |
+| CMF & Materials | [/checklists/cmf-materials.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/cmf-materials.html) |
+| Tooling & Molds | [/checklists/tooling-molds.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/tooling-molds.html) |
+| Packaging Engineering | [/checklists/packaging.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/checklists/packaging.html) |
+
+### Project Tools
+
+| Tool | URL |
+|------|-----|
+| FQC Photo Audit | [/tools/fqc-photo-audit.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/fqc-photo-audit.html) |
+| Factory Audit App | [/tools/factory-audit.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/factory-audit.html) |
+| Factory Visit Report | [/tools/factory-visit-report.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/factory-visit-report.html) |
+| Supplier Pipeline | [/tools/supplier-pipeline.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/supplier-pipeline.html) |
+| Client Dashboard | [/tools/client-dashboard.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/client-dashboard.html) |
+| Operations Dashboard | [/tools/scm-dashboard-v3.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/scm-dashboard-v3.html) |
+| Handoff Manifest Builder | [/tools/handoff-manifest.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/handoff-manifest.html) |
+| Project Asset Registry | [/tools/project-asset-registry.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/project-asset-registry.html) |
+| Project Brief | [/tools/project-brief.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/project-brief.html) |
+| Project Report | [/tools/project-report.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/project-report.html) |
+
+### Templates
+
+| Tool | URL |
+|------|-----|
+| TRD | [/tools/trd-template.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/trd-template.html) |
+| RFI Template | [/tools/rfi-template.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/rfi-template.html) |
+| RFQ Template | [/tools/rfq-template.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/rfq-template.html) |
+| Tech Pack (Soft Goods) | [/tools/fabric-techpack.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/fabric-techpack.html) |
+| Mutual NDA | [/tools/nda-template.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/nda-template.html) |
+| SOW Template | [/tools/sow-template.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/sow-template.html) |
+
+### Reference
+
+| Tool | URL |
+|------|-----|
+| Chinese SCM Reference | [/tools/chinese-srs.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/chinese-srs.html) |
+| Odoo Playbook | [/tools/odoo-playbook.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/odoo-playbook.html) |
+| Shared Stylesheet | [/css/scm-styles.css](https://patrick-scm-solution.github.io/SCM-Bridge-OS/css/scm-styles.css) |
 
 ---
 
 ## Repository Structure
 
 ```
-SCM-hardware-dev-system/
-├── index.html                        ← Interactive phase map
+SCM-Bridge-OS/
+├── index.html                        ← Interactive phase map (home)
 ├── README.md
+├── nav.js                            ← Shared navigation bar
+├── private-configs.example.js        ← Template for local client configs (gitignored)
 ├── css/
-│   └── scm-styles.css                ← Shared stylesheet (all pages)
+│   └── scm-styles.css                ← Shared stylesheet (dark OS + light field tools)
 ├── checklists/
 │   ├── me-assets.html                ← ME asset checklist
 │   ├── ee-assets.html                ← EE asset checklist
@@ -43,49 +81,60 @@ SCM-hardware-dev-system/
 │   ├── tooling-molds.html            ← Tooling & Molds checklist
 │   └── packaging.html                ← Packaging Engineering checklist
 └── tools/
+    ├── fqc-photo-audit.html          ← FQC Photo Audit (ISO 2859-1 AQL inspection)
+    ├── factory-audit.html            ← Factory Audit App
+    ├── factory-visit-report.html     ← Factory Visit Report
+    ├── supplier-pipeline.html        ← Supplier sourcing funnel tracker
+    ├── client-dashboard.html         ← Client-facing project status portal
+    ├── scm-dashboard-v3.html         ← Internal operations dashboard
     ├── handoff-manifest.html         ← Handoff Manifest Builder
     ├── project-asset-registry.html   ← Project Asset Registry
-    ├── scm-dashboard-v3.html         ← Operations Dashboard
-    ├── Factory-Onsite-Audit-APP      ← Web Based App for Onsite Audits
-    └── chinese-srs.html              ← Chinese SCM Vocabulary Reference
+    ├── project-brief.html            ← Factory outreach project brief
+    ├── project-report.html           ← Project status report builder
+    ├── trd-template.html             ← Technical Requirements Document
+    ├── rfi-template.html             ← RFI Template
+    ├── rfq-template.html             ← RFQ Template
+    ├── fabric-techpack.html          ← Tech Pack (soft goods)
+    ├── nda-template.html             ← Mutual NDA Template
+    ├── sow-template.html             ← SOW Template
+    ├── workflow.html                 ← SCM Bridge Framework
+    ├── scm-playbook.html             ← SCM Bridge Playbook
+    ├── chinese-srs.html              ← Chinese SCM vocabulary reference
+    └── odoo-playbook.html            ← Odoo implementation playbook
 ```
 
 ---
 
-## Pages
+## Key Tool Details
 
-### Phase Map — `index.html`
-Interactive overview of all six development phases: Idea, PoC, Design, Test, Factory, Mass Production. Click any phase to expand deliverables and gate criteria. Links out to all checklists and tools.
+### FQC Photo Audit — `tools/fqc-photo-audit.html`
+ISO 2859-1 / ANSI Z1.4 AQL inspection app. Built-in templates for common product types; custom templates via the editor or a local `private-configs.js` sidecar (gitignored, for client-specific configs). Features:
+- Per-unit test checklist with Pass / Fail / N/A
+- Multiple photos per slot with thumbnail strip
+- Defect logging (serial, witness, notes)
+- Session auto-save to localStorage + manual export/import as `.json`
+- Exportable HTML inspection report with signatures
 
----
+### Factory Audit App — `tools/factory-audit.html`
+Structured onsite audit with guided prompts, section scoring, and exportable reports.
 
-### Checklists
+### Supplier Pipeline — `tools/supplier-pipeline.html`
+Funnel view tracking factories from Identified → Selected, with RFI/RFQ status and effort estimates per project.
 
-| File | Description |
-|------|-------------|
-| `checklists/me-assets.html` | Mechanical Engineering assets — master assembly, drawings, STEP exports, DXFs, supporting docs |
-| `checklists/ee-assets.html` | Electrical Engineering assets — schematics, Gerbers, BOM, CPL, firmware, test scripts |
-| `checklists/cmf-materials.html` | Color, Material & Finish specs — color callouts, plastic/metal specs, surface finish, compliance |
-| `checklists/tooling-molds.html` | Tooling & Molds — strategy, mold design, T1/T2/T3 review, production handover |
-| `checklists/packaging.html` | Packaging Engineering — primary box, inserts, shipping cartons, drop test, labelling |
+### Client Dashboard — `tools/client-dashboard.html`
+Phase progress, blockers, shared documents, and milestones. Exports as a standalone HTML file to share with clients.
 
-All checklists track completion progress with a live progress bar and persist state in browser localStorage.
-
----
-
-### Tools
-
-| File | Description |
-|------|-------------|
-| `tools/handoff-manifest.html` | 4-step builder: select asset packs → log file locations → confirm NDA → export manifest for CM/ODM |
-| `tools/project-asset-registry.html` | Central index for all project files across vendors, clients, and storage locations. Tracks status, access level, version, and storage path per asset. Exports JSON/CSV. |
-| `tools/chinese-srs.html` | SCM vocabulary reference — English terms with Traditional Chinese (繁體) and Simplified Chinese (简体) equivalents and usage context. Searchable by category. |
+### TRD — `tools/trd-template.html`
+Technical Requirements Document. Captures functional, mechanical, electrical, environmental, and compliance specs. A billable SCM deliverable.
 
 ---
 
 ## Stylesheet
 
-All pages share a single stylesheet at `css/scm-styles.css`. Page-specific styles are kept in a small inline `<style>` block per file.
+All pages share `css/scm-styles.css`. It supports two modes in a single file:
+
+- **Dark mode** (default) — used by the Phase Map and OS-level pages
+- **Light mode** (`body.light-mode`) — used by field tools (FQC, Factory Audit, etc.)
 
 **Link from root pages:**
 ```html
@@ -96,6 +145,14 @@ All pages share a single stylesheet at `css/scm-styles.css`. Page-specific style
 ```html
 <link rel="stylesheet" href="../css/scm-styles.css">
 ```
+
+Field tools add `class="light-mode"` to their `<body>` tag to activate the light theme.
+
+---
+
+## Private Configs (local only)
+
+Client-specific FQC templates can be stored in `private-configs.js` (gitignored). Copy `private-configs.example.js` to `private-configs.js` and add your templates — they appear alongside built-in templates when running locally and are never committed to the repo.
 
 ---
 
@@ -112,55 +169,17 @@ All pages share a single stylesheet at `css/scm-styles.css`. Page-specific style
 
 ---
 
-## Google Drive Structure
-
-Recommended folder structure per project:
-
-```
-/[Project_Name]/
-  /00_Master_Checklist/
-  /01_Master_Assembly/
-  /02_Parts/
-  /03_Native_CAD/          ← internal only
-  /04_Exports/             ← STEP, DXF, PDF — safe to share
-  /05_Drawings/
-  /06_Supporting_Docs/
-  /07_EE_Assets/
-    /Native/               ← internal only
-  /08_BOM_AVL/             ← strip pricing before sharing
-  /09_Test_Scripts/
-  /10_Vendor_Audits/
-  /11_Contact_Log/
-  /Handoff_Packages/
-    /CM_RevA_[date]/
-    /ODM_RevA_[date]/
-    /Client_RevA_[date]/
-```
-
----
-
 ## Coming Soon
 
-| File | Description |
+| Tool | Description |
 |------|-------------|
-| `checklists/dr0-gate.html` → `dr4-gate.html` | Design review gate pass/fail checklists |
-| `templates/mrd.html` | Market Requirements Document |
-| `templates/prd.html` | Product Requirements Document |
-| `templates/trd.html` | Technical Requirements Document |
-| `checklists/quality-aql.html` | Quality inspection & AQL tracker |
-| `checklists/compliance.html` | CE, FCC, RoHS, REACH compliance tracker |
-| `templates/rfq.html` | RFQ & should-cost model template |
-| `sops/revision-control.html` | File naming, versioning & release SOP |
-
----
-
-## Embedding in Notion
-
-Each page has its own GitHub Pages URL. Use Notion's `/embed` block with the full URL to render any page inline. The Phase Map index is the recommended entry point — all other pages are accessible from there.
-
-```
-https://patrick-scm-solution.github.io/SCM-hardware-dev-system/index.html
-```
+| Gate Checklists DR0–DR4 | Design review gate pass/fail checklists |
+| MRD Template | Market Requirements Document |
+| PRD Template | Product Requirements Document |
+| Manufacturer Matrix | Side-by-side factory capability comparison from visit/audit data |
+| Sample Tracker | T1 / T2 / Golden Sample workflow with dual sign-off |
+| Compliance Tracker | CE, FCC, RoHS, REACH per target market |
+| Revision Control SOP | File naming, versioning, and release process |
 
 ---
 
