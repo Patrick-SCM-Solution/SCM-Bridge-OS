@@ -393,9 +393,8 @@ function loadSession(){ try{ return JSON.parse(localStorage.getItem(SESSION_KEY)
 
 function resumeSession(){
   var s=loadSession(); if(!s)return;
-  var cfg=s.cfgBuiltin
-    ? BUILTINS.find(function(c){return c.id===s.cfgId;})
-    : customConfigs.find(function(c){return c.id===s.cfgId;});
+  var cfg=BUILTINS.find(function(c){return c.id===s.cfgId;})
+    ||customConfigs.find(function(c){return c.id===s.cfgId;});
   if(!cfg){ clearSession(); return; }
   ACTIVE_CFG=cfg;
   appData=s.appData;
@@ -484,14 +483,13 @@ function importSession(inp){
   reader.onload=function(e){
     var s;
     try{ s=JSON.parse(e.target.result); }catch(err){ alert('Invalid JSON file.'); return; }
-    if(!s||s.type!=='scm_fqc_session'||!s.cfgId||!s.appData){
+    if(!s||!s.cfgId||!s.appData||(s.type&&s.type!=='scm_fqc_session')){
       alert('This file is not a valid FQC session export.');
       return;
     }
     _pendingImport=s;
-    var cfg=s.cfgBuiltin
-      ? BUILTINS.find(function(c){return c.id===s.cfgId;})
-      : customConfigs.find(function(c){return c.id===s.cfgId;});
+    var cfg=BUILTINS.find(function(c){return c.id===s.cfgId;})
+      ||customConfigs.find(function(c){return c.id===s.cfgId;});
     var cfgName=cfg?cfg.name:s.cfgId;
     var unitsDone=s.appData.units?s.appData.units.length:0;
     var failCount=s.appData.units?s.appData.units.filter(function(u){return u.status==='FAILED';}).length:0;
