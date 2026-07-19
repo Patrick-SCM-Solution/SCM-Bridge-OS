@@ -36,7 +36,6 @@ Built for use alongside Google Drive and Odoo. All tools run as static HTML — 
 | Factory Audit App | [/tools/factory-audit.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/factory-audit.html) |
 | Factory Visit Report | [/tools/factory-visit-report.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/factory-visit-report.html) |
 | Supplier Pipeline | [/tools/supplier-pipeline.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/supplier-pipeline.html) |
-| Client Dashboard | [/tools/client-dashboard.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/client-dashboard.html) |
 | Operations Dashboard | [/tools/scm-dashboard-v3.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/scm-dashboard-v3.html) |
 | Handoff Manifest Builder | [/tools/handoff-manifest.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/handoff-manifest.html) |
 | Project Asset Registry | [/tools/project-asset-registry.html](https://patrick-scm-solution.github.io/SCM-Bridge-OS/tools/project-asset-registry.html) |
@@ -85,7 +84,6 @@ SCM-Bridge-OS/
     ├── factory-audit.html            ← Factory Audit App
     ├── factory-visit-report.html     ← Factory Visit Report
     ├── supplier-pipeline.html        ← Supplier sourcing funnel tracker
-    ├── client-dashboard.html         ← Client-facing project status portal
     ├── scm-dashboard-v3.html         ← Internal operations dashboard
     ├── handoff-manifest.html         ← Handoff Manifest Builder
     ├── project-asset-registry.html   ← Project Asset Registry
