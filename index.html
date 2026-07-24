@@ -1,1226 +1,863 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SCM Bridge OS</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/scm-styles.css">
-<style>
-
-/* ── HERO ─────────────────────────────────────────────────── */
-.hero {
-  position: relative;
-  z-index: 1;
-  background: var(--dark);
-  border-bottom: 1px solid var(--bdr);
-  overflow: hidden;
-}
-.hero::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 65% 70% at 100% 0%, rgba(27,155,212,.07) 0%, transparent 60%);
-  pointer-events: none;
-}
-.hero-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 84px 32px 64px;
-  position: relative;
-  z-index: 1;
-}
-.hero-eyebrow {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .22em;
-  text-transform: uppercase;
-  color: var(--scm-blue);
-  margin-bottom: 22px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.hero-eyebrow::before {
-  content: '';
-  display: block;
-  width: 28px;
-  height: 1.5px;
-  background: var(--scm-blue);
-  flex-shrink: 0;
-}
-.hero-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: clamp(52px, 7vw, 88px);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .01em;
-  line-height: .92;
-  color: var(--text);
-  margin-bottom: 26px;
-}
-
-.hero-title em {
-  font-style: normal;
-  color: var(--scm-blue);
-}
-.hero-sub {
-  font-size: 15px;
-  color: var(--muted);
-  max-width: 500px;
-  line-height: 1.65;
-  margin-bottom: 38px;
-}
-.hero-ctas {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.cta-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--scm-blue);
-  color: #fff;
-  text-decoration: none;
-  border-radius: 6px;
-  padding: 11px 22px;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  transition: filter .15s;
-}
-.cta-primary:hover { filter: brightness(1.12); }
-.cta-ghost {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: transparent;
-  color: var(--muted);
-  text-decoration: none;
-  border: 1px solid var(--bdr);
-  border-radius: 6px;
-  padding: 11px 22px;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  transition: all .15s;
-}
-.cta-ghost:hover { border-color: var(--muted); color: var(--text); }
-
-/* ── PHASE TABS (bottom of hero) ──────────────────────────── */
-.phase-tabs {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  border-top: 1px solid var(--bdr);
-  position: relative;
-  z-index: 1;
-}
-.pt {
-  padding: 18px 20px 16px;
-  border-right: 1px solid var(--bdr);
-  cursor: pointer;
-  transition: background .15s;
-  position: relative;
-  -webkit-user-select: none;
-  user-select: none;
-}
-.pt:last-child { border-right: none; }
-.pt:hover { background: rgba(255,255,255,.03); }
-.pt.active { background: rgba(27,155,212,.08); }
-.pt.active::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--scm-blue);
-}
-.pt-num {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .18em;
-  color: rgba(255,255,255,.15);
-  margin-bottom: 4px;
-  transition: color .15s;
-}
-.pt-label {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 14px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .07em;
-  color: rgba(255,255,255,.6);
-  margin-bottom: 2px;
-  transition: color .15s;
-}
-.pt-gate {
-  font-size: 11px;
-  color: rgba(255,255,255,.22);
-  letter-spacing: .02em;
-}
-.pt.active .pt-num  { color: rgba(27,155,212,.6); }
-.pt.active .pt-label { color: var(--scm-blue); }
-
-/* ── PHASE DETAIL PANELS ──────────────────────────────────── */
-.phase-detail {
-  background: var(--mid);
-  border-bottom: 1px solid var(--bdr);
-  display: none;
-  position: relative;
-  z-index: 1;
-}
-.phase-detail.open { display: block; }
-.pd-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 36px 32px 40px;
-}
-.pd-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid var(--bdr);
-}
-.pd-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.pd-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 18px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  flex: 1;
-}
-.pd-badge {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  padding: 5px 12px;
-  border-radius: 4px;
-  color: #fff;
-}
-.pd-cols {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 28px;
-}
-.pd-col-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 10px;
-}
-.pd-item {
-  font-size: 13px;
-  padding: 5px 0;
-  border-bottom: 1px solid rgba(30,58,85,.5);
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  color: var(--text);
-  line-height: 1.4;
-}
-.pd-item::before {
-  content: "→";
-  color: var(--scm-blue);
-  flex-shrink: 0;
-  font-size: 11px;
-  margin-top: 2px;
-}
-.pd-item.pass { color: var(--scm-green); font-weight: 600; }
-.pd-item.pass::before { color: var(--scm-green); }
-
-/* ── SERVICES BAND ────────────────────────────────────────── */
-.services-band {
-  background: var(--mid);
-  border-bottom: 1px solid var(--bdr);
-  position: relative;
-  z-index: 1;
-}
-.services-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 56px 32px;
-}
-.band-eyebrow {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  color: var(--scm-blue);
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.band-eyebrow::before {
-  content: '';
-  width: 24px;
-  height: 1.5px;
-  background: var(--scm-blue);
-  flex-shrink: 0;
-}
-.band-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 26px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  color: var(--text);
-  margin-bottom: 28px;
-}
-.srv-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  border: 1px solid var(--bdr);
-  border-radius: 8px;
-  overflow: hidden;
-}
-.srv-col {
-  padding: 20px 18px;
-  border-right: 1px solid var(--bdr);
-  background: var(--surf);
-}
-.srv-col:last-child { border-right: none; }
-.srv-head {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--scm-blue);
-  margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--bdr);
-}
-.srv-item {
-  font-size: 12px;
-  color: var(--muted);
-  padding: 3px 0;
-  line-height: 1.4;
-}
-
-/* ── MAIN CONTENT ─────────────────────────────────────────── */
-.main {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 64px 32px 88px;
-  position: relative;
-  z-index: 1;
-}
-
-/* ── STATS ROW ────────────────────────────────────────────── */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  border: 1px solid var(--bdr);
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 60px;
-  background: var(--bdr);
-  gap: 1px;
-}
-.stat-cell {
-  background: var(--surf);
-  padding: 26px 24px;
-  text-align: center;
-}
-.stat-num {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 42px;
-  font-weight: 800;
-  color: var(--scm-blue);
-  line-height: 1;
-  margin-bottom: 5px;
-  letter-spacing: -.01em;
-}
-.stat-lbl {
-  font-size: 11px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: .12em;
-  font-weight: 600;
-}
-
-/* ── RESOURCE GROUPS ──────────────────────────────────────── */
-.rg {
-  margin-bottom: 52px;
-}
-.rg-label {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.rg-label::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--bdr);
-}
-
-/* ── TOOL CARDS ───────────────────────────────────────────── */
-.tool-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-.tool-card {
-  background: var(--surf);
-  border: 1px solid var(--bdr);
-  border-radius: 8px;
-  padding: 20px 20px 18px;
-  text-decoration: none;
-  color: var(--text);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  transition: border-color .18s, transform .18s;
-}
-.tool-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--scm-green);
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform .22s ease;
-}
-.tool-card:hover {
-  border-color: rgba(125,194,66,.4);
-  transform: translateY(-2px);
-}
-.tool-card:hover::after { transform: scaleX(1); }
-.tc-icon { font-size: 20px; margin-bottom: 11px; }
-.tc-name {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 14px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-  color: var(--text);
-  margin-bottom: 5px;
-  line-height: 1.2;
-}
-.tc-desc {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.55;
-  flex: 1;
-  margin-bottom: 13px;
-}
-.tc-tag {
-  display: inline-block;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 3px;
-  align-self: flex-start;
-  color: var(--scm-green);
-  background: rgba(125,194,66,.08);
-  border: 1px solid rgba(125,194,66,.2);
-}
-.tc-tag-blue {
-  color: var(--scm-blue);
-  background: rgba(27,155,212,.08);
-  border-color: rgba(27,155,212,.2);
-}
-.tc-tag-muted {
-  color: var(--muted);
-  background: transparent;
-  border-color: var(--bdr);
-}
-
-/* CHECKLIST GRID — 5-up */
-.checklist-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-}
-/* checklist cards get the blue accent bottom line */
-.tool-card.cl-card::after { background: var(--scm-blue); }
-.tool-card.cl-card:hover { border-color: rgba(27,155,212,.4); }
-
-/* FRAMEWORK GRID — 2-up */
-.fw-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-/* SOON cards */
-.tool-card.soon {
-  opacity: .38;
-  pointer-events: none;
-  cursor: default;
-}
-.tool-card.soon::after { display: none; }
-.soon-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
-/* Per-phase colour helpers */
-.ph-idea   { color: var(--idea); }
-.ph-poc    { color: var(--poc); }
-.ph-design { color: var(--design); }
-.ph-test   { color: var(--test); }
-.ph-factory{ color: var(--factory); }
-.ph-mp     { color: var(--mp); }
-.bg-idea   { background: var(--idea); }
-.bg-poc    { background: var(--poc); }
-.bg-design { background: var(--design); color: #0D1B2E; }
-.bg-test   { background: var(--test);   color: #0D1B2E; }
-.bg-factory{ background: var(--factory); }
-.bg-mp     { background: var(--mp); }
-.dot-idea   { background: var(--idea); }
-.dot-poc    { background: var(--poc); }
-.dot-design { background: var(--design); }
-.dot-test   { background: var(--test); }
-.dot-factory{ background: var(--factory); }
-.dot-mp     { background: var(--mp); }
-
-/* ── FOOTER ───────────────────────────────────────────────── */
-.page-footer {
-  border-top: 1px solid var(--bdr);
-  position: relative;
-  z-index: 1;
-}
-.footer-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 24px 32px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
-  color: var(--muted);
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.footer-brand {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .1em;
-  color: var(--text);
-}
-
-/* ── RESPONSIVE ───────────────────────────────────────────── */
-@media (max-width: 1024px) {
-  .phase-tabs { grid-template-columns: repeat(3, 1fr); }
-  .pt:nth-child(3) { border-right: none; }
-  .pt:nth-child(4) { border-top: 1px solid var(--bdr); }
-  .pd-cols { grid-template-columns: 1fr 1fr; }
-  .srv-grid { grid-template-columns: repeat(3, 1fr); }
-  .srv-col:nth-child(3) { border-right: none; }
-  .srv-col:nth-child(4) { border-top: 1px solid var(--bdr); }
-  .tool-grid { grid-template-columns: repeat(2, 1fr); }
-  .checklist-grid { grid-template-columns: repeat(3, 1fr); }
-  .stats-row { grid-template-columns: repeat(2, 1fr); }
-  .soon-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 640px) {
-  .hero-inner { padding: 60px 20px 44px; }
-  .hero-title { font-size: 48px; }
-  .phase-tabs { grid-template-columns: repeat(2, 1fr); }
-  .pt:nth-child(2) { border-right: none; }
-  .pt:nth-child(3) { border-right: 1px solid var(--bdr); border-top: 1px solid var(--bdr); }
-  .pt:nth-child(4) { border-right: none; }
-  .pt:nth-child(5) { border-right: 1px solid var(--bdr); border-top: 1px solid var(--bdr); }
-  .pt:nth-child(6) { border-top: 1px solid var(--bdr); }
-  .pd-cols { grid-template-columns: 1fr; }
-  .pd-inner { padding: 24px 20px; }
-  .tool-grid { grid-template-columns: 1fr; }
-  .fw-grid { grid-template-columns: 1fr; }
-  .checklist-grid { grid-template-columns: repeat(2, 1fr); }
-  .stats-row { grid-template-columns: 1fr 1fr; }
-  .soon-grid { grid-template-columns: 1fr 1fr; }
-  .srv-grid { grid-template-columns: repeat(2, 1fr); }
-  .services-inner, .main { padding-left: 20px; padding-right: 20px; }
-  .footer-inner { padding: 20px; }
-}
-</style>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/scm-styles.css">
+  <style>
+  /* Phase arrows */
+  .phase-bar{display:flex;gap:0;position:relative}
+  .phase-arrow{flex:1;position:relative;padding:14px 14px 14px 28px;background:var(--surf);border:1px solid var(--bdr);cursor:pointer;transition:all .2s;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,0 100%,16px 50%);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;min-height:80px}
+  .phase-arrow:first-child{clip-path:polygon(0 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,0 100%);padding-left:14px}
+  .phase-arrow:hover,.phase-arrow.active{background:rgba(27,155,212,.15);border-color:var(--scm-blue);z-index:1}
+  .pa-label{font-family:"Barlow Condensed",sans-serif;font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+  .pa-sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .phase-arrow.active .pa-label{color:var(--scm-blue)}
+  /* Detail panels */
+  .detail-panel{display:none;background:var(--surf);border:1px solid var(--bdr);border-radius:0 0 8px 8px;border-top:none;padding:28px 32px;margin-top:-1px}
+  .detail-panel.open{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:24px}
+  .dp-section-title{font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  .dp-item{font-size:14px;padding:5px 0;border-bottom:1px solid rgba(30,58,85,.4);display:flex;align-items:flex-start;gap:8px}
+  .dp-item::before{content:"→";color:var(--scm-blue);flex-shrink:0;font-size:13px;margin-top:1px}
+  .dp-item.highlight{color:var(--scm-green);font-weight:600}
+  .dp-item.highlight::before{color:var(--scm-green)}
+  /* Flow */
+  .flow-section{margin-bottom:48px}
+  .section-title{font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:12px}
+  .section-title::after{content:"";flex:1;height:1px;background:var(--bdr)}
+  /* Gates */
+  .gate-flow{display:flex;align-items:center;overflow-x:auto;padding:20px 0}
+  .gate-node{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+  .gate-diamond{width:56px;height:56px;border:2px solid var(--scm-blue);background:rgba(27,155,212,.1);transform:rotate(45deg);display:flex;align-items:center;justify-content:center;transition:all .2s}
+  .gate-diamond:hover{background:rgba(27,155,212,.2);transform:rotate(45deg) scale(1.08)}
+  .gate-inner{transform:rotate(-45deg);text-align:center}
+  .gate-id{font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:800;color:var(--scm-blue);letter-spacing:.05em}
+  .gate-name-label{font-size:12px;color:var(--muted);margin-top:10px;text-align:center;max-width:70px;line-height:1.3}
+  .gate-connector{flex:1;height:2px;background:linear-gradient(90deg,var(--scm-blue),rgba(27,155,212,.3));min-width:20px}
+  /* Bridge */
+  .bridge-section{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:28px 32px;margin-bottom:40px}
+  .bridge-title{font-family:"Barlow Condensed",sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:20px}
+  .scm{color:var(--scm-blue)}.bridge{color:var(--scm-green)}
+  .bridge-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+  .bridge-col-head{font-family:"Barlow Condensed",sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--scm-blue);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bdr)}
+  .bridge-item{font-size:13px;color:var(--muted);padding:3px 0}
+  /* Resources */
+  .resources-section{margin-top:56px;padding-top:48px;border-top:1px solid var(--bdr)}
+  .resources-title{font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:32px}
+  .resources-group{margin-bottom:36px}
+  .resources-group-label{font-family:"Barlow Condensed",sans-serif;font-size:15px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--scm-blue);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  .resources-group-label::after{content:"";flex:1;height:1px;background:var(--bdr)}
+  .resources-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+  .res-card{background:var(--surf);border:1px solid var(--bdr);border-radius:6px;padding:16px;text-decoration:none;color:var(--text);display:block;transition:all .15s}
+  .res-card:hover{border-color:var(--scm-blue);background:rgba(27,155,212,.06);transform:translateY(-1px)}
+  .res-card-tool:hover{border-color:var(--scm-green);background:rgba(125,194,66,.06)}
+  .res-card-soon{opacity:.45;cursor:default;pointer-events:none}
+  .res-icon{font-size:24px;margin-bottom:8px}
+  .res-name{font-family:"Barlow Condensed",sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+  .res-desc{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:10px}
+  .res-tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:3px;color:var(--scm-blue);background:rgba(27,155,212,.1);border:1px solid rgba(27,155,212,.25)}
+  .res-tag-tool{color:var(--scm-green);background:rgba(125,194,66,.1);border-color:rgba(125,194,66,.25)}
+  .res-tag-soon{color:var(--muted);background:rgba(122,155,181,.08);border-color:rgba(122,155,181,.2)}
+  /* Logo */
+  .logo-area{margin-bottom:40px}
+  .logo-text{font-family:"Barlow Condensed",sans-serif;font-size:34px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+  .s{color:var(--scm-blue)}.c{color:var(--scm-green)}.m{color:var(--scm-blue)}.sol{color:var(--text);font-weight:400}
+  .logo-sub{font-size:13px;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;margin-top:4px}
+  /* Legend */
+  .legend{display:flex;gap:24px;flex-wrap:wrap;margin-top:24px;padding:16px 20px;background:var(--surf);border:1px solid var(--bdr);border-radius:6px}
+  .legend-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+  .l-diamond{width:12px;height:12px;border:2px solid var(--scm-blue);transform:rotate(45deg);flex-shrink:0}
+  .l-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .l-line{width:24px;height:2px;flex-shrink:0}
+  /* Responsive */
+  @media(max-width:900px){
+    .bridge-grid{grid-template-columns:repeat(3,1fr)}
+    .detail-panel.open{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:600px){
+    .phase-bar{overflow-x:auto}
+    .phase-arrow{min-width:110px;flex-shrink:0}
+    .detail-panel{padding:20px 16px}
+    .detail-panel.open{grid-template-columns:1fr}
+    .bridge-section{padding:20px 16px}
+    .bridge-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media(max-width:400px){
+    .bridge-grid{grid-template-columns:1fr}
+  }
+  /* ── Overview Diagram ───────────────────────────────────── */
+  .ov-diagram{margin-bottom:48px}
+  .ov-wrapper{overflow-x:auto}
+  .ov-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--bdr);border:1px solid var(--bdr);border-radius:8px;overflow:hidden;min-width:640px}
+  .ov-phase-head{padding:13px 8px;text-align:center;font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#fff}
+  .ov-phase-head.ph-idea{background:var(--idea)}
+  .ov-phase-head.ph-poc{background:var(--poc)}
+  .ov-phase-head.ph-design{background:var(--design);color:#0D1B2E}
+  .ov-phase-head.ph-test{background:var(--test);color:#0D1B2E}
+  .ov-phase-head.ph-factory{background:var(--factory)}
+  .ov-phase-head.ph-mp{background:var(--mp)}
+  .ov-content-cell{padding:14px 12px}
+  .ov-content-cell.ph-idea{background:rgba(27,155,212,.12)}
+  .ov-content-cell.ph-poc{background:rgba(42,171,110,.12)}
+  .ov-content-cell.ph-design{background:rgba(125,194,66,.12)}
+  .ov-content-cell.ph-test{background:rgba(245,166,35,.12)}
+  .ov-content-cell.ph-factory{background:rgba(232,98,74,.12)}
+  .ov-content-cell.ph-mp{background:rgba(155,107,212,.12)}
+  .ov-cell-title{font-size:13px;font-weight:700;margin-bottom:8px;line-height:1.35}
+  .ph-idea .ov-cell-title{color:var(--idea)}
+  .ph-poc .ov-cell-title{color:var(--poc)}
+  .ph-design .ov-cell-title{color:var(--design)}
+  .ph-test .ov-cell-title{color:var(--test)}
+  .ph-factory .ov-cell-title{color:var(--factory)}
+  .ph-mp .ov-cell-title{color:var(--mp)}
+  .ov-cell-list{list-style:none;padding:0;margin:0}
+  .ov-cell-list li{font-size:12px;color:var(--muted);line-height:1.5;padding:2px 0 2px 12px;position:relative}
+  .ov-cell-list li::before{content:"•";position:absolute;left:0}
+  .ov-divider-row{grid-column:1/-1;background:var(--mid);padding:12px 20px;display:flex;align-items:center;gap:6px;font-family:"Barlow Condensed",sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text)}
+  .ov-service-cell{padding:14px 12px;background:var(--surf)}
+  </style>
 </head>
 <body>
 <div id="site-nav-root"></div>
 <script src="nav.js"></script>
+<div class="wrap">
 
-<!-- ── HERO ───────────────────────────────────────────────── -->
-<section class="hero">
-  <div class="hero-inner">
-    <div class="hero-eyebrow">SCM Solution LTD — Operations System</div>
-    <h1 class="hero-title">From Idea<br>to <em>Mass Production.</em></h1>
-    <p class="hero-sub">A structured operations platform for hardware product development — tools, frameworks, and field documentation for every phase of the supply chain.</p>
-    <div class="hero-ctas">
-      <a href="#tools" class="cta-primary">Browse All Tools →</a>
-      <a href="#services" class="cta-ghost">Services by Phase</a>
+  <!-- Header -->
+  <header>
+    <div>
+      <h1><span class="s">S</span><span class="c">C</span><span class="m">M</span> Bridge OS</h1>
+      <p class="subtitle" style="margin-bottom:0">From Idea to Mass Production — click any phase to expand deliverables and gate criteria.</p>
+    </div>
+    <div class="header-badge">Rev 1.0</div>
+  </header>
+
+  <!-- Overview Diagram — Typical Product Development Phases -->
+  <div class="ov-diagram">
+    <div class="section-title">Typical Product Development Phases</div>
+    <div class="ov-wrapper">
+      <div class="ov-grid">
+
+        <!-- Phase headers -->
+        <div class="ov-phase-head ph-idea">Idea</div>
+        <div class="ov-phase-head ph-poc">PoC</div>
+        <div class="ov-phase-head ph-design">Design</div>
+        <div class="ov-phase-head ph-test">Test</div>
+        <div class="ov-phase-head ph-factory">Factory</div>
+        <div class="ov-phase-head ph-mp">MP</div>
+
+        <!-- Product development objectives -->
+        <div class="ov-content-cell ph-idea">
+          <div class="ov-cell-title">Identify Market Needs</div>
+          <ul class="ov-cell-list">
+            <li>PRD</li>
+            <li>Stakeholder &amp; resource review</li>
+            <li>User Stories</li>
+          </ul>
+        </div>
+        <div class="ov-content-cell ph-poc">
+          <div class="ov-cell-title">Reduce Risk</div>
+          <ul class="ov-cell-list">
+            <li>Market Validation</li>
+            <li>System Interface Diagram</li>
+            <li>Build non-form factor sample</li>
+          </ul>
+        </div>
+        <div class="ov-content-cell ph-design">
+          <div class="ov-cell-title">Create and Document</div>
+          <ul class="ov-cell-list">
+            <li>Schematics</li>
+            <li>Layout</li>
+            <li>Mechanical</li>
+            <li>Software</li>
+          </ul>
+        </div>
+        <div class="ov-content-cell ph-test">
+          <div class="ov-cell-title">Testing and Release Tools</div>
+          <ul class="ov-cell-list">
+            <li>EVT</li>
+            <li>DVT</li>
+          </ul>
+        </div>
+        <div class="ov-content-cell ph-factory">
+          <div class="ov-cell-title">Production Readiness</div>
+          <ul class="ov-cell-list">
+            <li>PVT</li>
+            <li>SOPs</li>
+            <li>Training</li>
+          </ul>
+        </div>
+        <div class="ov-content-cell ph-mp">
+          <div class="ov-cell-title">Ship Product</div>
+          <ul class="ov-cell-list">
+            <li>Optimize</li>
+            <li>Failure Analysis</li>
+            <li>Logistics</li>
+          </ul>
+        </div>
+
+        <!-- SCM Bridge divider -->
+        <div class="ov-divider-row">
+          Use <span class="scm">&nbsp;SCM</span>&nbsp;<span class="bridge">BRIDGE</span>&nbsp;for Supply Chain Services:
+        </div>
+
+        <!-- SCM Bridge services per phase -->
+        <div class="ov-service-cell">
+          <ul class="ov-cell-list">
+            <li>Document Review</li>
+            <li>Get Supplier Input</li>
+            <li>Translation</li>
+            <li>Find Factory Partners</li>
+          </ul>
+        </div>
+        <div class="ov-service-cell">
+          <ul class="ov-cell-list">
+            <li>Test Prototypes</li>
+            <li>Source Components &amp; Engineering Services</li>
+            <li>Explore off-the-shelf solutions</li>
+          </ul>
+        </div>
+        <div class="ov-service-cell">
+          <ul class="ov-cell-list">
+            <li>Support EE, ME, SW &amp; Packaging teams</li>
+            <li>BOM Costing</li>
+            <li>Material Selection</li>
+            <li>3rd party checks</li>
+            <li>FMEA support</li>
+          </ul>
+        </div>
+        <div class="ov-service-cell">
+          <ul class="ov-cell-list">
+            <li>FAI support</li>
+            <li>Check EVT &amp; DVT results</li>
+            <li>Oversee Reliability testing</li>
+            <li>Certifications</li>
+            <li>Test fixture design</li>
+            <li>RFQs — POs — PIs</li>
+          </ul>
+        </div>
+        <div class="ov-service-cell">
+          <ul class="ov-cell-list">
+            <li>Check Production line SOPs</li>
+            <li>Check PVT results</li>
+            <li>Verify Operator Training</li>
+            <li>Check capacity</li>
+            <li>Test production line</li>
+            <li>Determine MP readiness</li>
+          </ul>
+        </div>
+        <div class="ov-service-cell">
+          <ul class="ov-cell-list">
+            <li>Verify Quality processes</li>
+            <li>Final Inspection</li>
+            <li>Logistics &amp; Shipping</li>
+            <li>Metrics &amp; 8D reports</li>
+            <li>Failure Analysis</li>
+            <li>Arrange shipping/logistics</li>
+          </ul>
+        </div>
+
+      </div>
     </div>
   </div>
 
-  <!-- Phase tab strip -->
-  <div class="phase-tabs">
-    <div class="pt" data-phase="idea" onclick="togglePanel('idea')">
-      <div class="pt-num">01</div>
-      <div class="pt-label">Idea</div>
-      <div class="pt-gate">DR0 · Concept</div>
+  <!-- Phase Arrow Bar -->
+  <div class="phase-bar">
+    <div class="phase-arrow" data-phase="idea" onclick="togglePanel('idea')">
+      <div class="pa-label">Idea</div>
+      <div class="pa-gate">DR0 · Concept</div>
     </div>
-    <div class="pt" data-phase="poc" onclick="togglePanel('poc')">
-      <div class="pt-num">02</div>
-      <div class="pt-label">PoC</div>
-      <div class="pt-gate">DR1 · Prelim</div>
+    <div class="phase-arrow" data-phase="poc" onclick="togglePanel('poc')">
+      <div class="pa-label">PoC</div>
+      <div class="pa-gate">DR1 · Prelim</div>
     </div>
-    <div class="pt" data-phase="design" onclick="togglePanel('design')">
-      <div class="pt-num">03</div>
-      <div class="pt-label">Design</div>
-      <div class="pt-gate">DR2 · Critical</div>
+    <div class="phase-arrow" data-phase="design" onclick="togglePanel('design')">
+      <div class="pa-label">Design</div>
+      <div class="pa-gate">DR2 · Critical</div>
     </div>
-    <div class="pt" data-phase="test" onclick="togglePanel('test')">
-      <div class="pt-num">04</div>
-      <div class="pt-label">Test</div>
-      <div class="pt-gate">DR3 · EVT / DVT</div>
+    <div class="phase-arrow" data-phase="test" onclick="togglePanel('test')">
+      <div class="pa-label">Test</div>
+      <div class="pa-gate">DR3 · EVT / DVT</div>
     </div>
-    <div class="pt" data-phase="factory" onclick="togglePanel('factory')">
-      <div class="pt-num">05</div>
-      <div class="pt-label">Factory</div>
-      <div class="pt-gate">DR4 · PVT</div>
+    <div class="phase-arrow" data-phase="factory" onclick="togglePanel('factory')">
+      <div class="pa-label">Factory</div>
+      <div class="pa-gate">DR4 · PVT</div>
     </div>
-    <div class="pt" data-phase="mp" onclick="togglePanel('mp')">
-      <div class="pt-num">06</div>
-      <div class="pt-label">MP</div>
-      <div class="pt-gate">Mass Production</div>
+    <div class="phase-arrow" data-phase="mp" onclick="togglePanel('mp')">
+      <div class="pa-label">MP</div>
+      <div class="pa-gate">Mass Production</div>
     </div>
   </div>
-</section>
 
-<!-- ── PHASE DETAIL PANELS ─────────────────────────────────── -->
-<div id="panel-idea" class="phase-detail">
-  <div class="pd-inner">
-    <div class="pd-header">
-      <div class="pd-dot dot-idea"></div>
-      <div class="pd-title ph-idea">Idea Phase</div>
-      <div class="pd-badge bg-idea">Gate: DR0 — Concept Review</div>
+  <!-- Detail Panels (expand on click) -->
+  <div id="panel-idea" class="detail-panel">
+    <div class="dp-header">
+      <div class="dp-dot" style="background:var(--idea)"></div>
+      <div class="dp-title" style="color:var(--idea)">Idea Phase</div>
+      <div class="dp-gate-badge" style="background:var(--idea)">Gate: DR0 — Concept Review</div>
     </div>
-    <div class="pd-cols">
-      <div>
-        <div class="pd-col-title">Objective</div>
-        <div class="pd-item">Identify market need and define the problem</div>
-        <div class="pd-item">Secure stakeholder and resource buy-in</div>
-        <div class="pd-item">Select manufacturing partners</div>
-        <div class="pd-item">Establish project infrastructure</div>
+    <div class="dp-body">
+      <div class="dp-col">
+        <div class="dp-col-title">Objective</div>
+        <div class="dp-item">Identify market need and define the problem</div>
+        <div class="dp-item">Secure stakeholder and resource buy-in</div>
+        <div class="dp-item">Select manufacturing partners</div>
+        <div class="dp-item">Establish project infrastructure</div>
       </div>
-      <div>
-        <div class="pd-col-title">Key Deliverables</div>
-        <div class="pd-item">MRD — Market Requirements Document</div>
-        <div class="pd-item">Stakeholder review sign-off</div>
-        <div class="pd-item">User stories documented</div>
-        <div class="pd-item">Vendor shortlist + NDAs signed</div>
-        <div class="pd-item">Google Drive folder structure created</div>
-        <div class="pd-item">Contact log opened</div>
+      <div class="dp-col">
+        <div class="dp-col-title">Key Deliverables</div>
+        <div class="dp-item">MRD — Market Requirements Document</div>
+        <div class="dp-item">Stakeholder review sign-off</div>
+        <div class="dp-item">User stories documented</div>
+        <div class="dp-item">Vendor shortlist + NDAs signed</div>
+        <div class="dp-item">Google Drive folder structure created</div>
+        <div class="dp-item">Contact log opened</div>
       </div>
-      <div>
-        <div class="pd-col-title">SCM Solution Tasks</div>
-        <div class="pd-item">Document review</div>
-        <div class="pd-item">Find factory partners with matching skills</div>
-        <div class="pd-item">Get supplier input</div>
-        <div class="pd-item">Translation support</div>
+      <div class="dp-col">
+        <div class="dp-col-title">SCM Solution Tasks</div>
+        <div class="dp-item">Document review</div>
+        <div class="dp-item">Find factory partners with matching skills</div>
+        <div class="dp-item">Get supplier input</div>
+        <div class="dp-item">Translation support</div>
       </div>
-      <div>
-        <div class="pd-col-title">DR0 Gate Criteria</div>
-        <div class="pd-item pass">MRD drafted and reviewed</div>
-        <div class="pd-item pass">Stakeholder sign-off complete</div>
-        <div class="pd-item pass">Partners selected and NDAs signed</div>
-        <div class="pd-item pass">Drive structure created</div>
-        <div class="pd-item pass">Contact log opened</div>
+      <div class="dp-col">
+        <div class="dp-col-title">DR0 Gate Criteria</div>
+        <div class="dp-item highlight">MRD drafted and reviewed</div>
+        <div class="dp-item highlight">Stakeholder sign-off complete</div>
+        <div class="dp-item highlight">Partners selected and NDAs signed</div>
+        <div class="dp-item highlight">Drive structure created</div>
+        <div class="dp-item highlight">Contact log opened</div>
       </div>
     </div>
   </div>
+
+  <div id="panel-poc" class="detail-panel">
+    <div class="dp-header">
+      <div class="dp-dot" style="background:var(--poc)"></div>
+      <div class="dp-title" style="color:var(--poc)">Proof of Concept Phase</div>
+      <div class="dp-gate-badge" style="background:var(--poc)">Gate: DR1 — Preliminary Design Review</div>
+    </div>
+    <div class="dp-body">
+      <div class="dp-col">
+        <div class="dp-col-title">Objective</div>
+        <div class="dp-item">Reduce technical and market risk</div>
+        <div class="dp-item">Validate core technology works</div>
+        <div class="dp-item">Explore off-the-shelf solutions</div>
+        <div class="dp-item">Lock architecture before full design</div>
+      </div>
+      <div class="dp-col">
+        <div class="dp-col-title">Key Deliverables</div>
+        <div class="dp-item">Market validation complete</div>
+        <div class="dp-item">System interface diagram</div>
+        <div class="dp-item">Non-form-factor PoC sample built</div>
+        <div class="dp-item">PRD drafted internally</div>
+        <div class="dp-item">Preliminary BOM drafted</div>
+        <div class="dp-item">Long-lead items flagged</div>
+      </div>
+      <div class="dp-col">
+        <div class="dp-col-title">SCM Solution Tasks</div>
+        <div class="dp-item">Test prototypes</div>
+        <div class="dp-item">Source components and engineering services</div>
+        <div class="dp-item">Explore off-the-shelf solutions</div>
+      </div>
+      <div class="dp-col">
+        <div class="dp-col-title">DR1 Gate Criteria</div>
+        <div class="dp-item highlight">PoC sample built and tested</div>
+        <div class="dp-item highlight">Market validation done</div>
+        <div class="dp-item highlight">PRD approved internally</div>
+        <div class="dp-item highlight">Preliminary BOM drafted</div>
+        <div class="dp-item highlight">Factory partners confirmed</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-design" class="detail-panel">
+    <div class="dp-header">
+      <div class="dp-dot" style="background:var(--design)"></div>
+      <div class="dp-title" style="color:var(--design)">Design Phase</div>
+      <div class="dp-gate-badge" style="background:var(--design)">Gate: DR2 — Critical Design Review</div>
+    </div>
+    <div class="dp-body">
+      <div class="dp-col">
+        <div class="dp-col-title">Objective</div>
+        <div class="dp-item">Complete all ME and EE design</div>
+        <div class="dp-item">Release all engineering drawings</div>
+        <div class="dp-item">Get DFM feedback from partners</div>
+        <div class="dp-item">Prepare manufacturer-ready file packages</div>
+      </div>
+      <div class="dp-col">
+        <div class="dp-col-title">Key Deliverables</div>
+        <div class="dp-item">ME asset checklist signed off</div>
+        <div class="dp-item">EE asset checklist signed off</div>
+        <div class="dp-item">TRD compiled</div>
+        <div class="dp-item">DFM feedback incorporated</div>
+        <div class="dp-item">Handoff manifests prepared</div>
+        <div class="dp-item">Master BOM with MPNs</div>
+      </div>
+      <div class="dp-col">
+        <div class="dp-col-title">SCM Solution Tasks</div>
+        <div class="dp-item">Support ME, EE, SW, packaging design teams</div>
+        <div class="dp-item">BOM costing</div>
+        <div class="dp-item">Material selection</div>
+        <div class="dp-item">3rd party checks</div>
+        <div class="dp-item">FMEA support</div>
+      </div>
+      <div class="dp-col">
+        <div class="dp-col-title">DR2 Gate Criteria</div>
+        <div class="dp-item highlight">ME + EE checklists signed off</div>
+        <div class="dp-item highlight">All drawings released</div>
+        <div class="dp-item highlight">TRD reviewed and approved</div>
+        <div class="dp-item highlight">DFM feedback incorporated</div>
+        <div class="dp-item highlight">IP review complete</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-test" class="detail-panel">
+    <div class="dp-header">
+      <div class="dp-dot" style="background:var(--test)"></div>
+      <div class="dp-title" style="color:var(--test)">Test Phase</div>
+      <div class="dp-gate-badge" style="background:var(--test)">Gates: DR3 · EVT · DVT</div>
+    </div>
+    <div class="dp-body">
+      <div class="dp-col">
+        <div class="dp-col-title">Objective</div>
+        <div class="dp-item">Send file packages to CM and ODM</div>
+        <div class="dp-item">Build and test first physical prototypes</div>
+        <div class="dp-item">Validate design against all requirements</div>
+        <div class="dp-item">Complete First Article Inspection</div>
+      </div>
+      <div class="dp-col">
+        <div class="dp-col-title">Key Deliverables</div>
+        <div class="dp-item">CM + ODM packages sent with manifests</div>
+        <div class="dp-item">EVT report — pass/fail</div>
+        <div class="dp-item">DVT report — reliability + regulatory</div>
+        <div class="dp-item">FAI report signed off</div>
+        <div class="dp-item">Vendor audit complete</div>
+        <div class="dp-item">Certifications submitted</div>
+      </div>
+      <div class="dp-col">
+        <div class="dp-col-title">SCM Solution Tasks</div>
+        <div class="dp-item">FAI support</div>
+        <div class="dp-item">Check EVT and DVT steps and results</div>
+        <div class="dp-item">Oversee reliability testing</div>
+        <div class="dp-item">Certifications for different markets</div>
+        <div class="dp-item">Test fixture design</div>
+        <div class="dp-item">RFQs — POs — PIs</div>
+      </div>
+      <div class="dp-col">
+        <div class="dp-col-title">DR3 Gate Criteria</div>
+        <div class="dp-item highlight">EVT passed</div>
+        <div class="dp-item highlight">DVT passed</div>
+        <div class="dp-item highlight">FAI signed off</div>
+        <div class="dp-item highlight">Vendor audit complete</div>
+        <div class="dp-item highlight">BOM frozen</div>
+        <div class="dp-item highlight">All certifications obtained</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-factory" class="detail-panel">
+    <div class="dp-header">
+      <div class="dp-dot" style="background:var(--factory)"></div>
+      <div class="dp-title" style="color:var(--factory)">Factory Phase</div>
+      <div class="dp-gate-badge" style="background:var(--factory)">Gates: DR4 · PVT</div>
+    </div>
+    <div class="dp-body">
+      <div class="dp-col">
+        <div class="dp-col-title">Objective</div>
+        <div class="dp-item">Set up and validate production line</div>
+        <div class="dp-item">Run PVT to confirm yield and quality</div>
+        <div class="dp-item">Train operators and confirm SOPs</div>
+        <div class="dp-item">Confirm MP readiness</div>
+      </div>
+      <div class="dp-col">
+        <div class="dp-col-title">Key Deliverables</div>
+        <div class="dp-item">Production SOPs approved</div>
+        <div class="dp-item">Test fixtures validated</div>
+        <div class="dp-item">Operator training verified</div>
+        <div class="dp-item">PVT report — yield targets met</div>
+        <div class="dp-item">QC inline inspection active</div>
+        <div class="dp-item">MP readiness confirmed</div>
+      </div>
+      <div class="dp-col">
+        <div class="dp-col-title">SCM Solution Tasks</div>
+        <div class="dp-item">Check production line SOPs</div>
+        <div class="dp-item">Check PVT results</div>
+        <div class="dp-item">Verify operator training</div>
+        <div class="dp-item">Check capacity</div>
+        <div class="dp-item">Test the production line</div>
+        <div class="dp-item">Determine MP readiness</div>
+      </div>
+      <div class="dp-col">
+        <div class="dp-col-title">DR4 Gate Criteria</div>
+        <div class="dp-item highlight">PVT passed</div>
+        <div class="dp-item highlight">Production SOPs confirmed</div>
+        <div class="dp-item highlight">Operator training verified</div>
+        <div class="dp-item highlight">QC inspection active</div>
+        <div class="dp-item highlight">BOM locked</div>
+        <div class="dp-item highlight">MP readiness sign-off</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-mp" class="detail-panel">
+    <div class="dp-header">
+      <div class="dp-dot" style="background:var(--mp)"></div>
+      <div class="dp-title" style="color:var(--mp)">Mass Production</div>
+      <div class="dp-gate-badge" style="background:var(--mp)">Gate: MP — Ship Product</div>
+    </div>
+    <div class="dp-body">
+      <div class="dp-col">
+        <div class="dp-col-title">Objective</div>
+        <div class="dp-item">Run sustained mass production</div>
+        <div class="dp-item">Monitor quality and yield continuously</div>
+        <div class="dp-item">Manage logistics and shipping</div>
+        <div class="dp-item">Handle failure analysis and improvements</div>
+      </div>
+      <div class="dp-col">
+        <div class="dp-col-title">Key Deliverables</div>
+        <div class="dp-item">MP POs placed and confirmed</div>
+        <div class="dp-item">Production schedule running</div>
+        <div class="dp-item">Yield metrics tracked</div>
+        <div class="dp-item">Final inspection active</div>
+        <div class="dp-item">Logistics and shipping arranged</div>
+        <div class="dp-item">8D failure analysis process active</div>
+      </div>
+      <div class="dp-col">
+        <div class="dp-col-title">SCM Solution Tasks</div>
+        <div class="dp-item">Verify quality processes are working</div>
+        <div class="dp-item">Final inspection of material</div>
+        <div class="dp-item">Logistics and shipping</div>
+        <div class="dp-item">Metrics and 8D reports</div>
+        <div class="dp-item">Optimize production</div>
+        <div class="dp-item">Failure analysis</div>
+      </div>
+      <div class="dp-col">
+        <div class="dp-col-title">Ongoing Requirements</div>
+        <div class="dp-item highlight">Contact log kept current</div>
+        <div class="dp-item highlight">ECOs tracked and communicated</div>
+        <div class="dp-item highlight">Quality issues logged with 8D ref</div>
+        <div class="dp-item highlight">Partner communications documented</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCM Bridge Services -->
+  <div class="bridge-section">
+    <div class="bridge-title">
+      Use <span class="scm">SCM</span> <span class="bridge">BRIDGE</span> for Supply Chain Services
+    </div>
+    <div class="bridge-grid">
+      <div class="bridge-col">
+        <div class="bridge-col-head">Idea</div>
+        <div class="bridge-item">Document review</div>
+        <div class="bridge-item">Get supplier input</div>
+        <div class="bridge-item">Translation</div>
+        <div class="bridge-item">Find factory partners</div>
+      </div>
+      <div class="bridge-col">
+        <div class="bridge-col-head">PoC</div>
+        <div class="bridge-item">Test prototypes</div>
+        <div class="bridge-item">Source components</div>
+        <div class="bridge-item">Engineering services</div>
+        <div class="bridge-item">Off-the-shelf solutions</div>
+      </div>
+      <div class="bridge-col">
+        <div class="bridge-col-head">Design</div>
+        <div class="bridge-item">Support EE, ME, SW teams</div>
+        <div class="bridge-item">BOM costing</div>
+        <div class="bridge-item">Material selection</div>
+        <div class="bridge-item">3rd party checks</div>
+        <div class="bridge-item">FMEA support</div>
+      </div>
+      <div class="bridge-col">
+        <div class="bridge-col-head">Test</div>
+        <div class="bridge-item">FAI support</div>
+        <div class="bridge-item">EVT + DVT oversight</div>
+        <div class="bridge-item">Reliability testing</div>
+        <div class="bridge-item">Certifications</div>
+        <div class="bridge-item">RFQs — POs — PIs</div>
+      </div>
+      <div class="bridge-col">
+        <div class="bridge-col-head">Factory</div>
+        <div class="bridge-item">Production line SOPs</div>
+        <div class="bridge-item">PVT results check</div>
+        <div class="bridge-item">Operator training verify</div>
+        <div class="bridge-item">Capacity checks</div>
+        <div class="bridge-item">MP readiness</div>
+      </div>
+      <div class="bridge-col">
+        <div class="bridge-col-head">MP</div>
+        <div class="bridge-item">Quality verification</div>
+        <div class="bridge-item">Final inspection</div>
+        <div class="bridge-item">Logistics + shipping</div>
+        <div class="bridge-item">Metrics + 8D reports</div>
+        <div class="bridge-item">Failure analysis</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item">
+      <div class="l-diamond"></div>
+      Design Review Gate — must pass to proceed
+    </div>
+    <div class="legend-item">
+      <div class="l-dot" style="background:var(--scm-blue)"></div>
+      Click any phase arrow above to expand details
+    </div>
+    <div class="legend-item">
+      <div class="l-dot" style="background:var(--scm-green)"></div>
+      Green items = gate pass criteria
+    </div>
+    <div class="legend-item">
+      <div class="l-line" style="background:linear-gradient(90deg,var(--scm-blue),var(--scm-green))"></div>
+      Primary development flow
+    </div>
+  </div>
+
+  <!-- Resources -->
+  <div class="resources-section">
+    <div class="resources-title">System Resources</div>
+
+    <div class="resources-group">
+      <div class="resources-group-label">Asset Checklists</div>
+      <div class="resources-grid">
+        <a href="checklists/me-assets.html" class="res-card">
+          <div class="res-icon">⚙️</div>
+          <div class="res-name">ME Asset Checklist</div>
+          <div class="res-desc">CAD files, drawings, STEP exports, supporting docs</div>
+          <div class="res-tag">Checklist</div>
+        </a>
+        <a href="checklists/ee-assets.html" class="res-card">
+          <div class="res-icon">⚡</div>
+          <div class="res-name">EE Asset Checklist</div>
+          <div class="res-desc">Schematics, Gerbers, BOM, CPL, firmware</div>
+          <div class="res-tag">Checklist</div>
+        </a>
+        <a href="checklists/cmf-materials.html" class="res-card">
+          <div class="res-icon">🎨</div>
+          <div class="res-name">CMF & Materials</div>
+          <div class="res-desc">Color, material, finish specs and compliance</div>
+          <div class="res-tag">Checklist</div>
+        </a>
+        <a href="checklists/tooling-molds.html" class="res-card">
+          <div class="res-icon">🔧</div>
+          <div class="res-name">Tooling & Molds</div>
+          <div class="res-desc">Mold design, T1/T2/T3 samples, tool ownership</div>
+          <div class="res-tag">Checklist</div>
+        </a>
+        <a href="checklists/packaging.html" class="res-card">
+          <div class="res-icon">📦</div>
+          <div class="res-name">Packaging Engineering</div>
+          <div class="res-desc">Box, insert, carton, labelling, drop test</div>
+          <div class="res-tag">Checklist</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="resources-group">
+      <div class="resources-group-label">Framework</div>
+      <div class="resources-grid">
+        <a href="tools/workflow.html" class="res-card res-card-tool">
+          <div class="res-icon">🧭</div>
+          <div class="res-name">SCM Bridge Framework</div>
+          <div class="res-desc">End-to-end operational guide — BD pipeline from outreach to client onboard, and PM delivery across all six development phases</div>
+          <div class="res-tag res-tag-tool">Framework</div>
+        </a>
+        <a href="tools/scm-playbook.html" class="res-card res-card-tool">
+          <div class="res-icon">📖</div>
+          <div class="res-name">SCM Bridge Playbook</div>
+          <div class="res-desc">Detailed operational playbook covering BD track, project management track, and service delivery procedures for the full engagement lifecycle</div>
+          <div class="res-tag res-tag-tool">Playbook</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="resources-group">
+      <div class="resources-group-label">Project Tools</div>
+      <div class="resources-grid">
+        <a href="tools/handoff-manifest.html" class="res-card res-card-tool">
+          <div class="res-icon">📋</div>
+          <div class="res-name">Handoff Manifest Builder</div>
+          <div class="res-desc">Select asset packs, log file locations, export manifest for CM / ODM</div>
+          <div class="res-tag res-tag-tool">Tool</div>
+        </a>
+        <a href="tools/project-asset-registry.html" class="res-card res-card-tool">
+          <div class="res-icon">🗂️</div>
+          <div class="res-name">Project Asset Registry</div>
+          <div class="res-desc">Central index of all project files across vendors, clients and storage locations</div>
+          <div class="res-tag res-tag-tool">Tool</div>
+        </a>
+        <a href="tools/chinese-srs.html" class="res-card res-card-tool">
+          <div class="res-icon">🇨🇳</div>
+          <div class="res-name">Chinese SCM Reference</div>
+          <div class="res-desc">Supply chain vocabulary in Traditional &amp; Simplified Chinese — for working with suppliers and factories</div>
+          <div class="res-tag res-tag-tool">Reference</div>
+        </a>
+        <a href="tools/odoo-playbook.html" class="res-card res-card-tool">
+          <div class="res-icon">🛠️</div>
+          <div class="res-name">Odoo Playbook</div>
+          <div class="res-desc">Known gaps, automation backlog, and implementation guidance for the SCM Bridge OS Odoo instance</div>
+          <div class="res-tag res-tag-tool">Playbook</div>
+        </a>
+        <a href="tools/scm-dashboard-v3.html" class="res-card res-card-tool">
+          <div class="res-icon">📊</div>
+          <div class="res-name">Operations Dashboard</div>
+          <div class="res-desc">Live operations view — project status, metrics, and supply chain activity at a glance</div>
+          <div class="res-tag res-tag-tool">Dashboard</div>
+        </a>
+        <a href="tools/factory-audit.html" class="res-card res-card-tool">
+          <div class="res-icon">🏭</div>
+          <div class="res-name">Factory Audit App</div>
+          <div class="res-desc">Structured onsite audit platform with guided prompts, scoring, and exportable audit reports</div>
+          <div class="res-tag res-tag-tool">Tool</div>
+        </a>
+        <a href="tools/fqc-photo-audit.html" class="res-card res-card-tool">
+          <div class="res-icon">📷</div>
+          <div class="res-name">FQC Photo Audit</div>
+          <div class="res-desc">ISO 2859-1 AQL inspection app — customisable test templates, per-unit photo capture, defect logging, and exportable FQC reports. Supports multiple photos per slot and session save/resume</div>
+          <div class="res-tag res-tag-tool">Tool</div>
+        </a>
+        <a href="tools/factory-visit-report.html" class="res-card res-card-tool">
+          <div class="res-icon">📋</div>
+          <div class="res-name">Factory Visit Report</div>
+          <div class="res-desc">Document supplier visits — capabilities, QC, observations, fit assessment, and action items — then export a print-ready report</div>
+          <div class="res-tag res-tag-tool">Tool</div>
+        </a>
+        <a href="tools/project-brief.html" class="res-card res-card-tool">
+          <div class="res-icon">📋</div>
+          <div class="res-name">Project Brief</div>
+          <div class="res-desc">Build a structured product brief for factory outreach — process, materials, volumes, timeline, and a clear "what we need from you" response checklist</div>
+          <div class="res-tag res-tag-tool">Template</div>
+        </a>
+        <a href="tools/trd-template.html" class="res-card res-card-tool">
+          <div class="res-icon">📐</div>
+          <div class="res-name">TRD</div>
+          <div class="res-desc">Technical Requirements Document — capture functional requirements, mechanical, electrical, environmental, and compliance specs. Billable deliverable SCM creates with or for the client</div>
+          <div class="res-tag res-tag-tool">Template</div>
+        </a>
+        <a href="tools/supplier-pipeline.html" class="res-card res-card-tool">
+          <div class="res-icon">🔍</div>
+          <div class="res-name">Supplier Pipeline</div>
+          <div class="res-desc">Track factory sourcing from identified to selected — funnel view, stage tracking, RFI/RFQ status, and effort estimates per project</div>
+          <div class="res-tag res-tag-tool">Tool</div>
+        </a>
+        <a href="tools/rfi-template.html" class="res-card res-card-tool">
+          <div class="res-icon">📨</div>
+          <div class="res-name">RFI Template</div>
+          <div class="res-desc">Send structured capability requests to new factories — capabilities, certifications, MOQ, capacity, and references in one form</div>
+          <div class="res-tag res-tag-tool">Template</div>
+        </a>
+        <a href="tools/rfq-template.html" class="res-card res-card-tool">
+          <div class="res-icon">💰</div>
+          <div class="res-name">RFQ Template</div>
+          <div class="res-desc">Request tiered unit pricing, tooling/NRE costs, sample costs, and production terms — export a print-ready quotation request</div>
+          <div class="res-tag res-tag-tool">Template</div>
+        </a>
+        <a href="tools/fabric-techpack.html" class="res-card res-card-tool">
+          <div class="res-icon">🧵</div>
+          <div class="res-name">Tech Pack</div>
+          <div class="res-desc">Build soft goods technical specification documents — fabric specs, construction callouts, schedule, POM, CMF, and BOM — export as print-ready PDF</div>
+          <div class="res-tag res-tag-tool">Template</div>
+        </a>
+        <a href="tools/project-report.html" class="res-card res-card-tool">
+          <div class="res-icon">📄</div>
+          <div class="res-name">Project Report</div>
+          <div class="res-desc">Build and export structured project status reports for clients and stakeholders</div>
+          <div class="res-tag res-tag-tool">Tool</div>
+        </a>
+        <a href="tools/nda-template.html" class="res-card res-card-tool">
+          <div class="res-icon">🤝</div>
+          <div class="res-name">Mutual NDA Template</div>
+          <div class="res-desc">Standard mutual NDA for SCM Solution Ltd. — fill in counterparty, print or save as PDF</div>
+          <div class="res-tag res-tag-tool">Template</div>
+        </a>
+        <a href="tools/sow-template.html" class="res-card res-card-tool">
+          <div class="res-icon">📋</div>
+          <div class="res-name">SOW Template</div>
+          <div class="res-desc">Build a client-ready Statement of Work — deliverables, milestones, investment, and signature block</div>
+          <div class="res-tag res-tag-tool">Template</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="resources-group">
+      <div class="resources-group-label">Coming Soon</div>
+      <div class="resources-grid">
+        <div class="res-card res-card-soon">
+          <div class="res-icon">🚦</div>
+          <div class="res-name">Gate Checklists DR0–DR4</div>
+          <div class="res-desc">Design review gate pass/fail criteria per phase</div>
+          <div class="res-tag res-tag-soon">Checklist</div>
+        </div>
+        <div class="res-card res-card-soon">
+          <div class="res-icon">📄</div>
+          <div class="res-name">MRD Template</div>
+          <div class="res-desc">Market Requirements Document</div>
+          <div class="res-tag res-tag-soon">Template</div>
+        </div>
+        <div class="res-card res-card-soon">
+          <div class="res-icon">📄</div>
+          <div class="res-name">PRD Template</div>
+          <div class="res-desc">Product Requirements Document</div>
+          <div class="res-tag res-tag-soon">Template</div>
+        </div>
+        <div class="res-card res-card-soon">
+          <div class="res-icon">🏭</div>
+          <div class="res-name">Manufacturer Matrix</div>
+          <div class="res-desc">Aggregate factory visit and audit data — side-by-side capability comparison across suppliers</div>
+          <div class="res-tag res-tag-soon">Tool</div>
+        </div>
+        <div class="res-card res-card-soon">
+          <div class="res-icon">🔬</div>
+          <div class="res-name">Sample Tracker</div>
+          <div class="res-desc">T1 / T2 / Golden Sample workflow with dual sign-off and approval status tracking</div>
+          <div class="res-tag res-tag-soon">Tool</div>
+        </div>
+        <div class="res-card res-card-soon">
+          <div class="res-icon">✅</div>
+          <div class="res-name">Compliance Tracker</div>
+          <div class="res-desc">CE, FCC, RoHS, REACH per target market</div>
+          <div class="res-tag res-tag-soon">Tracker</div>
+        </div>
+        <div class="res-card res-card-soon">
+          <div class="res-icon">🔁</div>
+          <div class="res-name">Revision Control SOP</div>
+          <div class="res-desc">File naming, versioning, and release process</div>
+          <div class="res-tag res-tag-soon">SOP</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>SCM Solution LTD. — SCM Bridge OS</span>
+    <span>© 2025 · Rev 1.0</span>
+  </footer>
+
 </div>
-
-<div id="panel-poc" class="phase-detail">
-  <div class="pd-inner">
-    <div class="pd-header">
-      <div class="pd-dot dot-poc"></div>
-      <div class="pd-title ph-poc">Proof of Concept Phase</div>
-      <div class="pd-badge bg-poc">Gate: DR1 — Preliminary Design Review</div>
-    </div>
-    <div class="pd-cols">
-      <div>
-        <div class="pd-col-title">Objective</div>
-        <div class="pd-item">Reduce technical and market risk</div>
-        <div class="pd-item">Validate core technology works</div>
-        <div class="pd-item">Explore off-the-shelf solutions</div>
-        <div class="pd-item">Lock architecture before full design</div>
-      </div>
-      <div>
-        <div class="pd-col-title">Key Deliverables</div>
-        <div class="pd-item">Market validation complete</div>
-        <div class="pd-item">System interface diagram</div>
-        <div class="pd-item">Non-form-factor PoC sample built</div>
-        <div class="pd-item">PRD drafted internally</div>
-        <div class="pd-item">Preliminary BOM drafted</div>
-        <div class="pd-item">Long-lead items flagged</div>
-      </div>
-      <div>
-        <div class="pd-col-title">SCM Solution Tasks</div>
-        <div class="pd-item">Test prototypes</div>
-        <div class="pd-item">Source components and engineering services</div>
-        <div class="pd-item">Explore off-the-shelf solutions</div>
-      </div>
-      <div>
-        <div class="pd-col-title">DR1 Gate Criteria</div>
-        <div class="pd-item pass">PoC sample built and tested</div>
-        <div class="pd-item pass">Market validation done</div>
-        <div class="pd-item pass">PRD approved internally</div>
-        <div class="pd-item pass">Preliminary BOM drafted</div>
-        <div class="pd-item pass">Factory partners confirmed</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="panel-design" class="phase-detail">
-  <div class="pd-inner">
-    <div class="pd-header">
-      <div class="pd-dot dot-design"></div>
-      <div class="pd-title ph-design">Design Phase</div>
-      <div class="pd-badge bg-design">Gate: DR2 — Critical Design Review</div>
-    </div>
-    <div class="pd-cols">
-      <div>
-        <div class="pd-col-title">Objective</div>
-        <div class="pd-item">Complete all ME and EE design</div>
-        <div class="pd-item">Release all engineering drawings</div>
-        <div class="pd-item">Get DFM feedback from partners</div>
-        <div class="pd-item">Prepare manufacturer-ready file packages</div>
-      </div>
-      <div>
-        <div class="pd-col-title">Key Deliverables</div>
-        <div class="pd-item">ME asset checklist signed off</div>
-        <div class="pd-item">EE asset checklist signed off</div>
-        <div class="pd-item">TRD compiled</div>
-        <div class="pd-item">DFM feedback incorporated</div>
-        <div class="pd-item">Handoff manifests prepared</div>
-        <div class="pd-item">Master BOM with MPNs</div>
-      </div>
-      <div>
-        <div class="pd-col-title">SCM Solution Tasks</div>
-        <div class="pd-item">Support ME, EE, SW, packaging design teams</div>
-        <div class="pd-item">BOM costing</div>
-        <div class="pd-item">Material selection</div>
-        <div class="pd-item">3rd party checks</div>
-        <div class="pd-item">FMEA support</div>
-      </div>
-      <div>
-        <div class="pd-col-title">DR2 Gate Criteria</div>
-        <div class="pd-item pass">ME + EE checklists signed off</div>
-        <div class="pd-item pass">All drawings released</div>
-        <div class="pd-item pass">TRD reviewed and approved</div>
-        <div class="pd-item pass">DFM feedback incorporated</div>
-        <div class="pd-item pass">IP review complete</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="panel-test" class="phase-detail">
-  <div class="pd-inner">
-    <div class="pd-header">
-      <div class="pd-dot dot-test"></div>
-      <div class="pd-title ph-test">Test Phase</div>
-      <div class="pd-badge bg-test">Gates: DR3 · EVT · DVT</div>
-    </div>
-    <div class="pd-cols">
-      <div>
-        <div class="pd-col-title">Objective</div>
-        <div class="pd-item">Send file packages to CM and ODM</div>
-        <div class="pd-item">Build and test first physical prototypes</div>
-        <div class="pd-item">Validate design against all requirements</div>
-        <div class="pd-item">Complete First Article Inspection</div>
-      </div>
-      <div>
-        <div class="pd-col-title">Key Deliverables</div>
-        <div class="pd-item">CM + ODM packages sent with manifests</div>
-        <div class="pd-item">EVT report — pass/fail</div>
-        <div class="pd-item">DVT report — reliability + regulatory</div>
-        <div class="pd-item">FAI report signed off</div>
-        <div class="pd-item">Vendor audit complete</div>
-        <div class="pd-item">Certifications submitted</div>
-      </div>
-      <div>
-        <div class="pd-col-title">SCM Solution Tasks</div>
-        <div class="pd-item">FAI support</div>
-        <div class="pd-item">Check EVT and DVT steps and results</div>
-        <div class="pd-item">Oversee reliability testing</div>
-        <div class="pd-item">Certifications for different markets</div>
-        <div class="pd-item">Test fixture design</div>
-        <div class="pd-item">RFQs — POs — PIs</div>
-      </div>
-      <div>
-        <div class="pd-col-title">DR3 Gate Criteria</div>
-        <div class="pd-item pass">EVT passed</div>
-        <div class="pd-item pass">DVT passed</div>
-        <div class="pd-item pass">FAI signed off</div>
-        <div class="pd-item pass">Vendor audit complete</div>
-        <div class="pd-item pass">BOM frozen</div>
-        <div class="pd-item pass">All certifications obtained</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="panel-factory" class="phase-detail">
-  <div class="pd-inner">
-    <div class="pd-header">
-      <div class="pd-dot dot-factory"></div>
-      <div class="pd-title ph-factory">Factory Phase</div>
-      <div class="pd-badge bg-factory">Gates: DR4 · PVT</div>
-    </div>
-    <div class="pd-cols">
-      <div>
-        <div class="pd-col-title">Objective</div>
-        <div class="pd-item">Set up and validate production line</div>
-        <div class="pd-item">Run PVT to confirm yield and quality</div>
-        <div class="pd-item">Train operators and confirm SOPs</div>
-        <div class="pd-item">Confirm MP readiness</div>
-      </div>
-      <div>
-        <div class="pd-col-title">Key Deliverables</div>
-        <div class="pd-item">Production SOPs approved</div>
-        <div class="pd-item">Test fixtures validated</div>
-        <div class="pd-item">Operator training verified</div>
-        <div class="pd-item">PVT report — yield targets met</div>
-        <div class="pd-item">QC inline inspection active</div>
-        <div class="pd-item">MP readiness confirmed</div>
-      </div>
-      <div>
-        <div class="pd-col-title">SCM Solution Tasks</div>
-        <div class="pd-item">Check production line SOPs</div>
-        <div class="pd-item">Check PVT results</div>
-        <div class="pd-item">Verify operator training</div>
-        <div class="pd-item">Check capacity</div>
-        <div class="pd-item">Test the production line</div>
-        <div class="pd-item">Determine MP readiness</div>
-      </div>
-      <div>
-        <div class="pd-col-title">DR4 Gate Criteria</div>
-        <div class="pd-item pass">PVT passed</div>
-        <div class="pd-item pass">Production SOPs confirmed</div>
-        <div class="pd-item pass">Operator training verified</div>
-        <div class="pd-item pass">QC inspection active</div>
-        <div class="pd-item pass">BOM locked</div>
-        <div class="pd-item pass">MP readiness sign-off</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="panel-mp" class="phase-detail">
-  <div class="pd-inner">
-    <div class="pd-header">
-      <div class="pd-dot dot-mp"></div>
-      <div class="pd-title ph-mp">Mass Production</div>
-      <div class="pd-badge bg-mp">Gate: MP — Ship Product</div>
-    </div>
-    <div class="pd-cols">
-      <div>
-        <div class="pd-col-title">Objective</div>
-        <div class="pd-item">Run sustained mass production</div>
-        <div class="pd-item">Monitor quality and yield continuously</div>
-        <div class="pd-item">Manage logistics and shipping</div>
-        <div class="pd-item">Handle failure analysis and improvements</div>
-      </div>
-      <div>
-        <div class="pd-col-title">Key Deliverables</div>
-        <div class="pd-item">MP POs placed and confirmed</div>
-        <div class="pd-item">Production schedule running</div>
-        <div class="pd-item">Yield metrics tracked</div>
-        <div class="pd-item">Final inspection active</div>
-        <div class="pd-item">Logistics and shipping arranged</div>
-        <div class="pd-item">8D failure analysis process active</div>
-      </div>
-      <div>
-        <div class="pd-col-title">SCM Solution Tasks</div>
-        <div class="pd-item">Verify quality processes are working</div>
-        <div class="pd-item">Final inspection of material</div>
-        <div class="pd-item">Logistics and shipping</div>
-        <div class="pd-item">Metrics and 8D reports</div>
-        <div class="pd-item">Optimize production</div>
-        <div class="pd-item">Failure analysis</div>
-      </div>
-      <div>
-        <div class="pd-col-title">Ongoing Requirements</div>
-        <div class="pd-item pass">Contact log kept current</div>
-        <div class="pd-item pass">ECOs tracked and communicated</div>
-        <div class="pd-item pass">Quality issues logged with 8D ref</div>
-        <div class="pd-item pass">Partner communications documented</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ── SERVICES BAND ───────────────────────────────────────── -->
-<section class="services-band" id="services">
-  <div class="services-inner">
-    <div class="band-eyebrow">Supply Chain Services</div>
-    <div class="band-title">What SCM Bridge Does Per Phase</div>
-    <div class="srv-grid">
-      <div class="srv-col">
-        <div class="srv-head">Idea</div>
-        <div class="srv-item">Document review</div>
-        <div class="srv-item">Get supplier input</div>
-        <div class="srv-item">Translation</div>
-        <div class="srv-item">Find factory partners</div>
-      </div>
-      <div class="srv-col">
-        <div class="srv-head">PoC</div>
-        <div class="srv-item">Test prototypes</div>
-        <div class="srv-item">Source components</div>
-        <div class="srv-item">Engineering services</div>
-        <div class="srv-item">Off-the-shelf solutions</div>
-      </div>
-      <div class="srv-col">
-        <div class="srv-head">Design</div>
-        <div class="srv-item">Support EE, ME, SW teams</div>
-        <div class="srv-item">BOM costing</div>
-        <div class="srv-item">Material selection</div>
-        <div class="srv-item">3rd party checks</div>
-        <div class="srv-item">FMEA support</div>
-      </div>
-      <div class="srv-col">
-        <div class="srv-head">Test</div>
-        <div class="srv-item">FAI support</div>
-        <div class="srv-item">EVT + DVT oversight</div>
-        <div class="srv-item">Reliability testing</div>
-        <div class="srv-item">Certifications</div>
-        <div class="srv-item">RFQs — POs — PIs</div>
-      </div>
-      <div class="srv-col">
-        <div class="srv-head">Factory</div>
-        <div class="srv-item">Production line SOPs</div>
-        <div class="srv-item">PVT results check</div>
-        <div class="srv-item">Operator training verify</div>
-        <div class="srv-item">Capacity checks</div>
-        <div class="srv-item">MP readiness</div>
-      </div>
-      <div class="srv-col">
-        <div class="srv-head">MP</div>
-        <div class="srv-item">Quality verification</div>
-        <div class="srv-item">Final inspection</div>
-        <div class="srv-item">Logistics + shipping</div>
-        <div class="srv-item">Metrics + 8D reports</div>
-        <div class="srv-item">Failure analysis</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── TOOLS & RESOURCES ───────────────────────────────────── -->
-<main class="main" id="tools">
-
-  <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat-cell">
-      <div class="stat-num">6</div>
-      <div class="stat-lbl">Dev Phases</div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-num">20+</div>
-      <div class="stat-lbl">Field Tools</div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-num">5</div>
-      <div class="stat-lbl">Asset Checklists</div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-num">4</div>
-      <div class="stat-lbl">Design Review Gates</div>
-    </div>
-  </div>
-
-  <!-- Framework -->
-  <div class="rg">
-    <div class="rg-label">Framework</div>
-    <div class="fw-grid">
-      <a href="tools/workflow.html" class="tool-card">
-        <div class="tc-icon">🧭</div>
-        <div class="tc-name">SCM Bridge Framework</div>
-        <div class="tc-desc">End-to-end operational guide — BD pipeline from outreach to client onboard, and PM delivery across all six development phases</div>
-        <span class="tc-tag">Framework</span>
-      </a>
-      <a href="tools/scm-playbook.html" class="tool-card">
-        <div class="tc-icon">📖</div>
-        <div class="tc-name">SCM Bridge Playbook</div>
-        <div class="tc-desc">Detailed operational playbook covering BD track, project management track, and service delivery procedures for the full engagement lifecycle</div>
-        <span class="tc-tag">Playbook</span>
-      </a>
-    </div>
-  </div>
-
-  <!-- Asset Checklists -->
-  <div class="rg">
-    <div class="rg-label">Asset Checklists</div>
-    <div class="checklist-grid">
-      <a href="checklists/me-assets.html" class="tool-card cl-card">
-        <div class="tc-icon">⚙️</div>
-        <div class="tc-name">ME Asset Checklist</div>
-        <div class="tc-desc">CAD files, drawings, STEP exports, supporting docs</div>
-        <span class="tc-tag tc-tag-blue">Checklist</span>
-      </a>
-      <a href="checklists/ee-assets.html" class="tool-card cl-card">
-        <div class="tc-icon">⚡</div>
-        <div class="tc-name">EE Asset Checklist</div>
-        <div class="tc-desc">Schematics, Gerbers, BOM, CPL, firmware</div>
-        <span class="tc-tag tc-tag-blue">Checklist</span>
-      </a>
-      <a href="checklists/cmf-materials.html" class="tool-card cl-card">
-        <div class="tc-icon">🎨</div>
-        <div class="tc-name">CMF &amp; Materials</div>
-        <div class="tc-desc">Color, material, finish specs and compliance</div>
-        <span class="tc-tag tc-tag-blue">Checklist</span>
-      </a>
-      <a href="checklists/tooling-molds.html" class="tool-card cl-card">
-        <div class="tc-icon">🔧</div>
-        <div class="tc-name">Tooling &amp; Molds</div>
-        <div class="tc-desc">Mold design, T1/T2/T3 samples, tool ownership</div>
-        <span class="tc-tag tc-tag-blue">Checklist</span>
-      </a>
-      <a href="checklists/packaging.html" class="tool-card cl-card">
-        <div class="tc-icon">📦</div>
-        <div class="tc-name">Packaging Engineering</div>
-        <div class="tc-desc">Box, insert, carton, labelling, drop test</div>
-        <span class="tc-tag tc-tag-blue">Checklist</span>
-      </a>
-    </div>
-  </div>
-
-  <!-- Project Tools -->
-  <div class="rg">
-    <div class="rg-label">Project Tools</div>
-    <div class="tool-grid">
-      <a href="tools/fqc-photo-audit.html" class="tool-card">
-        <div class="tc-icon">📷</div>
-        <div class="tc-name">FQC Photo Audit</div>
-        <div class="tc-desc">ISO 2859-1 AQL inspection app — customisable test templates, per-unit photo capture, defect logging, and exportable FQC reports</div>
-        <span class="tc-tag">Tool</span>
-      </a>
-      <a href="tools/factory-audit.html" class="tool-card">
-        <div class="tc-icon">🏭</div>
-        <div class="tc-name">Factory Audit App</div>
-        <div class="tc-desc">Structured onsite audit platform with guided prompts, scoring, and exportable audit reports</div>
-        <span class="tc-tag">Tool</span>
-      </a>
-      <a href="tools/factory-visit-report.html" class="tool-card">
-        <div class="tc-icon">📋</div>
-        <div class="tc-name">Factory Visit Report</div>
-        <div class="tc-desc">Document supplier visits — capabilities, QC, observations, fit assessment, and action items — then export a print-ready report</div>
-        <span class="tc-tag">Tool</span>
-      </a>
-      <a href="tools/supplier-pipeline.html" class="tool-card">
-        <div class="tc-icon">🔍</div>
-        <div class="tc-name">Supplier Pipeline</div>
-        <div class="tc-desc">Track factory sourcing from identified to selected — funnel view, stage tracking, RFI/RFQ status, and effort estimates per project</div>
-        <span class="tc-tag">Tool</span>
-      </a>
-      <a href="tools/scm-dashboard-v3.html" class="tool-card">
-        <div class="tc-icon">📊</div>
-        <div class="tc-name">Operations Dashboard</div>
-        <div class="tc-desc">Live operations view — project status, metrics, and supply chain activity at a glance</div>
-        <span class="tc-tag">Dashboard</span>
-      </a>
-      <a href="tools/handoff-manifest.html" class="tool-card">
-        <div class="tc-icon">📋</div>
-        <div class="tc-name">Handoff Manifest Builder</div>
-        <div class="tc-desc">Select asset packs, log file locations, export manifest for CM / ODM</div>
-        <span class="tc-tag">Tool</span>
-      </a>
-      <a href="tools/project-asset-registry.html" class="tool-card">
-        <div class="tc-icon">🗂️</div>
-        <div class="tc-name">Project Asset Registry</div>
-        <div class="tc-desc">Central index of all project files across vendors, clients and storage locations</div>
-        <span class="tc-tag">Tool</span>
-      </a>
-      <a href="tools/project-brief.html" class="tool-card">
-        <div class="tc-icon">📋</div>
-        <div class="tc-name">Project Brief</div>
-        <div class="tc-desc">Build a structured product brief for factory outreach — process, materials, volumes, timeline, and a clear response checklist</div>
-        <span class="tc-tag">Tool</span>
-      </a>
-      <a href="tools/project-report.html" class="tool-card">
-        <div class="tc-icon">📄</div>
-        <div class="tc-name">Project Report</div>
-        <div class="tc-desc">Build and export structured project status reports for clients and stakeholders</div>
-        <span class="tc-tag">Tool</span>
-      </a>
-    </div>
-  </div>
-
-  <!-- Templates -->
-  <div class="rg">
-    <div class="rg-label">Templates</div>
-    <div class="tool-grid">
-      <a href="tools/trd-template.html" class="tool-card">
-        <div class="tc-icon">📐</div>
-        <div class="tc-name">TRD</div>
-        <div class="tc-desc">Technical Requirements Document — functional, mechanical, electrical, environmental, and compliance specs. Billable deliverable SCM creates with or for the client</div>
-        <span class="tc-tag">Template</span>
-      </a>
-      <a href="tools/rfi-template.html" class="tool-card">
-        <div class="tc-icon">📨</div>
-        <div class="tc-name">RFI Template</div>
-        <div class="tc-desc">Send structured capability requests to new factories — capabilities, certifications, MOQ, capacity, and references in one form</div>
-        <span class="tc-tag">Template</span>
-      </a>
-      <a href="tools/rfq-template.html" class="tool-card">
-        <div class="tc-icon">💰</div>
-        <div class="tc-name">RFQ Template</div>
-        <div class="tc-desc">Request tiered unit pricing, tooling/NRE costs, sample costs, and production terms — export a print-ready quotation request</div>
-        <span class="tc-tag">Template</span>
-      </a>
-      <a href="tools/fabric-techpack.html" class="tool-card">
-        <div class="tc-icon">🧵</div>
-        <div class="tc-name">Tech Pack</div>
-        <div class="tc-desc">Build soft goods technical specification documents — fabric specs, construction callouts, schedule, POM, CMF, and BOM</div>
-        <span class="tc-tag">Template</span>
-      </a>
-      <a href="tools/nda-template.html" class="tool-card">
-        <div class="tc-icon">🤝</div>
-        <div class="tc-name">Mutual NDA</div>
-        <div class="tc-desc">Standard mutual NDA for SCM Solution Ltd. — fill in counterparty, print or save as PDF</div>
-        <span class="tc-tag">Template</span>
-      </a>
-      <a href="tools/sow-template.html" class="tool-card">
-        <div class="tc-icon">📋</div>
-        <div class="tc-name">SOW Template</div>
-        <div class="tc-desc">Build a client-ready Statement of Work — deliverables, milestones, investment, and signature block</div>
-        <span class="tc-tag">Template</span>
-      </a>
-    </div>
-  </div>
-
-  <!-- Reference -->
-  <div class="rg">
-    <div class="rg-label">Reference</div>
-    <div class="fw-grid">
-      <a href="tools/chinese-srs.html" class="tool-card">
-        <div class="tc-icon">🇨🇳</div>
-        <div class="tc-name">Chinese SCM Reference</div>
-        <div class="tc-desc">Supply chain vocabulary in Traditional &amp; Simplified Chinese — for working with suppliers and factories</div>
-        <span class="tc-tag tc-tag-blue">Reference</span>
-      </a>
-      <a href="tools/odoo-playbook.html" class="tool-card">
-        <div class="tc-icon">🛠️</div>
-        <div class="tc-name">Odoo Playbook</div>
-        <div class="tc-desc">Known gaps, automation backlog, and implementation guidance for the SCM Bridge OS Odoo instance</div>
-        <span class="tc-tag tc-tag-blue">Playbook</span>
-      </a>
-    </div>
-  </div>
-
-  <!-- Coming Soon -->
-  <div class="rg">
-    <div class="rg-label">Coming Soon</div>
-    <div class="soon-grid">
-      <div class="tool-card soon">
-        <div class="tc-icon">🚦</div>
-        <div class="tc-name">Gate Checklists DR0–DR4</div>
-        <div class="tc-desc">Design review gate pass/fail criteria per phase</div>
-        <span class="tc-tag tc-tag-muted">Checklist</span>
-      </div>
-      <div class="tool-card soon">
-        <div class="tc-icon">📄</div>
-        <div class="tc-name">MRD Template</div>
-        <div class="tc-desc">Market Requirements Document</div>
-        <span class="tc-tag tc-tag-muted">Template</span>
-      </div>
-      <div class="tool-card soon">
-        <div class="tc-icon">📄</div>
-        <div class="tc-name">PRD Template</div>
-        <div class="tc-desc">Product Requirements Document</div>
-        <span class="tc-tag tc-tag-muted">Template</span>
-      </div>
-      <div class="tool-card soon">
-        <div class="tc-icon">🏭</div>
-        <div class="tc-name">Manufacturer Matrix</div>
-        <div class="tc-desc">Side-by-side factory capability comparison from visit and audit data</div>
-        <span class="tc-tag tc-tag-muted">Tool</span>
-      </div>
-      <div class="tool-card soon">
-        <div class="tc-icon">🔬</div>
-        <div class="tc-name">Sample Tracker</div>
-        <div class="tc-desc">T1 / T2 / Golden Sample workflow with dual sign-off and approval status tracking</div>
-        <span class="tc-tag tc-tag-muted">Tool</span>
-      </div>
-      <div class="tool-card soon">
-        <div class="tc-icon">✅</div>
-        <div class="tc-name">Compliance Tracker</div>
-        <div class="tc-desc">CE, FCC, RoHS, REACH per target market</div>
-        <span class="tc-tag tc-tag-muted">Tracker</span>
-      </div>
-      <div class="tool-card soon">
-        <div class="tc-icon">🔁</div>
-        <div class="tc-name">Revision Control SOP</div>
-        <div class="tc-desc">File naming, versioning, and release process</div>
-        <span class="tc-tag tc-tag-muted">SOP</span>
-      </div>
-    </div>
-  </div>
-
-</main>
-
-<!-- ── FOOTER ──────────────────────────────────────────────── -->
-<footer class="page-footer">
-  <div class="footer-inner">
-    <span class="footer-brand">SCM Bridge OS</span>
-    <span>SCM Solution LTD · © 2025 · Rev 1.1</span>
-  </div>
-</footer>
 
 <script>
-function togglePanel(phase) {
-  var panel = document.getElementById('panel-' + phase);
-  var tab   = document.querySelector('[data-phase="' + phase + '"]');
-  var isOpen = panel.classList.contains('open');
+  function togglePanel(phase) {
+    const panel = document.getElementById('panel-' + phase);
+    const arrow = document.querySelector('[data-phase="' + phase + '"]');
+    const isOpen = panel.classList.contains('open');
 
-  document.querySelectorAll('.phase-detail').forEach(function(p) { p.classList.remove('open'); });
-  document.querySelectorAll('.pt').forEach(function(t) { t.classList.remove('active'); });
+    // Close all
+    document.querySelectorAll('.detail-panel').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.phase-arrow').forEach(a => a.classList.remove('active'));
 
-  if (!isOpen) {
-    panel.classList.add('open');
-    tab.classList.add('active');
-    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // Open clicked if it was closed
+    if (!isOpen) {
+      panel.classList.add('open');
+      arrow.classList.add('active');
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }
-}
 </script>
 </body>
 </html>
